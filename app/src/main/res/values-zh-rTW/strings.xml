@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">土撥鼠獵人</string>
+
+    <string name="start_string">開始</string>
+    <string name="pause_string">暫停</string>
+    <string name="resume_string">恢復</string>
+    <string name="newGame_string">新遊戲</string>
+    <string name="quit_string">離開</string>
+    <string name="begin_string">按開始按鈕啟動</string>
+    <string name="gameOver_string">你失敗了.\n重玩?</string>
+    <string name="win_string">你贏了.\n重玩?</string>
+    <string name="cancelStr">取消</string>
+    <string name="submitStr">送出</string>
+    <string name="nameStr">輸入你的名字</string>
+    <string name="yesStr">是</string>
+    <string name="noStr">否</string>
+
+    <string name="top_10_score_str">前10名最高分</string>        <!-- for menu item -->
+    <string name="activity_top_10_score">前10名最高分</string>   <!-- for activity name -->
+    <string name="top_10_score_title">前10名最高分</string>      <!-- for title of list view -->
+
+    <string name="score_history">歷史分數</string>                    <!-- for menu item -->
+    <string name="activity_score_history">歷史分數</string>    <!-- for activity name -->
+    <string name="score_history_title">歷史分數</string>              <!-- for title of list view -->
+</resources>
