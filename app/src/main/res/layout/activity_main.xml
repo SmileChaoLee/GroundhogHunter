@@ -30,11 +30,54 @@
 
     <LinearLayout
         android:id="@+id/buttonLinearLayout"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintHeight_percent="0.1"
-        app:layout_constraintTop_toBottomOf="@id/gameAreaGridLayout">
+        app:layout_constraintTop_toBottomOf="@id/gameAreaGridLayout"
+        android:weightSum="3">
+
+        <ImageButton
+            android:id="@+id/gameControlButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent">
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/newGameButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent">
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/quitGameButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent">
+        </ImageButton>
 
     </LinearLayout>
 

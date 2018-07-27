@@ -1,11 +1,19 @@
 <resources>
     <string name="app_name">GroundhogHunter</string>
 
-    <string name="start_string">Start</string>
-    <string name="pause_string">Pause</string>
-    <string name="resume_string">Resume</string>
-    <string name="newGame_string">New Game</string>
-    <string name="quit_string">Quit</string>
+    <string-array name="stageLevels">
+        <item>Start</item>
+        <item>Stage 1</item>
+        <item>Stage 2</item>
+        <item>Stage 3</item>
+        <item>Stage 4</item>
+    </string-array>
+
+    <string name="start_game_string">Start</string>
+    <string name="pause_game_string">Pause</string>
+    <string name="resume_game_string">Resume</string>
+    <string name="new_game_string">New</string>
+    <string name="quit_game_string">Quit</string>
     <string name="begin_string">Start button to begin</string>
     <string name="gameOver_string">You failed.\nReplay?</string>
     <string name="win_string">You won.\nReplay?</string>
