@@ -1,5 +1,6 @@
 package com.smile.groundhoghunter;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -10,14 +11,28 @@ import android.provider.CalendarContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
+
+    // private properties
+    private final String TAG = new String("com.smile.groundhoghunter.MainActivity");
+    private int rowNum;
+    private int colNum;
+
+    // default properties (package modifiers)
+    boolean gamePause = false;
+    Handler activityHandler = null;
+
+
+    // public properties
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,10 +43,14 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        gamePause = false;
+        activityHandler = new Handler();
+
+        FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
         // game view area
         GridLayout gameGrid = findViewById(R.id.gameAreaGridLayout);
-        int rowNum = gameGrid.getRowCount();
-        int colNum = gameGrid.getColumnCount();
+        rowNum = gameGrid.getRowCount();
+        colNum = gameGrid.getColumnCount();
         for (int i=0; i<rowNum; i++) {
             GridLayout.Spec rowSpec = GridLayout.spec(i, 1, 1);
             for (int j=0; j<colNum; j++) {
@@ -50,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
                 gameGrid.addView(imageView, index, glP);
             }
         }
+
+        GameView gameView = new GameView(this);
+        Log.i(TAG, "gameView created.");
+        gameFrameLayout.addView(gameView);
 
         // buttons for start game, new game, quit game
         String startGameStr = getString(R.string.start_game_string);
@@ -118,6 +141,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        System.out.println("onResume() is called.");
+
+        synchronized (activityHandler) {
+            gamePause = false;
+            activityHandler.notifyAll();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        System.out.println("onPause() is called.");
+
+        synchronized (activityHandler) {
+            gamePause = true;
+        }
+        // super.onPause();
+    }
+
+    @Override
     public void onDestroy() {
         // release and destroy threads and resources before destroy activity
 
@@ -145,5 +190,14 @@ public class MainActivity extends AppCompatActivity {
         // release resources and threads
         // gameView.releaseSynchronizings();
         // gameView.stopThreads();
+    }
+
+    // public methods
+    public int getRowNum() {
+        return rowNum;
+    }
+
+    public int getColNum() {
+        return colNum;
     }
 }

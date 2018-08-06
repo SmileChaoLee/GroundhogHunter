@@ -7,11 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.text.Layout;
-import android.text.StaticLayout;
 import android.text.TextPaint;
-
-import java.util.ArrayList;
 
 public class FontAndBitmapUtility {
 
@@ -59,10 +55,9 @@ public class FontAndBitmapUtility {
 
     public static Bitmap getBitmapFromResourceWithText(Context context, int resourceId, String caption, int textColor) {
 
-        Bitmap bm = null;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inMutable = true;
-        bm = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
+        Bitmap bm = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
 
         return getBitmapFromBitmapWithText(bm, caption, textColor);
     }
