@@ -7,11 +7,12 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 
+import com.smile.groundhoghunter.GameView;
+
 public class Groundhog {
 
     private final Paint eraserPaint = new Paint();
     private RectF drawArea;
-    private Bitmap groundhogBm;
 
     // status = 0 --> no jump
     // status = 1 --> jump to first stage
@@ -22,9 +23,8 @@ public class Groundhog {
     /*
     constructor
      */
-    public Groundhog(RectF rectF, Bitmap bm) {
+    public Groundhog(RectF rectF) {
         drawArea = new RectF(rectF);
-        groundhogBm = Bitmap.createBitmap(bm);
         status = 0;
 
         eraserPaint.setAlpha(0);
@@ -42,12 +42,12 @@ public class Groundhog {
     }
 
     public void draw(Canvas canvas) {
-        if (status == 0) {
-            // do show (hidden)
-            canvas.drawBitmap(groundhogBm, null, drawArea, eraserPaint);
-        } else {
+        if (status > 0) {
             // show groundhog
-            canvas.drawBitmap(groundhogBm, null, drawArea, null);
+            canvas.drawBitmap(GameView.groundhogBitmaps[status-1], null, drawArea, null);
+        } else {
+            // do show (hidden)
+            canvas.drawBitmap(GameView.groundhogBitmaps[0], null, drawArea, eraserPaint);
         }
     }
 }

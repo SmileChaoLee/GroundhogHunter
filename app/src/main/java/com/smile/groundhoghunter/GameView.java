@@ -16,15 +16,12 @@ import android.view.SurfaceHolder;
 
 import com.smile.groundhoghunter.Model.Groundhog;
 
-import java.util.Random;
-
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private final String TAG = new String("com.smile.groundhoghunter.GameView");
     private SurfaceHolder surfaceHolder;
     private int gameViewWidth;
     private int gameViewHeight;
-    private Bitmap groundhogBitmap;
 
     private GameViewDrawThread gameViewDrawThread;
     private GroundhogRandomThread groundhogRandomThread;
@@ -32,10 +29,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     // default properties (package modifier)
     MainActivity mainActivity;
     Handler gameViewHandler;  // for synchronizing
-    boolean gameViewPause;   // for synchronizing
+    boolean gameViewPause;    // for synchronizing
     int rowNum;
     int colNum;
-    Groundhog[][] groundhogs;
+    Groundhog[] groundhogs;
+
+    // public properties
+    public static final Bitmap[] groundhogBitmaps = new Bitmap[4];
 
     public GameView(Context context) {
         super(context);
@@ -46,8 +46,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         rowNum = mainActivity.getRowNum();
         colNum = mainActivity.getColNum();
 
-        groundhogBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog);
-        groundhogs = new Groundhog[rowNum][colNum];
+        groundhogBitmaps[0] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_0);
+        groundhogBitmaps[1] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_1);
+        groundhogBitmaps[2] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_2);
+        groundhogBitmaps[3] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_3);
+
+        groundhogs = new Groundhog[rowNum * colNum];
 
         gameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
         gameViewPause = false;   // for synchronizing
@@ -86,18 +90,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         float heightInc = gameViewHeight / (float)colNum;
         float bottomY;
         int status;
+        int index;
 
         RectF temp = new RectF();
         for (int i=0; i<rowNum; ++i) {
             x = 0;
             bottomY = y + heightInc;
             for (int j=0; j<colNum; ++j) {
+                index = rowNum * i + j;
                 temp.left = x;
                 x += widthInc;
                 temp.right = x;
                 temp.top = y;
                 temp.bottom = bottomY;
-                groundhogs[i][j] = new Groundhog(temp, groundhogBitmap);
+                groundhogs[index] = new Groundhog(shrinkRectF(temp,40.0f));
             }
             y = bottomY;
         }
@@ -141,10 +147,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     // private methods
     private void doDraw(Canvas canvas) {
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        int index;
         for (int i=0; i<rowNum; ++i) {
             for (int j=0; j<colNum; ++j) {
-                (groundhogs[i][j]).draw(canvas);
+                index = rowNum * i + j;
+                (groundhogs[index]).draw(canvas);
             }
         }
+    }
+
+    private RectF shrinkRectF(RectF rectF, float percentage) {
+
+        RectF rect = new RectF();
+
+        float halfPercent = percentage / 100.0f / 2.0f;
+        float halfPercentWidth = rectF.width() * halfPercent;
+        float halfPercentHeight = rectF.height() * halfPercent;
+
+        rect.left = rectF.left + halfPercentWidth;
+        rect.top = rectF.top + halfPercentHeight;
+        rect.right = rectF.right - halfPercentWidth;
+        rect.bottom = rectF.bottom - halfPercentHeight;
+
+        return rect;
     }
 }
