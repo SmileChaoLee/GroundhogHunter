@@ -35,21 +35,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     Groundhog[] groundhogs;
 
     // public properties
-    public static final Bitmap[] groundhogBitmaps = new Bitmap[4];
+    public static Bitmap[] groundhogBitmaps = new Bitmap[4];
+    public static Bitmap groundhog_hit;
 
     public GameView(Context context) {
         super(context);
 
         Log.d(TAG, "GameView created.");
 
-        mainActivity = (MainActivity)context;
-        rowNum = mainActivity.getRowNum();
-        colNum = mainActivity.getColNum();
-
         groundhogBitmaps[0] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_0);
         groundhogBitmaps[1] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_1);
         groundhogBitmaps[2] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_2);
         groundhogBitmaps[3] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_3);
+        groundhog_hit = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_hit);
+
+        mainActivity = (MainActivity)context;
+        rowNum = mainActivity.getRowNum();
+        colNum = mainActivity.getColNum();
 
         groundhogs = new Groundhog[rowNum * colNum];
 
@@ -65,10 +67,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         // surfaceHolder.setFormat(PixelFormat.TRANSPARENT);    // same effect as the following
         surfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
 
-    }
-
-    public GameView(Context context, AttributeSet attrs) {
-        super(context, attrs);
     }
 
     @Override
@@ -103,7 +101,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 temp.right = x;
                 temp.top = y;
                 temp.bottom = bottomY;
-                groundhogs[index] = new Groundhog(shrinkRectF(temp,40.0f));
+                groundhogs[index] = new Groundhog(shrinkRectF(temp,20.0f));
             }
             y = bottomY;
         }

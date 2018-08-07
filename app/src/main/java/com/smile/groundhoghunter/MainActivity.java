@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     boolean gamePause = false;
     Handler activityHandler = null;
 
-
     // public properties
 
     @Override
@@ -47,7 +46,12 @@ public class MainActivity extends AppCompatActivity {
         activityHandler = new Handler();
 
         FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
+
+        rowNum = 5;
+        colNum = 5;
+
         // game view area
+        /*
         GridLayout gameGrid = findViewById(R.id.gameAreaGridLayout);
         rowNum = gameGrid.getRowCount();
         colNum = gameGrid.getColumnCount();
@@ -69,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 gameGrid.addView(imageView, index, glP);
             }
         }
+        */
 
         GameView gameView = new GameView(this);
         Log.i(TAG, "gameView created.");
