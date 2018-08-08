@@ -1,5 +1,7 @@
 package com.smile.groundhoghunter;
 
+import com.smile.groundhoghunter.Model.Groundhog;
+
 import java.util.Random;
 
 public class GroundhogRandomThread extends Thread {
@@ -42,17 +44,12 @@ public class GroundhogRandomThread extends Thread {
                 }
             }
 
-            // random the jump of all groundhogs
+            // random the jump of all groundhogs in groundhogList
             int status;
-            int index;
-            for (int i=0; i<gameView.rowNum; ++i) {
-                for (int j=0; j<gameView.colNum; ++j) {
-                    index = gameView.rowNum * i + j;
-                    status = groundhogRandom.nextInt(2);    // 0 or 1
-                    gameView.groundhogs[index].setStatus(status);
-                }
+            for (Groundhog groundhog : gameView.groundhogList) {
+                status = groundhogRandom.nextInt(2);    // 0 or 1
+                groundhog.setStatus(status);
             }
-
 
             try{Thread.sleep(synchronizeTime);}
             catch(Exception e){e.printStackTrace();}

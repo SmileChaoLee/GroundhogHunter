@@ -14,6 +14,7 @@ import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     // private properties
     private final String TAG = new String("com.smile.groundhoghunter.MainActivity");
+    private GameView gameView;
     private int rowNum;
     private int colNum;
 
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         }
         */
 
-        GameView gameView = new GameView(this);
+        gameView = new GameView(this);
         Log.i(TAG, "gameView created.");
         gameFrameLayout.addView(gameView);
 
@@ -99,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
         ImageButton quitGameButton = findViewById(R.id.quitGameButton);
         Bitmap quitGameBitmap = FontAndBitmapUtility.getBitmapFromResourceWithText(this, R.drawable.quit_game_button, quitGameStr, Color.BLUE);
         quitGameButton.setImageBitmap(quitGameBitmap);
+        quitGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     @Override
@@ -193,8 +201,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void finishApplication() {
         // release resources and threads
-        // gameView.releaseSynchronizings();
-        // gameView.stopThreads();
+        gameView.releaseSynchronizations();
+        gameView.stopThreads();
     }
 
     // public methods

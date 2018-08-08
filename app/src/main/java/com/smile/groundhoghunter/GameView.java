@@ -16,6 +16,10 @@ import android.view.SurfaceHolder;
 
 import com.smile.groundhoghunter.Model.Groundhog;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private final String TAG = new String("com.smile.groundhoghunter.GameView");
@@ -32,7 +36,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     boolean gameViewPause;    // for synchronizing
     int rowNum;
     int colNum;
-    Groundhog[] groundhogs;
+    List<Groundhog> groundhogList;
 
     // public properties
     public static Bitmap[] groundhogBitmaps = new Bitmap[4];
@@ -53,7 +57,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         rowNum = mainActivity.getRowNum();
         colNum = mainActivity.getColNum();
 
-        groundhogs = new Groundhog[rowNum * colNum];
+        groundhogList = new ArrayList<>();
 
         gameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
         gameViewPause = false;   // for synchronizing
@@ -87,21 +91,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         float widthInc = gameViewWidth / (float)rowNum;
         float heightInc = gameViewHeight / (float)colNum;
         float bottomY;
-        int status;
-        int index;
+        Groundhog groundhog;
 
+        groundhogList.clear();
         RectF temp = new RectF();
         for (int i=0; i<rowNum; ++i) {
             x = 0;
             bottomY = y + heightInc;
             for (int j=0; j<colNum; ++j) {
-                index = rowNum * i + j;
                 temp.left = x;
                 x += widthInc;
                 temp.right = x;
                 temp.top = y;
                 temp.bottom = bottomY;
-                groundhogs[index] = new Groundhog(shrinkRectF(temp,20.0f));
+                groundhog = new Groundhog(shrinkRectF(temp,20.0f));
+                groundhogList.add(groundhog);
             }
             y = bottomY;
         }
@@ -142,15 +146,62 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    public void releaseSynchronizations() {
+        if (mainActivity.gamePause) {
+            // in pause status
+            synchronized (mainActivity.activityHandler) {
+                mainActivity.gamePause = false;
+                mainActivity.activityHandler.notifyAll();
+            }
+        }
+
+        if (gameViewPause) {
+            // GameView in pause status
+            synchronized (gameViewHandler) {
+                gameViewPause = false;
+                gameViewHandler.notifyAll();
+            }
+        }
+    }
+
+    public void stopThreads() {
+
+        boolean retry = true;
+        if (groundhogRandomThread != null) {
+            groundhogRandomThread.setKeepRunning(false);
+            retry = true;
+            while (retry) {
+                try {
+                    groundhogRandomThread.join();
+                    System.out.println("groundhogRandomThread.Join()........\n");
+                    retry = false;
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }// continue processing until the thread ends
+            }
+        }
+
+        if (gameViewDrawThread != null) {
+            gameViewDrawThread.setKeepRunning(false);
+            retry = true;
+            while (retry) {
+                try {
+                    gameViewDrawThread.join();
+                    System.out.println("gameViewDrawThread.Join()........\n");
+                    retry = false;
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }// continue processing until the thread ends
+            }
+        }
+
+    }
+
     // private methods
     private void doDraw(Canvas canvas) {
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-        int index;
-        for (int i=0; i<rowNum; ++i) {
-            for (int j=0; j<colNum; ++j) {
-                index = rowNum * i + j;
-                (groundhogs[index]).draw(canvas);
-            }
+        for (Groundhog groundhog : groundhogList) {
+            groundhog.draw(canvas);
         }
     }
 
