@@ -203,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
         // release resources and threads
         gameView.releaseSynchronizations();
         gameView.stopThreads();
+        gameView.releaseResources();
     }
 
     // public methods

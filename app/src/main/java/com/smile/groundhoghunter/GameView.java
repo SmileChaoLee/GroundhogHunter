@@ -129,7 +129,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void drawGameScreen() {
 
-        System.out.println("drawGameScreen is called.");
         Canvas canvas = null;
         try {
             canvas = surfaceHolder.lockCanvas(null);
@@ -141,7 +140,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         } finally {
             if (canvas != null) {
                 surfaceHolder.unlockCanvasAndPost(canvas);
-                Log.i(TAG, "surfaceHolder.unlockCanvasAndPost(canvas) is called.");
             }
         }
     }
@@ -173,7 +171,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             while (retry) {
                 try {
                     groundhogRandomThread.join();
-                    System.out.println("groundhogRandomThread.Join()........\n");
+                    Log.d(TAG, "groundhogRandomThread.Join()........\n");
                     retry = false;
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
@@ -187,14 +185,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             while (retry) {
                 try {
                     gameViewDrawThread.join();
-                    System.out.println("gameViewDrawThread.Join()........\n");
+                    Log.d(TAG, "gameViewDrawThread.Join()........\n");
                     retry = false;
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }// continue processing until the thread ends
             }
         }
+    }
 
+    public void releaseResources() {
+        groundhogList.clear();
+        Log.d(TAG, "releaseResources() is called.\n");
     }
 
     // private methods
