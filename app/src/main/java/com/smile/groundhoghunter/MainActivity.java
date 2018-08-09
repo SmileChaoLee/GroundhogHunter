@@ -1,6 +1,7 @@
 package com.smile.groundhoghunter;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -26,14 +27,14 @@ public class MainActivity extends AppCompatActivity {
     // private properties
     private final String TAG = new String("com.smile.groundhoghunter.MainActivity");
     private GameView gameView;
-    private int rowNum;
-    private int colNum;
 
     // default properties (package modifiers)
+    final Handler activityHandler;
     boolean gamePause = false;
-    Handler activityHandler = null;
 
-    // public properties
+    public MainActivity() {
+        activityHandler = new Handler();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +46,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         gamePause = false;
-        activityHandler = new Handler();
 
         FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
-
-        rowNum = 5;
-        colNum = 5;
-
         // game view area
         /*
         GridLayout gameGrid = findViewById(R.id.gameAreaGridLayout);
@@ -125,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.newGame) {
-            // gameView.releaseSynchronizings();
+            // gameView.releaseSynchronizations();
             // gameView.newGame();
             return true;
         }
@@ -204,14 +200,5 @@ public class MainActivity extends AppCompatActivity {
         gameView.releaseSynchronizations();
         gameView.stopThreads();
         gameView.releaseResources();
-    }
-
-    // public methods
-    public int getRowNum() {
-        return rowNum;
-    }
-
-    public int getColNum() {
-        return colNum;
     }
 }

@@ -1,6 +1,7 @@
 package com.smile.groundhoghunter;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -23,39 +24,41 @@ import java.util.List;
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private final String TAG = new String("com.smile.groundhoghunter.GameView");
-    private SurfaceHolder surfaceHolder;
+    private final SurfaceHolder surfaceHolder;
+
     private int gameViewWidth;
     private int gameViewHeight;
-
     private GameViewDrawThread gameViewDrawThread;
     private GroundhogRandomThread groundhogRandomThread;
 
     // default properties (package modifier)
-    MainActivity mainActivity;
-    Handler gameViewHandler;  // for synchronizing
+    final MainActivity mainActivity;
+    final Handler gameViewHandler;  // for synchronizing
+    final int rowNum = 5;
+    final int colNum = 5;
     boolean gameViewPause;    // for synchronizing
-    int rowNum;
-    int colNum;
     List<Groundhog> groundhogList;
 
     // public properties
-    public static Bitmap[] groundhogBitmaps = new Bitmap[4];
-    public static Bitmap groundhog_hit;
+    public static final int numberOfGroundhogTypes;
+    public static final Bitmap groundhog_hit;
+    public static final Bitmap[] groundhogBitmaps;
+    static {
+        numberOfGroundhogTypes = 5;   // including hiding
+        groundhogBitmaps = new Bitmap[numberOfGroundhogTypes];
+        groundhogBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_0);
+        groundhogBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
+        groundhogBitmaps[2] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_2);
+        groundhogBitmaps[3] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_3);
+        groundhog_hit = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_hit);
+    }
 
     public GameView(Context context) {
         super(context);
 
         Log.d(TAG, "GameView created.");
 
-        groundhogBitmaps[0] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_0);
-        groundhogBitmaps[1] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_1);
-        groundhogBitmaps[2] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_2);
-        groundhogBitmaps[3] = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_3);
-        groundhog_hit = BitmapFactory.decodeResource(getResources(), R.drawable.groundhog_hit);
-
         mainActivity = (MainActivity)context;
-        rowNum = mainActivity.getRowNum();
-        colNum = mainActivity.getColNum();
 
         groundhogList = new ArrayList<>();
 
@@ -104,7 +107,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 temp.right = x;
                 temp.top = y;
                 temp.bottom = bottomY;
-                groundhog = new Groundhog(shrinkRectF(temp,20.0f));
+                groundhog = new Groundhog(shrinkRectF(temp,30.0f));
                 groundhogList.add(groundhog);
             }
             y = bottomY;

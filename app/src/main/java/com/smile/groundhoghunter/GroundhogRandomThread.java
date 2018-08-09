@@ -16,7 +16,7 @@ public class GroundhogRandomThread extends Thread {
         this.gameView = gView;
         this.mainActivity = gView.mainActivity;
         keepRunning = true; // keepRunning = true -> loop in run() still going
-        synchronizeTime = 500;   // 500 mini seconds
+        synchronizeTime = 1000;   // 1000 mini seconds (1 second)
         groundhogRandom = new Random(System.currentTimeMillis());
     }
 
@@ -47,7 +47,7 @@ public class GroundhogRandomThread extends Thread {
             // random the jump of all groundhogs in groundhogList
             int status;
             for (Groundhog groundhog : gameView.groundhogList) {
-                status = groundhogRandom.nextInt(2);    // 0 or 1
+                status = groundhogRandom.nextInt(GameView.numberOfGroundhogTypes);    // 0 - 4
                 groundhog.setStatus(status);
             }
 

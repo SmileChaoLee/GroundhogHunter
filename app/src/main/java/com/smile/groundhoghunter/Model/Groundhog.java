@@ -19,6 +19,7 @@ public class Groundhog {
     // status = 2 --> jump to second stage
     // status = 3 --> jump to third stage
     private int status;
+    private boolean isHit;
 
     /*
     constructor
@@ -26,6 +27,7 @@ public class Groundhog {
     public Groundhog(RectF rectF) {
         drawArea = new RectF(rectF);
         status = 0;
+        isHit = false;
 
         eraserPaint.setAlpha(0);
         eraserPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -41,13 +43,22 @@ public class Groundhog {
         this.status = status;
     }
 
+    public void setIsHit(boolean isHit) {
+        this.isHit = isHit;
+    }
+
     public void draw(Canvas canvas) {
-        if (status > 0) {
-            // show groundhog
-            canvas.drawBitmap(GameView.groundhogBitmaps[status-1], null, drawArea, null);
+
+        if (!isHit) {
+            if (status > 0) {
+                // show groundhog
+                canvas.drawBitmap(GameView.groundhogBitmaps[status - 1], null, drawArea, null);
+            } else {
+                // do show (hidden)
+                canvas.drawBitmap(GameView.groundhogBitmaps[0], null, drawArea, eraserPaint);
+            }
         } else {
-            // do show (hidden)
-            canvas.drawBitmap(GameView.groundhogBitmaps[0], null, drawArea, eraserPaint);
+            canvas.drawBitmap(GameView.groundhog_hit, null, drawArea, null);
         }
     }
 }
