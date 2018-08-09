@@ -14,11 +14,12 @@ public class Groundhog {
     private final Paint eraserPaint = new Paint();
     private RectF drawArea;
 
-    // status = 0 --> no jump
-    // status = 1 --> jump to first stage
-    // status = 2 --> jump to second stage
-    // status = 3 --> jump to third stage
+    // status = 0 --> jump to first stage
+    // status = 1 --> jump to second stage
+    // status = 2 --> jump to third stage
+    // status = 3 --> jump to fourth stage
     private int status;
+    private int numOfTimeIntervalShown;
     private boolean isHit;
 
     /*
@@ -27,6 +28,7 @@ public class Groundhog {
     public Groundhog(RectF rectF) {
         drawArea = new RectF(rectF);
         status = 0;
+        numOfTimeIntervalShown = 0;
         isHit = false;
 
         eraserPaint.setAlpha(0);
@@ -38,9 +40,29 @@ public class Groundhog {
 
     // public methods
 
+    public int getStatus() {
+        return this.status;
+    }
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public int getNumOfTimeIntervalShown() {
+        return this.numOfTimeIntervalShown;
+    }
+
+    public void setNumOfTimeIntervalShown(int numTimeInterval) {
+        if (numTimeInterval < GameView.NumTimeIntervalShown[status]) {
+            this.numOfTimeIntervalShown = numTimeInterval;
+        } else {
+            this.numOfTimeIntervalShown = 0;
+            setIsHit(true);    // groundhog becomes hiding
+        }
+    }
+
+    public boolean getIsHit() {
+        return this.isHit;
     }
 
     public void setIsHit(boolean isHit) {
@@ -50,15 +72,11 @@ public class Groundhog {
     public void draw(Canvas canvas) {
 
         if (!isHit) {
-            if (status > 0) {
-                // show groundhog
-                canvas.drawBitmap(GameView.groundhogBitmaps[status - 1], null, drawArea, null);
-            } else {
-                // do show (hidden)
-                canvas.drawBitmap(GameView.groundhogBitmaps[0], null, drawArea, eraserPaint);
-            }
+            // show groundhog
+            canvas.drawBitmap(GameView.GroundhogBitmaps[status], null, drawArea, null);
         } else {
-            canvas.drawBitmap(GameView.groundhog_hit, null, drawArea, null);
+            // hiding
+            canvas.drawBitmap(GameView.Groundhog_hit, null, drawArea, eraserPaint);
         }
     }
 }

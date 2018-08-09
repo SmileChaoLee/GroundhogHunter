@@ -1,7 +1,6 @@
 package com.smile.groundhoghunter;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,7 +9,6 @@ import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
@@ -18,7 +16,6 @@ import android.view.SurfaceHolder;
 import com.smile.groundhoghunter.Model.Groundhog;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
@@ -40,17 +37,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     List<Groundhog> groundhogList;
 
     // public properties
-    public static final int numberOfGroundhogTypes;
-    public static final Bitmap groundhog_hit;
-    public static final Bitmap[] groundhogBitmaps;
+    public static final int NumberOfGroundhogTypes;
+    public static final int TimeIntervalShown;
+    public static final int[] NumTimeIntervalShown;
+    public static final Bitmap Groundhog_hit;
+    public static final Bitmap[] GroundhogBitmaps;
     static {
-        numberOfGroundhogTypes = 5;   // including hiding
-        groundhogBitmaps = new Bitmap[numberOfGroundhogTypes];
-        groundhogBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_0);
-        groundhogBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
-        groundhogBitmaps[2] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_2);
-        groundhogBitmaps[3] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_3);
-        groundhog_hit = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_hit);
+        NumberOfGroundhogTypes = 4;     // including hiding
+        TimeIntervalShown = 1000;        // 500 mini seconds
+        NumTimeIntervalShown = new int[NumberOfGroundhogTypes];
+        NumTimeIntervalShown[0] = 1;
+        NumTimeIntervalShown[1] = 2;
+        NumTimeIntervalShown[2] = 3;
+        NumTimeIntervalShown[3] = 4;
+        GroundhogBitmaps = new Bitmap[NumberOfGroundhogTypes];
+        GroundhogBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_0);
+        GroundhogBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_2);
+        GroundhogBitmaps[2] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
+        GroundhogBitmaps[3] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_3);
+        Groundhog_hit = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_hit);
     }
 
     public GameView(Context context) {

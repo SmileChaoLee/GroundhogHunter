@@ -16,7 +16,7 @@ public class GroundhogRandomThread extends Thread {
         this.gameView = gView;
         this.mainActivity = gView.mainActivity;
         keepRunning = true; // keepRunning = true -> loop in run() still going
-        synchronizeTime = 1000;   // 1000 mini seconds (1 second)
+        synchronizeTime = GameView.TimeIntervalShown;       // 5000 mini seconds (1 second)
         groundhogRandom = new Random(System.currentTimeMillis());
     }
 
@@ -45,10 +45,24 @@ public class GroundhogRandomThread extends Thread {
             }
 
             // random the jump of all groundhogs in groundhogList
+            int hide;
             int status;
             for (Groundhog groundhog : gameView.groundhogList) {
-                status = groundhogRandom.nextInt(GameView.numberOfGroundhogTypes);    // 0 - 4
-                groundhog.setStatus(status);
+                if (groundhog.getIsHit()) {
+                    // if hiding
+                    hide = groundhogRandom.nextInt(2);   // 0 or 1
+                    if (hide == 0) {
+                        // showing
+                        // original status is hiding then showing with an image that might be different from previous one
+                        status = groundhogRandom.nextInt(GameView.NumberOfGroundhogTypes);    // 0 - 3
+                        groundhog.setStatus(status);
+                        groundhog.setIsHit(false);
+                        groundhog.setNumOfTimeIntervalShown(0);     // status of starting showing
+                    }
+                } else {
+                    // not hiding
+                    groundhog.setNumOfTimeIntervalShown(groundhog.getNumOfTimeIntervalShown() + 1);
+                }
             }
 
             try{Thread.sleep(synchronizeTime);}
