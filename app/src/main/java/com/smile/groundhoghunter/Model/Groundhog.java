@@ -41,7 +41,7 @@ public class Groundhog {
     // public methods
 
     public int getStatus() {
-        return this.status;
+        return status;
     }
 
     public void setStatus(int status) {
@@ -49,20 +49,20 @@ public class Groundhog {
     }
 
     public int getNumOfTimeIntervalShown() {
-        return this.numOfTimeIntervalShown;
+        return numOfTimeIntervalShown;
     }
 
     public void setNumOfTimeIntervalShown(int numTimeInterval) {
         if (numTimeInterval < GameView.NumTimeIntervalShown[status]) {
-            this.numOfTimeIntervalShown = numTimeInterval;
+            numOfTimeIntervalShown = numTimeInterval;
         } else {
-            this.numOfTimeIntervalShown = 0;
+            numOfTimeIntervalShown = 0;
             setIsHit(true);    // groundhog becomes hiding
         }
     }
 
     public boolean getIsHit() {
-        return this.isHit;
+        return isHit;
     }
 
     public void setIsHit(boolean isHit) {
