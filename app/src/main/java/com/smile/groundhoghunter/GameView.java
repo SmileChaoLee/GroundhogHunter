@@ -9,18 +9,20 @@ import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Base64;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
 import com.smile.groundhoghunter.Model.Groundhog;
+import com.smile.groundhoghunter.Utilities.MathUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
-    private final String TAG = new String("com.smile.groundhoghunter.GameView");
+    private static final String TAG = new String("com.smile.groundhoghunter.GameView");
     private final SurfaceHolder surfaceHolder;
 
     private int gameViewWidth;
@@ -40,11 +42,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public static final int NumberOfGroundhogTypes;
     public static final int TimeIntervalShown;
     public static final int[] NumTimeIntervalShown;
-    public static final Bitmap Groundhog_hit;
     public static final Bitmap[] GroundhogBitmaps;
+    public static final Bitmap[] GroundhogHitBitmaps;
+    public static final int[] hitScores;
+    public static final Bitmap[] scoreBitmaps;
+
     static {
         NumberOfGroundhogTypes = 4;     // including hiding
-        TimeIntervalShown = 1000;        // 500 mini seconds
+        TimeIntervalShown = 500;        // 500 mini seconds
         NumTimeIntervalShown = new int[NumberOfGroundhogTypes];
         NumTimeIntervalShown[0] = 1;
         NumTimeIntervalShown[1] = 2;
@@ -55,7 +60,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         GroundhogBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_2);
         GroundhogBitmaps[2] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
         GroundhogBitmaps[3] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_3);
-        Groundhog_hit = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_hit);
+        GroundhogHitBitmaps = new Bitmap[NumberOfGroundhogTypes];
+        GroundhogHitBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_0);
+        GroundhogHitBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_2);
+        GroundhogHitBitmaps[2] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
+        GroundhogHitBitmaps[3] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_3);
+        hitScores = new int[NumberOfGroundhogTypes];
+        hitScores[0] = 40;
+        hitScores[1] = 30;
+        hitScores[2] = 20;
+        hitScores[3] = 10;
+        scoreBitmaps = new Bitmap[NumberOfGroundhogTypes];
+        // convert numbers to Bitmaps
+        scoreBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.s40);
+        scoreBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.s30);
+        scoreBitmaps[2] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.s20);
+        scoreBitmaps[3] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.s10);
     }
 
     public GameView(Context context) {
@@ -112,7 +132,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 temp.right = x;
                 temp.top = y;
                 temp.bottom = bottomY;
-                groundhog = new Groundhog(shrinkRectF(temp,30.0f));
+                groundhog = new Groundhog(MathUtil.shrinkRectF(temp,30.0f));
                 groundhogList.add(groundhog);
             }
             y = bottomY;
@@ -213,21 +233,5 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         for (Groundhog groundhog : groundhogList) {
             groundhog.draw(canvas);
         }
-    }
-
-    private RectF shrinkRectF(RectF rectF, float percentage) {
-
-        RectF rect = new RectF();
-
-        float halfPercent = percentage / 100.0f / 2.0f;
-        float halfPercentWidth = rectF.width() * halfPercent;
-        float halfPercentHeight = rectF.height() * halfPercent;
-
-        rect.left = rectF.left + halfPercentWidth;
-        rect.top = rectF.top + halfPercentHeight;
-        rect.right = rectF.right - halfPercentWidth;
-        rect.bottom = rectF.bottom - halfPercentHeight;
-
-        return rect;
     }
 }

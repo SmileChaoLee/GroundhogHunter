@@ -45,23 +45,30 @@ public class GroundhogRandomThread extends Thread {
             }
 
             // random the jump of all groundhogs in groundhogList
-            int hide;
+            int hiding;
             int status;
             for (Groundhog groundhog : gameView.groundhogList) {
-                if (groundhog.getIsHit()) {
+                if (groundhog.getIsHiding()) {
                     // if hiding
-                    hide = groundhogRandom.nextInt(2);   // 0 or 1
-                    if (hide == 0) {
+                    hiding = groundhogRandom.nextInt(2);   // 0 or 1
+                    if (hiding == 0) {
                         // showing
                         // original status is hiding then showing with an image that might be different from previous one
                         status = groundhogRandom.nextInt(GameView.NumberOfGroundhogTypes);    // 0 - 3
                         groundhog.setStatus(status);
-                        groundhog.setIsHit(false);
+                        groundhog.setIsHiding(false);
                         groundhog.setNumOfTimeIntervalShown(0);     // status of starting showing
                     }
                 } else {
                     // not hiding
                     groundhog.setNumOfTimeIntervalShown(groundhog.getNumOfTimeIntervalShown() + 1);
+
+                    // simulating hitting
+                    int isHit = groundhogRandom.nextInt(4);   // 0, 1, 2, 3
+                    if (isHit == 0) {
+                        // hit
+                        groundhog.setIsHit(true);
+                    }
                 }
             }
 
