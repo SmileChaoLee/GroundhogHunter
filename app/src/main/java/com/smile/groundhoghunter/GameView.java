@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
@@ -18,6 +19,7 @@ import com.smile.groundhoghunter.Model.Groundhog;
 import com.smile.groundhoghunter.Utilities.MathUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
@@ -27,6 +29,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private int gameViewWidth;
     private int gameViewHeight;
+    private float rectWidthForOneGroundhog;
+    private float rectHeightForOneGroundhog;
     private GameViewDrawThread gameViewDrawThread;
     private GroundhogRandomThread groundhogRandomThread;
 
@@ -36,7 +40,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     final int rowNum = 5;
     final int colNum = 5;
     boolean gameViewPause;    // for synchronizing
-    List<Groundhog> groundhogList;
+    Groundhog[] groundhogArray;
 
     // public properties
     public static final int NumberOfGroundhogTypes;
@@ -51,10 +55,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         NumberOfGroundhogTypes = 4;     // including hiding
         TimeIntervalShown = 500;        // 500 mini seconds
         NumTimeIntervalShown = new int[NumberOfGroundhogTypes];
-        NumTimeIntervalShown[0] = 1;
-        NumTimeIntervalShown[1] = 2;
-        NumTimeIntervalShown[2] = 3;
-        NumTimeIntervalShown[3] = 4;
+        NumTimeIntervalShown[0] = 2;
+        NumTimeIntervalShown[1] = 3;
+        NumTimeIntervalShown[2] = 4;
+        NumTimeIntervalShown[3] = 5;
         GroundhogBitmaps = new Bitmap[NumberOfGroundhogTypes];
         GroundhogBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_0);
         GroundhogBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_2);
@@ -85,7 +89,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         mainActivity = (MainActivity)context;
 
-        groundhogList = new ArrayList<>();
+        groundhogArray = new Groundhog[rowNum * colNum];
 
         gameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
         gameViewPause = false;   // for synchronizing
@@ -116,24 +120,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         float x;
         float y = 0;
-        float widthInc = gameViewWidth / (float)rowNum;
-        float heightInc = gameViewHeight / (float)colNum;
+        rectWidthForOneGroundhog = gameViewWidth / (float)rowNum;
+        rectHeightForOneGroundhog = gameViewHeight / (float)colNum;
         float bottomY;
+        int index;
         Groundhog groundhog;
 
-        groundhogList.clear();
         RectF temp = new RectF();
         for (int i=0; i<rowNum; ++i) {
             x = 0;
-            bottomY = y + heightInc;
+            bottomY = y + rectHeightForOneGroundhog;
             for (int j=0; j<colNum; ++j) {
+                index = rowNum * i + j;
                 temp.left = x;
-                x += widthInc;
+                x += rectWidthForOneGroundhog;
                 temp.right = x;
                 temp.top = y;
                 temp.bottom = bottomY;
-                groundhog = new Groundhog(MathUtil.shrinkRectF(temp,30.0f));
-                groundhogList.add(groundhog);
+                groundhog = new Groundhog(temp);
+                groundhogArray[index] = groundhog;
             }
             y = bottomY;
         }
@@ -148,6 +153,35 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         Log.i(TAG, "surfaceChanged() is called");
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int x = (int) event.getX();
+        int y = (int) event.getY();
+        int action = event.getAction();
+        Groundhog groundhog;
+
+        switch (action & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_BUTTON_PRESS:
+            case MotionEvent.ACTION_DOWN:
+                int i = (int)(y / rectHeightForOneGroundhog);   // row
+                int j = (int)(x / rectWidthForOneGroundhog);    // col
+                int index = rowNum * i + j;
+                groundhog = groundhogArray[index];
+                if (!groundhog.getIsHiding()) {
+                    // showing but not hiding
+                    if (groundhog.getDrawArea().contains(x,y)) {
+                        // hit
+                        groundhog.setIsHit(true);
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+
+        return super.onTouchEvent(event);
     }
 
     @Override
@@ -223,14 +257,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void releaseResources() {
-        groundhogList.clear();
         Log.d(TAG, "releaseResources() is called.\n");
     }
 
     // private methods
     private void doDraw(Canvas canvas) {
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-        for (Groundhog groundhog : groundhogList) {
+        for (Groundhog groundhog : groundhogArray) {
             groundhog.draw(canvas);
         }
     }

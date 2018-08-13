@@ -10,6 +10,7 @@ public class GroundhogRandomThread extends Thread {
     private MainActivity mainActivity;
     private boolean keepRunning;
     private int synchronizeTime;
+    private int chanceToShow;
     private Random groundhogRandom;
 
     public GroundhogRandomThread(GameView gView) {
@@ -17,6 +18,7 @@ public class GroundhogRandomThread extends Thread {
         this.mainActivity = gView.mainActivity;
         keepRunning = true; // keepRunning = true -> loop in run() still going
         synchronizeTime = GameView.TimeIntervalShown;       // 5000 mini seconds (1 second)
+        chanceToShow = 5;   // 1/2, 3-->1/3, 4-->1/4, 5-->1/5;
         groundhogRandom = new Random(System.currentTimeMillis());
     }
 
@@ -47,10 +49,10 @@ public class GroundhogRandomThread extends Thread {
             // random the jump of all groundhogs in groundhogList
             int hiding;
             int status;
-            for (Groundhog groundhog : gameView.groundhogList) {
+            for (Groundhog groundhog : gameView.groundhogArray) {
                 if (groundhog.getIsHiding()) {
                     // if hiding
-                    hiding = groundhogRandom.nextInt(2);   // 0 or 1
+                    hiding = groundhogRandom.nextInt(chanceToShow);
                     if (hiding == 0) {
                         // showing
                         // original status is hiding then showing with an image that might be different from previous one
@@ -63,12 +65,17 @@ public class GroundhogRandomThread extends Thread {
                     // not hiding
                     groundhog.setNumOfTimeIntervalShown(groundhog.getNumOfTimeIntervalShown() + 1);
 
+                    /*
                     // simulating hitting
-                    int isHit = groundhogRandom.nextInt(4);   // 0, 1, 2, 3
-                    if (isHit == 0) {
-                        // hit
-                        groundhog.setIsHit(true);
+                    if (!groundhog.getIsHit()) {
+                        // has not been hit
+                        int isHit = groundhogRandom.nextInt(4);   // 0, 1, 2, 3
+                        if (isHit == 0) {
+                            // hit
+                            groundhog.setIsHit(true);
+                        }
                     }
+                    */
                 }
             }
 

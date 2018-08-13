@@ -12,7 +12,7 @@ import com.smile.groundhoghunter.Utilities.MathUtil;
 
 public class Groundhog {
 
-    private final Paint eraserPaint = new Paint();
+    // private final Paint eraserPaint = new Paint();
     private RectF drawArea;
     private RectF scoreArea;
 
@@ -29,8 +29,18 @@ public class Groundhog {
     constructor
      */
     public Groundhog(RectF rectF) {
-        drawArea = new RectF(rectF);
-        scoreArea = MathUtil.shrinkRectF(drawArea, 60);
+        float shrinkRatio = 30.0f;
+        drawArea = MathUtil.shrinkRectF(rectF, shrinkRatio);
+        float shift = rectF.bottom - drawArea.bottom;
+        drawArea.top = drawArea.top + shift;
+        drawArea.bottom = drawArea.bottom + shift;
+        // score position
+        shrinkRatio = 100.0f * ( 1.0f - (drawArea.top - rectF.top) / rectF.height());
+        scoreArea = MathUtil.shrinkRectF(rectF, shrinkRatio);
+        shift = scoreArea.top - rectF.top;
+        scoreArea.top = rectF.top;
+        scoreArea.bottom = scoreArea.bottom - shift;
+
         status = 0;
         numOfTimeIntervalShown = 0;
         isHiding = true;
@@ -39,7 +49,7 @@ public class Groundhog {
         // eraserPaint.setAlpha(0);
         // eraserPaint.setStrokeJoin(Paint.Join.ROUND);
         // eraserPaint.setStrokeCap(Paint.Cap.ROUND);
-        eraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        // eraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         // eraserPaint.setAntiAlias(true);
     }
 
@@ -83,6 +93,10 @@ public class Groundhog {
         this.isHit = isHit;
     }
 
+    public RectF getDrawArea() {
+        return drawArea;
+    }
+
     public void draw(Canvas canvas) {
 
         if (!isHiding) {
@@ -97,7 +111,7 @@ public class Groundhog {
             }
         } else {
             // hiding
-            canvas.drawBitmap(GameView.GroundhogBitmaps[0], null, drawArea, eraserPaint);
+            // canvas.drawBitmap(GameView.GroundhogBitmaps[0], null, scoreArea, eraserPaint);
         }
     }
 }
