@@ -9,18 +9,12 @@ import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
 import com.smile.groundhoghunter.Model.Groundhog;
-import com.smile.groundhoghunter.Utilities.MathUtil;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -31,8 +25,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private int gameViewHeight;
     private float rectWidthForOneGroundhog;
     private float rectHeightForOneGroundhog;
+    private int score;
     private GameViewDrawThread gameViewDrawThread;
     private GroundhogRandomThread groundhogRandomThread;
+    private boolean surfaceViewCreated;
+    private boolean isGameRunning;
 
     // default properties (package modifier)
     final MainActivity mainActivity;
@@ -61,13 +58,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         NumTimeIntervalShown[3] = 5;
         GroundhogBitmaps = new Bitmap[NumberOfGroundhogTypes];
         GroundhogBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_0);
-        GroundhogBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_2);
-        GroundhogBitmaps[2] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
+        GroundhogBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
+        GroundhogBitmaps[2] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_2);
         GroundhogBitmaps[3] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_3);
         GroundhogHitBitmaps = new Bitmap[NumberOfGroundhogTypes];
         GroundhogHitBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_0);
-        GroundhogHitBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_2);
-        GroundhogHitBitmaps[2] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
+        GroundhogHitBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
+        GroundhogHitBitmaps[2] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_2);
         GroundhogHitBitmaps[3] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_3);
         hitScores = new int[NumberOfGroundhogTypes];
         hitScores[0] = 40;
@@ -102,6 +99,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         setZOrderOnTop(true);
         // surfaceHolder.setFormat(PixelFormat.TRANSPARENT);    // same effect as the following
         surfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
+
+        score = 0;
+        surfaceViewCreated = false; // surfaceView has not been created yet
+        isGameRunning = false;
 
     }
 
@@ -143,11 +144,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             y = bottomY;
         }
 
-        gameViewDrawThread = new GameViewDrawThread(this);
-        gameViewDrawThread.start();
-
-        groundhogRandomThread = new GroundhogRandomThread(this);
-        groundhogRandomThread.start();
+        surfaceViewCreated = true;  // surfaceView has been created
     }
 
     @Override
@@ -187,6 +184,32 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         Log.i(TAG, "surfaceDestroyed() is called");
+    }
+
+    public void startGame() {
+        if (surfaceViewCreated) {
+
+            isGameRunning = true;
+
+            gameViewDrawThread = new GameViewDrawThread(this);
+            gameViewDrawThread.start();
+            groundhogRandomThread = new GroundhogRandomThread(this);
+            groundhogRandomThread.start();
+        }
+    }
+
+    public void newGame() {
+        if (groundhogArray != null) {
+            for (Groundhog groundhog : groundhogArray) {
+                groundhog.setIsHiding(true);
+                groundhog.setIsHit(false);
+                groundhog.setNumOfTimeIntervalShown(0);
+            }
+        }
+
+        stopThreads();
+
+        isGameRunning = false;
     }
 
     public void drawGameScreen() {

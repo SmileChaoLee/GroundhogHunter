@@ -87,11 +87,23 @@ public class MainActivity extends AppCompatActivity {
         Bitmap pauseGameBitmap = FontAndBitmapUtility.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseGameStr, Color.BLUE);
         Bitmap resumeGameBitmap = FontAndBitmapUtility.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeGameStr, Color.BLUE);
         startGameButton.setImageBitmap(startGameBitmap);
+        startGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameView.startGame();
+            }
+        });
 
         String newGameStr = getString(R.string.new_game_string);
         ImageButton newGameButton = findViewById(R.id.newGameButton);
         Bitmap newGameBitmap = FontAndBitmapUtility.getBitmapFromResourceWithText(this, R.drawable.new_game_button, newGameStr, Color.BLUE);
         newGameButton.setImageBitmap(newGameBitmap);
+        newGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameView.newGame();
+            }
+        });
 
         String quitGameStr = getString(R.string.quit_game_string);
         ImageButton quitGameButton = findViewById(R.id.quitGameButton);
