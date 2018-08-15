@@ -64,18 +64,6 @@ public class GroundhogRandomThread extends Thread {
                 } else {
                     // not hiding
                     groundhog.setNumOfTimeIntervalShown(groundhog.getNumOfTimeIntervalShown() + 1);
-
-                    /*
-                    // simulating hitting
-                    if (!groundhog.getIsHit()) {
-                        // has not been hit
-                        int isHit = groundhogRandom.nextInt(4);   // 0, 1, 2, 3
-                        if (isHit == 0) {
-                            // hit
-                            groundhog.setIsHit(true);
-                        }
-                    }
-                    */
                 }
             }
 

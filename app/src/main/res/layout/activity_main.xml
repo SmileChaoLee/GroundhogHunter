@@ -20,25 +20,17 @@
         android:id="@+id/gameViewAreaFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@drawable/grass"
         app:layout_constraintHeight_percent="0.6"
         app:layout_constraintTop_toBottomOf="@id/scoreLinearLayout">
 
-        <!--
         <android.support.v7.widget.GridLayout
             android:id="@+id/gameAreaGridLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#118711"
             app:rowCount="5"
             app:columnCount="5">
         </android.support.v7.widget.GridLayout>
-        -->
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/grass">
-        </ImageView>
 
     </FrameLayout>
 

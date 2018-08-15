@@ -34,8 +34,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     // default properties (package modifier)
     final MainActivity mainActivity;
     final Handler gameViewHandler;  // for synchronizing
-    final int rowNum = 5;
-    final int colNum = 5;
+    final int rowNum;
+    final int colNum;
     boolean gameViewPause;    // for synchronizing
     Groundhog[] groundhogArray;
 
@@ -85,6 +85,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         Log.d(TAG, "GameView created.");
 
         mainActivity = (MainActivity)context;
+        rowNum = mainActivity.getRowNum();
+        colNum = mainActivity.getColNum();
 
         groundhogArray = new Groundhog[rowNum * colNum];
 

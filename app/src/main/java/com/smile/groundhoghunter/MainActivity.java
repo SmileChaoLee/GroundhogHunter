@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     // private properties
     private final String TAG = new String("com.smile.groundhoghunter.MainActivity");
     private GameView gameView;
+    private int rowNum;
+    private int colNum;
 
     // default properties (package modifiers)
     final Handler activityHandler;
@@ -49,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
         FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
         // game view area
-        /*
         GridLayout gameGrid = findViewById(R.id.gameAreaGridLayout);
         rowNum = gameGrid.getRowCount();
         colNum = gameGrid.getColumnCount();
@@ -67,11 +68,10 @@ public class MainActivity extends AppCompatActivity {
                 ImageView imageView = new ImageView(this);
                 imageView.setId(index);
                 imageView.setClickable(true);
-                imageView.setBackgroundResource(R.drawable.ground_hole);
+                imageView.setBackgroundResource(R.drawable.groundhog_hole);
                 gameGrid.addView(imageView, index, glP);
             }
         }
-        */
 
         gameView = new GameView(this);
         Log.i(TAG, "gameView created.");
@@ -207,10 +207,19 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
+    // private methods
     private void finishApplication() {
         // release resources and threads
         gameView.releaseSynchronizations();
         gameView.stopThreads();
         gameView.releaseResources();
+    }
+
+    // public methods
+    public int getRowNum() {
+        return rowNum;
+    }
+    public int getColNum() {
+        return colNum;
     }
 }
