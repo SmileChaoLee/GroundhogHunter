@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,6 +30,10 @@ public class MainActivity extends AppCompatActivity {
     private GameView gameView;
     private int rowNum;
     private int colNum;
+    private TextView highScoreTextView;
+    private TextView scoreTextView;
+    private TextView timerTextView;
+    private TextView hitNumTextView;
 
     // default properties (package modifiers)
     final Handler activityHandler;
@@ -48,6 +53,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         gamePause = false;
+
+        // score layout
+        highScoreTextView = findViewById(R.id.highestScoreText);
+        scoreTextView = findViewById(R.id.scoreText);
+        timerTextView = findViewById(R.id.timerText);
+        hitNumTextView = findViewById(R.id.num_hit_Text);
 
         FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
         // game view area
@@ -140,11 +151,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.top_10_score) {
             // gameView.getTop10ScoreList();
-            return true;
-        }
-
-        if (id == R.id.scoreHistory) {
-            // gameView.getScoreHistory();
             return true;
         }
 

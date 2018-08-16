@@ -9,11 +9,164 @@
     tools:context=".MainActivity">
 
     <LinearLayout
-        android:id="@+id/scoreLinearLayout"
-        android:orientation="vertical"
+        android:id="@+id/scoreLayout"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.2">
+        app:layout_constraintHeight_percent="0.2"
+        android:weightSum="2">
+
+        <LinearLayout
+            android:id="@+id/scoreLayoutLeft"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:weightSum="2">
+            <LinearLayout
+                android:id="@+id/scoreLayoutLeftTop"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+                <RelativeLayout
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/highestScoreTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:textColor="@color/darkGreen"
+                        android:textSize="30dp"
+                        android:text="@string/highest_string">
+                    </TextView>
+                    <TextView
+                        android:id="@+id/highestScoreText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/highestScoreTitle"
+                        android:layout_alignTop="@+id/highestScoreTitle"
+                        android:textColor="@color/darkRed"
+                        android:textSize="30dp"
+                        android:text="1000">
+                    </TextView>
+                </RelativeLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/scoreLayoutLeftBottom"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+                <RelativeLayout
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/scoreTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:textColor="@color/darkGreen"
+                        android:textSize="30dp"
+                        android:text="@string/score_string">
+                    </TextView>
+                    <TextView
+                        android:id="@+id/scoreText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/scoreTitle"
+                        android:layout_alignTop="@+id/scoreTitle"
+                        android:textColor="@color/blue"
+                        android:textSize="30dp"
+                        android:text="0">
+                    </TextView>
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/scoreLayoutRight"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:weightSum="2">
+            <LinearLayout
+                android:id="@+id/scoreLayoutRightTop"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+                <RelativeLayout
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/timerTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:textColor="@color/darkGreen"
+                        android:textSize="30dp"
+                        android:text="@string/timer_string">
+                    </TextView>
+                    <TextView
+                        android:id="@+id/timerText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/timerTitle"
+                        android:layout_alignTop="@+id/timerTitle"
+                        android:textColor="@color/blue"
+                        android:textSize="30dp"
+                        android:text="60">
+                    </TextView>
+                </RelativeLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/scoreLayoutRightBottom"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+                <RelativeLayout
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/num_hit_Title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:textColor="@color/darkGreen"
+                        android:textSize="30dp"
+                        android:text="@string/num_hit_string">
+                    </TextView>
+                    <TextView
+                        android:id="@+id/num_hit_Text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/num_hit_Title"
+                        android:layout_alignTop="@+id/num_hit_Title"
+                        android:textColor="@color/red"
+                        android:textSize="30dp"
+                        android:text="0">
+                    </TextView>
+                </RelativeLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <FrameLayout
@@ -22,7 +175,7 @@
         android:layout_height="0dp"
         android:background="@drawable/grass"
         app:layout_constraintHeight_percent="0.6"
-        app:layout_constraintTop_toBottomOf="@id/scoreLinearLayout">
+        app:layout_constraintTop_toBottomOf="@id/scoreLayout">
 
         <android.support.v7.widget.GridLayout
             android:id="@+id/gameAreaGridLayout"
@@ -53,7 +206,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="10dp"
             android:background="@android:color/transparent">
         </ImageButton>
 
@@ -67,7 +220,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="10dp"
             android:background="@android:color/transparent">
         </ImageButton>
 
@@ -81,7 +234,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="10dp"
             android:background="@android:color/transparent">
         </ImageButton>
 

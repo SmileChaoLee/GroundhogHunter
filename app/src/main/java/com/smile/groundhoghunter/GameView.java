@@ -54,10 +54,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         NumberOfGroundhogTypes = 4;     // including hiding
         TimeIntervalShown = 250;        // 250 mini seconds
         NumTimeIntervalShown = new int[NumberOfGroundhogTypes];
-        NumTimeIntervalShown[0] = 4;    // has to be even
-        NumTimeIntervalShown[1] = 6;    // has to be even
-        NumTimeIntervalShown[2] = 8;    // has to be even
-        NumTimeIntervalShown[3] = 10;   // has to be even
+        NumTimeIntervalShown[0] = 4;    // has to be even (4 frames for animation, total time is 250 * 4 milliseconds)
+        NumTimeIntervalShown[1] = 6;    // has to be even (6 frames for animation, total time is 250 * 6 milliseconds)
+        NumTimeIntervalShown[2] = 8;    // has to be even (8 frames for animation, total time is 250 * 8 milliseconds)
+        NumTimeIntervalShown[3] = 10;   // has to be even (10 frames for animation, total time is 250 * 10 milliseconds)
         GroundhogBitmaps = new Bitmap[NumberOfGroundhogTypes];
         GroundhogBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_0);
         GroundhogBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);

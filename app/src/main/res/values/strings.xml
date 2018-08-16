@@ -14,21 +14,17 @@
     <string name="resume_game_string">Resume</string>
     <string name="new_game_string">New</string>
     <string name="quit_game_string">Quit</string>
-    <string name="begin_string">Start button to begin</string>
-    <string name="gameOver_string">You failed.\nReplay?</string>
-    <string name="win_string">You won.\nReplay?</string>
     <string name="cancelStr">Cancel</string>
     <string name="submitStr">Send</string>
     <string name="nameStr">Input your name</string>
     <string name="yesStr">YES</string>
     <string name="noStr">NO</string>
+    <string name="highest_string">High:</string>
+    <string name="score_string">Score:</string>
+    <string name="timer_string">Timer:</string>
+    <string name="num_hit_string">Hits:</string>
 
     <string name="top_10_score_str">Top 10 scores</string>              <!-- for menu item -->
     <string name="activity_top_10_score">Top10ScoreActivity</string>    <!-- for activity name -->
     <string name="top_10_score_title">Top 10 Scores</string>            <!-- for title of list view -->
-
-    <string name="score_history">Score history</string>                    <!-- for menu item -->
-    <string name="activity_score_history">ScoreHistoryActivity</string>    <!-- for activity name -->
-    <string name="score_history_title">Score History</string>              <!-- for title of list view -->
-
 </resources>

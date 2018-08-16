@@ -9,12 +9,8 @@
         android:title="@string/top_10_score_str"
         android:orderInCategory="2"
         app:showAsAction="never"/>
-    <item android:id="@+id/scoreHistory"
-        android:title="@string/score_history"
-        android:orderInCategory="3"
-        app:showAsAction="never"/>
     <item android:id="@+id/quitGame"
         android:title="@string/quit_game_string"
-        android:orderInCategory="4"
+        android:orderInCategory="3"
         app:showAsAction="never"/>
 </menu>
