@@ -11,13 +11,12 @@ public class GameViewDrawThread extends Thread {
     private MainActivity mainActivity = null;
     private GameView gameView = null;
     private boolean keepRunning;
-    private int synchronizeTime;
+    private int synchronizeTime = GameView.DrawingInterval;
 
     public GameViewDrawThread(GameView gView) {
         this.gameView = gView;
         this.mainActivity = gView.mainActivity;
         keepRunning = true; // keepRunning = true -> loop in run() still going
-        synchronizeTime = 70;   // 70 mini seconds
     }
 
     public void run() {

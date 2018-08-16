@@ -40,6 +40,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     Groundhog[] groundhogArray;
 
     // public properties
+    public static final int DrawingInterval;
     public static final int NumberOfGroundhogTypes;
     public static final int TimeIntervalShown;
     public static final int[] NumTimeIntervalShown;
@@ -49,13 +50,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public static final Bitmap[] scoreBitmaps;
 
     static {
+        DrawingInterval = 80;
         NumberOfGroundhogTypes = 4;     // including hiding
-        TimeIntervalShown = 500;        // 500 mini seconds
+        TimeIntervalShown = 250;        // 250 mini seconds
         NumTimeIntervalShown = new int[NumberOfGroundhogTypes];
-        NumTimeIntervalShown[0] = 2;
-        NumTimeIntervalShown[1] = 3;
-        NumTimeIntervalShown[2] = 4;
-        NumTimeIntervalShown[3] = 5;
+        NumTimeIntervalShown[0] = 4;    // has to be even
+        NumTimeIntervalShown[1] = 6;    // has to be even
+        NumTimeIntervalShown[2] = 8;    // has to be even
+        NumTimeIntervalShown[3] = 10;   // has to be even
         GroundhogBitmaps = new Bitmap[NumberOfGroundhogTypes];
         GroundhogBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_0);
         GroundhogBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
