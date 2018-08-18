@@ -20,16 +20,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = new String("com.smile.groundhoghunter.GameView");
     private final SurfaceHolder surfaceHolder;
+    private final Handler timerHandler;
+    private final Runnable timerRunnable;
 
     private int gameViewWidth;
     private int gameViewHeight;
     private float rectWidthForOneGroundhog;
     private float rectHeightForOneGroundhog;
     private int score;
+    private int numOfHits;
+    private int timeRemaining;
     private GameViewDrawThread gameViewDrawThread;
     private GroundhogRandomThread groundhogRandomThread;
     private boolean surfaceViewCreated;
-    private boolean isGameRunning;
+    private int runningStatus;
 
     // default properties (package modifier)
     final MainActivity mainActivity;
@@ -87,8 +91,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         Log.d(TAG, "GameView created.");
 
         mainActivity = (MainActivity)context;
-        rowNum = mainActivity.getRowNum();
-        colNum = mainActivity.getColNum();
+        rowNum = mainActivity.rowNum;
+        colNum = mainActivity.colNum;
 
         groundhogArray = new Groundhog[rowNum * colNum];
 
@@ -105,8 +109,27 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         surfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
 
         score = 0;
+        numOfHits = 0;
+        timeRemaining = 60;
         surfaceViewCreated = false; // surfaceView has not been created yet
-        isGameRunning = false;
+        runningStatus = 0;  // game is not running
+
+        // timer
+        timerHandler = new Handler(Looper.getMainLooper());
+        timerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (timeRemaining <= 0) {
+                    timerHandler.removeCallbacks(this);
+                    stopThreads();
+                    runningStatus = 2;  // game over
+
+                } else {
+                    timerHandler.postDelayed(this, 1000);
+                    --timeRemaining;
+                }
+            }
+        };
 
     }
 
@@ -175,6 +198,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     if (groundhog.getDrawArea().contains(x,y)) {
                         // hit
                         groundhog.setIsHit(true);
+                        ++numOfHits;
+                        score += hitScores[groundhog.getStatus()];
                     }
                 }
                 break;
@@ -191,33 +216,43 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void startGame() {
-        if (surfaceViewCreated) {
+        if ( (surfaceViewCreated) && (runningStatus == 0) ) {
 
-            isGameRunning = true;
+            runningStatus = 1;  // game is running
 
             gameViewDrawThread = new GameViewDrawThread(this);
             gameViewDrawThread.start();
             groundhogRandomThread = new GroundhogRandomThread(this);
             groundhogRandomThread.start();
+
+            timerHandler.postDelayed(timerRunnable, 1000);
         }
     }
 
     public void newGame() {
-        if (groundhogArray != null) {
-            for (Groundhog groundhog : groundhogArray) {
-                groundhog.setIsHiding(true);
-                groundhog.setIsHit(false);
-                groundhog.setNumOfTimeIntervalShown(0);
+
+        if (runningStatus != 0) {
+            // game is running or game over
+            score = 0;
+            numOfHits = 0;
+            timeRemaining = 60;
+            runningStatus = 0;  // game is not running
+
+            stopThreads();
+
+            if (groundhogArray != null) {
+                for (Groundhog groundhog : groundhogArray) {
+                    groundhog.setIsHiding(true);
+                    groundhog.setIsHit(false);
+                    groundhog.setNumOfTimeIntervalShown(0);
+                }
+
+                drawGameScreen();
             }
         }
-
-        stopThreads();
-
-        isGameRunning = false;
     }
 
     public void drawGameScreen() {
-
         Canvas canvas = null;
         try {
             canvas = surfaceHolder.lockCanvas(null);
@@ -252,6 +287,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void stopThreads() {
+
+        timerHandler.removeCallbacks(timerRunnable);    // stop the timer runnable
 
         boolean retry = true;
         if (groundhogRandomThread != null) {
@@ -289,7 +326,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     // private methods
     private void doDraw(Canvas canvas) {
+
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mainActivity.highScoreTextView.setText("500");
+                mainActivity.scoreTextView.setText(String.valueOf(score));
+                mainActivity.hitNumTextView.setText(String.valueOf(numOfHits));
+                mainActivity.timerTextView.setText(String.valueOf(timeRemaining));
+            }
+        });
+
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        // Game View part
         for (Groundhog groundhog : groundhogArray) {
             groundhog.draw(canvas);
         }

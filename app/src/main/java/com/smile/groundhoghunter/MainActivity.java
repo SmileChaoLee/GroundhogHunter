@@ -28,15 +28,15 @@ public class MainActivity extends AppCompatActivity {
     // private properties
     private final String TAG = new String("com.smile.groundhoghunter.MainActivity");
     private GameView gameView;
-    private int rowNum;
-    private int colNum;
-    private TextView highScoreTextView;
-    private TextView scoreTextView;
-    private TextView timerTextView;
-    private TextView hitNumTextView;
 
     // default properties (package modifiers)
     final Handler activityHandler;
+    int rowNum;
+    int colNum;
+    TextView highScoreTextView;
+    TextView scoreTextView;
+    TextView timerTextView;
+    TextView hitNumTextView;
     boolean gamePause = false;
 
     public MainActivity() {
@@ -222,10 +222,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // public methods
-    public int getRowNum() {
-        return rowNum;
-    }
-    public int getColNum() {
-        return colNum;
-    }
 }
