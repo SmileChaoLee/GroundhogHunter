@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.Utilities;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,7 +9,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.text.TextPaint;
 
-public class FontAndBitmapUtility {
+public class FontAndBitmapUtil {
 
     public static Bitmap getBitmapFromBitmapWithText(Bitmap orgBitmap, String caption, int textColor) {
 

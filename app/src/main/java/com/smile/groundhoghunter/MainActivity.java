@@ -1,14 +1,8 @@
 package com.smile.groundhoghunter;
 
-import android.app.Activity;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.Image;
 import android.os.Handler;
-import android.provider.CalendarContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
@@ -16,12 +10,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -94,9 +88,9 @@ public class MainActivity extends AppCompatActivity {
         String resumeGameStr = getString(R.string.resume_game_string);
 
         ImageButton startGameButton = findViewById(R.id.gameControlButton);
-        Bitmap startGameBitmap = FontAndBitmapUtility.getBitmapFromResourceWithText(this, R.drawable.start_game_button, startGameStr, Color.BLUE);
-        Bitmap pauseGameBitmap = FontAndBitmapUtility.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseGameStr, Color.BLUE);
-        Bitmap resumeGameBitmap = FontAndBitmapUtility.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeGameStr, Color.BLUE);
+        Bitmap startGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.start_game_button, startGameStr, Color.BLUE);
+        Bitmap pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseGameStr, Color.BLUE);
+        Bitmap resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeGameStr, Color.BLUE);
         startGameButton.setImageBitmap(startGameBitmap);
         startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
         String newGameStr = getString(R.string.new_game_string);
         ImageButton newGameButton = findViewById(R.id.newGameButton);
-        Bitmap newGameBitmap = FontAndBitmapUtility.getBitmapFromResourceWithText(this, R.drawable.new_game_button, newGameStr, Color.BLUE);
+        Bitmap newGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.new_game_button, newGameStr, Color.BLUE);
         newGameButton.setImageBitmap(newGameBitmap);
         newGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         String quitGameStr = getString(R.string.quit_game_string);
         ImageButton quitGameButton = findViewById(R.id.quitGameButton);
-        Bitmap quitGameBitmap = FontAndBitmapUtility.getBitmapFromResourceWithText(this, R.drawable.quit_game_button, quitGameStr, Color.BLUE);
+        Bitmap quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.quit_game_button, quitGameStr, Color.BLUE);
         quitGameButton.setImageBitmap(quitGameBitmap);
         quitGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
