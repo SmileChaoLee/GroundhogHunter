@@ -1,7 +1,9 @@
 package com.smile.groundhoghunter;
 
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +18,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
+import com.smile.groundhoghunter.Utilities.ScreenUtil;
+
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,15 +49,37 @@ public class MainActivity extends AppCompatActivity {
         // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         // getSupportActionBar().hide();
 
+        float fontSize = 30;
+        int androidType = ScreenUtil.androidDeviceType(this);
+        if (androidType != 0) {
+            // not a cell phone, it is tablet
+            fontSize = 50;
+        }
+
         setContentView(R.layout.activity_main);
 
         gamePause = false;
 
         // score layout
+        TextView highScoreTitleView = findViewById(R.id.highestScoreTitle);
+        highScoreTitleView.setTextSize(fontSize);
         highScoreTextView = findViewById(R.id.highestScoreText);
+        highScoreTextView.setTextSize(fontSize);
+
+        TextView scoreTitleView = findViewById(R.id.scoreTitle);
+        scoreTitleView.setTextSize(fontSize);
         scoreTextView = findViewById(R.id.scoreText);
+        scoreTextView.setTextSize(fontSize);
+
+        TextView timerTitleView = findViewById(R.id.timerTitle);
+        timerTitleView.setTextSize(fontSize);
         timerTextView = findViewById(R.id.timerText);
+        timerTextView.setTextSize(fontSize);
+
+        TextView hitNumTitleView = findViewById(R.id.num_hit_Title);
+        hitNumTitleView.setTextSize(fontSize);
         hitNumTextView = findViewById(R.id.num_hit_Text);
+        hitNumTextView.setTextSize(fontSize);
 
         FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
         // game view area
