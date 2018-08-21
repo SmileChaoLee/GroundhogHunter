@@ -1,33 +1,48 @@
 package com.smile.groundhoghunter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.smile.groundhoghunter.Model.Groundhog;
+import com.smile.groundhoghunter.Utilities.ScoreSQLite;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = new String("com.smile.groundhoghunter.GameView");
+    private final ScoreSQLite scoreSQLite;
     private final SurfaceHolder surfaceHolder;
     private final Handler timerHandler;
     private final Runnable timerRunnable;
+    private final int rowNum;
+    private final int colNum;
 
     private int gameViewWidth;
     private int gameViewHeight;
     private float rectWidthForOneGroundhog;
     private float rectHeightForOneGroundhog;
-    private int score;
+    private int highestScore;
+    private int currentScore;
     private int numOfHits;
     private int timeRemaining;
     private GameViewDrawThread gameViewDrawThread;
@@ -38,8 +53,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     // default properties (package modifier)
     final MainActivity mainActivity;
     final Handler gameViewHandler;  // for synchronizing
-    final int rowNum;
-    final int colNum;
     boolean gameViewPause;    // for synchronizing
     Groundhog[] groundhogArray;
 
@@ -56,12 +69,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     static {
         DrawingInterval = 80;
         NumberOfGroundhogTypes = 4;     // including hiding
-        TimeIntervalShown = 250;        // 250 mini seconds
+        TimeIntervalShown = 350;        // 500 milli seconds
         NumTimeIntervalShown = new int[NumberOfGroundhogTypes];
-        NumTimeIntervalShown[0] = 4;    // has to be even (4 frames for animation, total time is 250 * 4 milliseconds)
-        NumTimeIntervalShown[1] = 6;    // has to be even (6 frames for animation, total time is 250 * 6 milliseconds)
-        NumTimeIntervalShown[2] = 8;    // has to be even (8 frames for animation, total time is 250 * 8 milliseconds)
-        NumTimeIntervalShown[3] = 10;   // has to be even (10 frames for animation, total time is 250 * 10 milliseconds)
+        NumTimeIntervalShown[0] = 4;    // has to be even (4 frames for animation, total time is 350 * 4 milliseconds)
+        NumTimeIntervalShown[1] = 6;    // has to be even (6 frames for animation, total time is 350 * 6 milliseconds)
+        NumTimeIntervalShown[2] = 8;    // has to be even (8 frames for animation, total time is 350 * 8 milliseconds)
+        NumTimeIntervalShown[3] = 10;   // has to be even (10 frames for animation, total time is 350 * 10 milliseconds)
         GroundhogBitmaps = new Bitmap[NumberOfGroundhogTypes];
         GroundhogBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_0);
         GroundhogBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
@@ -91,8 +104,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         Log.d(TAG, "GameView created.");
 
         mainActivity = (MainActivity)context;
-        rowNum = mainActivity.rowNum;
-        colNum = mainActivity.colNum;
+        scoreSQLite = mainActivity.getScoreSQLite();
+        rowNum = mainActivity.getRowNum();
+        colNum = mainActivity.getColNum();
 
         groundhogArray = new Groundhog[rowNum * colNum];
 
@@ -108,7 +122,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         // surfaceHolder.setFormat(PixelFormat.TRANSPARENT);    // same effect as the following
         surfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
 
-        score = 0;
+        highestScore = mainActivity.getHighestScore();
+        currentScore = 0;
         numOfHits = 0;
         timeRemaining = 60;
         surfaceViewCreated = false; // surfaceView has not been created yet
@@ -120,9 +135,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             @Override
             public void run() {
                 if (timeRemaining <= 0) {
-                    timerHandler.removeCallbacks(this);
-                    stopThreads();
-                    runningStatus = 2;  // game over
+                    gameOver();
 
                 } else {
                     timerHandler.postDelayed(this, 1000);
@@ -199,7 +212,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         // hit
                         groundhog.setIsHit(true);
                         ++numOfHits;
-                        score += hitScores[groundhog.getStatus()];
+                        currentScore += hitScores[groundhog.getStatus()];
                     }
                 }
                 break;
@@ -233,7 +246,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         if (runningStatus != 0) {
             // game is running or game over
-            score = 0;
+            currentScore = 0;
             numOfHits = 0;
             timeRemaining = 60;
             runningStatus = 0;  // game is not running
@@ -330,10 +343,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mainActivity.highScoreTextView.setText("500");
-                mainActivity.scoreTextView.setText(String.valueOf(score));
-                mainActivity.hitNumTextView.setText(String.valueOf(numOfHits));
-                mainActivity.timerTextView.setText(String.valueOf(timeRemaining));
+                mainActivity.setTextForHighScoreTextView(String.valueOf(highestScore));
+                mainActivity.setTextForScoreTextView(String.valueOf(currentScore));
+                mainActivity.setTextForTimerTextView(String.valueOf(timeRemaining));
+                mainActivity.setTextForHitNumTextView(String.valueOf(numOfHits));
+
             }
         });
 
@@ -342,5 +356,90 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         for (Groundhog groundhog : groundhogArray) {
             groundhog.draw(canvas);
         }
+    }
+
+    private void gameOver() {
+        // game over
+        timerHandler.removeCallbacks(timerRunnable);
+        stopThreads();
+        runningStatus = 2;
+        boolean isInTop10 = scoreSQLite.isInTop10(currentScore);
+        if (isInTop10) {
+            // record the current score
+            recordScore(currentScore);
+        }
+    }
+
+    private void recordScore(final int score) {
+        //    record currentScore as a score in database
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                final EditText et = new EditText(mainActivity);
+                et.setTextSize(mainActivity.getTextFontSize());
+                // et.setHeight(200);
+                et.setTextColor(Color.BLUE);
+                // et.setBackground(new ColorDrawable(Color.TRANSPARENT));
+                // et.setBackgroundColor(Color.TRANSPARENT);
+                et.setHint(getResources().getString(R.string.nameStr));
+                et.setGravity(Gravity.CENTER);
+                AlertDialog alertD = new AlertDialog.Builder(mainActivity).create();
+                alertD.setTitle(null);
+                alertD.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                alertD.setCancelable(false);
+                alertD.setView(et);
+                alertD.setButton(DialogInterface.BUTTON_NEGATIVE, getResources().getString(R.string.cancelStr), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alertD.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.submitStr), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        scoreSQLite.addScore(et.getText().toString(), score);
+                        if (currentScore > highestScore) {
+                            highestScore = currentScore;
+                            mainActivity.setHighestScore(highestScore);
+                            mainActivity.setTextForHighScoreTextView(String.valueOf(highestScore));
+                        }
+                    }
+                });
+                alertD.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        setDialogStyle(dialog);
+                    }
+                });
+                alertD.show();
+            }
+        });
+    }
+
+    private void setDialogStyle(DialogInterface dialog) {
+        AlertDialog dlg = (AlertDialog)dialog;
+
+        dlg.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        dlg.getWindow().setDimAmount(0.0f); // no dim for background screen
+
+        dlg.getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
+        dlg.getWindow().setBackgroundDrawableResource(R.drawable.dialogbackground);
+
+        float fontSize = mainActivity.getTextFontSize();
+        Button nBtn = dlg.getButton(DialogInterface.BUTTON_NEGATIVE);
+        nBtn.setTextSize(fontSize);
+        nBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        nBtn.setTextColor(Color.RED);
+
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)nBtn.getLayoutParams();
+        layoutParams.weight = 10;
+        nBtn.setLayoutParams(layoutParams);
+
+        Button pBtn = dlg.getButton(DialogInterface.BUTTON_POSITIVE);
+        pBtn.setTextSize(fontSize);
+        pBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        pBtn.setTextColor(Color.rgb(0x00,0x64,0x00));
+        pBtn.setLayoutParams(layoutParams);
     }
 }

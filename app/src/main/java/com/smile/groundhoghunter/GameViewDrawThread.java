@@ -8,8 +8,8 @@ import com.smile.groundhoghunter.MainActivity;
 
 public class GameViewDrawThread extends Thread {
 
-    private MainActivity mainActivity = null;
-    private GameView gameView = null;
+    private MainActivity mainActivity;
+    private GameView gameView;
     private boolean keepRunning;
     private int synchronizeTime = GameView.DrawingInterval;
 

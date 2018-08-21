@@ -23,6 +23,7 @@
     <string name="score_string">Score:</string>
     <string name="timer_string">Timer:</string>
     <string name="num_hit_string">Hits:</string>
+    <string name="top10Str">Top 10</string>
 
     <string name="top_10_score_str">Top 10 scores</string>              <!-- for menu item -->
     <string name="activity_top_10_score">Top10ScoreActivity</string>    <!-- for activity name -->

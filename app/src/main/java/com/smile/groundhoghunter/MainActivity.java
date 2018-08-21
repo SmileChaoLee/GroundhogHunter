@@ -1,45 +1,64 @@
 package com.smile.groundhoghunter;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
+import com.smile.groundhoghunter.Utilities.ScoreSQLite;
 import com.smile.groundhoghunter.Utilities.ScreenUtil;
 
 import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     // private properties
     private final String TAG = new String("com.smile.groundhoghunter.MainActivity");
+    private final ScoreSQLite scoreSQLite;
     private GameView gameView;
+    private int rowNum;
+    private int colNum;
+    private float textFontSize;
+    private int highestScore;
+    private TextView highScoreTextView;
+    private TextView scoreTextView;
+    private TextView timerTextView;
+    private TextView hitNumTextView;
 
     // default properties (package modifiers)
     final Handler activityHandler;
-    int rowNum;
-    int colNum;
-    TextView highScoreTextView;
-    TextView scoreTextView;
-    TextView timerTextView;
-    TextView hitNumTextView;
     boolean gamePause = false;
 
     public MainActivity() {
         activityHandler = new Handler();
+        // cannot use this as a parameter of context for SQLite because context has not been created yet
+        // until onCreate() in activity, so use the context in Application class
+        scoreSQLite = new ScoreSQLite(GroundhogHunterApp.AppContext);
+        highestScore = scoreSQLite.readHighestScore();
     }
 
     @Override
@@ -49,37 +68,53 @@ public class MainActivity extends AppCompatActivity {
         // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         // getSupportActionBar().hide();
 
-        float fontSize = 30;
-        int androidType = ScreenUtil.androidDeviceType(this);
-        if (androidType != 0) {
-            // not a cell phone, it is tablet
-            fontSize = 50;
+        textFontSize = 30;
+        boolean isTable = ScreenUtil.isTablet(this);
+        if (isTable) {
+            // not a cell phone, it is a tablet
+            textFontSize = 50;
         }
 
         setContentView(R.layout.activity_main);
 
         gamePause = false;
 
+        int darkOrange = getResources().getColor(R.color.darkOrange);
+        int darkRed = getResources().getColor(R.color.darkRed);
+
+        // upper buttons layout
+        String top10Str = getString(R.string.top10Str);
+        ImageButton top10Button = findViewById(R.id.top10Button);
+        Bitmap top10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.top10_button, top10Str, Color.RED);
+        top10Button.setImageBitmap(top10Bitmap);
+        top10Button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getTop10ScoreList();
+            }
+        });
+
         // score layout
         TextView highScoreTitleView = findViewById(R.id.highestScoreTitle);
-        highScoreTitleView.setTextSize(fontSize);
+        highScoreTitleView.setTextSize(textFontSize);
         highScoreTextView = findViewById(R.id.highestScoreText);
-        highScoreTextView.setTextSize(fontSize);
+        highScoreTextView.setTextSize(textFontSize);
+        highScoreTextView.setText(String.valueOf(highestScore));
 
         TextView scoreTitleView = findViewById(R.id.scoreTitle);
-        scoreTitleView.setTextSize(fontSize);
+        scoreTitleView.setTextSize(textFontSize);
         scoreTextView = findViewById(R.id.scoreText);
-        scoreTextView.setTextSize(fontSize);
+        scoreTextView.setTextSize(textFontSize);
 
         TextView timerTitleView = findViewById(R.id.timerTitle);
-        timerTitleView.setTextSize(fontSize);
+        timerTitleView.setTextSize(textFontSize);
         timerTextView = findViewById(R.id.timerText);
-        timerTextView.setTextSize(fontSize);
+        timerTextView.setTextSize(textFontSize);
 
         TextView hitNumTitleView = findViewById(R.id.num_hit_Title);
-        hitNumTitleView.setTextSize(fontSize);
+        hitNumTitleView.setTextSize(textFontSize);
         hitNumTextView = findViewById(R.id.num_hit_Text);
-        hitNumTextView.setTextSize(fontSize);
+        hitNumTextView.setTextSize(textFontSize);
 
         FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
         // game view area
@@ -139,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
         String quitGameStr = getString(R.string.quit_game_string);
         ImageButton quitGameButton = findViewById(R.id.quitGameButton);
-        Bitmap quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.quit_game_button, quitGameStr, Color.BLUE);
+        Bitmap quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.quit_game_button, quitGameStr, Color.YELLOW);
         quitGameButton.setImageBitmap(quitGameBitmap);
         quitGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,45 +182,6 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.newGame) {
-            // gameView.releaseSynchronizations();
-            // gameView.newGame();
-            return true;
-        }
-
-        if (id == R.id.top_10_score) {
-            // gameView.getTop10ScoreList();
-            return true;
-        }
-
-        if (id == R.id.quitGame) {
-            Handler handlerClose = new Handler();
-            handlerClose.postDelayed(new Runnable() {
-                public void run() {
-                    finish();
-                }
-            },300);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -242,5 +238,58 @@ public class MainActivity extends AppCompatActivity {
         gameView.releaseResources();
     }
 
+    private void getTop10ScoreList() {
+        ArrayList<Pair<String, Integer>> top10 = scoreSQLite.readTop10ScoreList();
+        ArrayList<String> playerNames = new ArrayList<String>();
+        ArrayList<Integer> playerScores = new ArrayList<Integer>();
+        for (Pair pair : top10) {
+            playerNames.add((String)pair.first);
+            playerScores.add((Integer)pair.second);
+        }
+
+        Log.d(TAG, "top10.size() = " + top10.size());
+
+        Intent intent = new Intent(this, Top10ScoreActivity.class);
+        Bundle extras = new Bundle();
+        extras.putStringArrayList("Top10Players", playerNames);
+        extras.putIntegerArrayList("Top10Scores", playerScores);
+        extras.putFloat("FontSizeForText", textFontSize);
+        intent.putExtras(extras);
+
+        Log.d(TAG, "Starting Top10ScoreActivity ......");
+
+        startActivity(intent);
+    }
+
     // public methods
+    public ScoreSQLite getScoreSQLite() {
+        return scoreSQLite;
+    }
+    public int getRowNum() {
+        return rowNum;
+    }
+    public int getColNum() {
+        return colNum;
+    }
+    public float getTextFontSize() {
+        return textFontSize;
+    }
+    public int getHighestScore() {
+        return highestScore;
+    }
+    public void setHighestScore(int highestScore) {
+        this.highestScore = highestScore;
+    }
+    public void setTextForHighScoreTextView(String text) {
+        highScoreTextView.setText(text);
+    }
+    public void setTextForScoreTextView(String text) {
+        scoreTextView.setText(text);
+    }
+    public void setTextForTimerTextView(String text) {
+        timerTextView.setText(text);
+    }
+    public void setTextForHitNumTextView(String text) {
+        hitNumTextView.setText(text);
+    }
 }

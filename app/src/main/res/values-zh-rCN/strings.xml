@@ -25,6 +25,7 @@
     <string name="score_string">分数:</string>
     <string name="timer_string">计时器:</string>
     <string name="num_hit_string">击中次数:</string>
+    <string name="top10Str">前10名</string>
 
     <string name="top_10_score_str">前10名最高分</string>        <!-- for menu item -->
     <string name="activity_top_10_score">前10名最高分</string>   <!-- for activity name -->

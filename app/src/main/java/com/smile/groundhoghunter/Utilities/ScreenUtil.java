@@ -2,8 +2,8 @@ package com.smile.groundhoghunter.Utilities;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Point;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 
@@ -47,30 +47,16 @@ public class ScreenUtil {
         display.getSize(size);
     }
 
-    public static int androidDeviceType(Context context) {
+    public static boolean isTablet(Context context)
+    {
+        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        display.getMetrics(displayMetrics);
 
-        int type = 0;   // default is cell phone
+        float wInches = (float)(displayMetrics.widthPixels) / (float)(displayMetrics.densityDpi);
+        float hInches = (float)(displayMetrics.heightPixels) / (float)(displayMetrics.densityDpi);
 
-        Point size = new Point();
-        ScreenUtil.getScreenSize(context, size);
-        int screenWidth = size.x;
-        int screenHeight = size.y;
-        float baseWidth = 1080.0f;      // portrait
-        float baseHeight = 1776.0f;
-        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // Landscape
-            if (screenWidth >= 2000) {
-                // assume Tablet
-                type = 1;
-            }
-        } else {
-            // portrait
-            if (screenWidth >= 1300) {
-                // assume Tablet
-                type = 1;
-            }
-        }
-
-        return type;
+        double screenDiagonal = Math.sqrt(Math.pow(wInches, 2) + Math.pow(hInches, 2));
+        return (screenDiagonal >= 7.0);
     }
 }
