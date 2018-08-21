@@ -64,7 +64,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public static final Bitmap[] GroundhogBitmaps;
     public static final Bitmap[] GroundhogHitBitmaps;
     public static final int[] hitScores;
-    public static final Bitmap[] scoreBitmaps;
+    public static final Bitmap score_board;
 
     static {
         DrawingInterval = 80;
@@ -90,12 +90,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         hitScores[1] = 30;
         hitScores[2] = 20;
         hitScores[3] = 10;
-        scoreBitmaps = new Bitmap[NumberOfGroundhogTypes];
-        // convert numbers to Bitmaps
-        scoreBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.s40);
-        scoreBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.s30);
-        scoreBitmaps[2] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.s20);
-        scoreBitmaps[3] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.s10);
+        score_board = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.score_board);
     }
 
     public GameView(Context context) {

@@ -245,10 +245,10 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // ArrayList<Pair<String, Integer>> top10 = scoreSQLite.readTop10ScoreList();
-        // boolean isTop10 = true;
-        ArrayList<Pair<String, Integer>> top10 = scoreSQLite.readAllScores();
-        boolean isTop10 = false;
+        ArrayList<Pair<String, Integer>> top10 = scoreSQLite.readTop10ScoreList();
+        boolean isTop10 = true;
+        // ArrayList<Pair<String, Integer>> top10 = scoreSQLite.readAllScores();
+        // boolean isTop10 = false;
         ArrayList<String> playerNames = new ArrayList<String>();
         ArrayList<Integer> playerScores = new ArrayList<Integer>();
         for (Pair pair : top10) {

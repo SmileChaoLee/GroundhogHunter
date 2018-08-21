@@ -2,12 +2,14 @@ package com.smile.groundhoghunter.Model;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 
 import com.smile.groundhoghunter.GameView;
+import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.groundhoghunter.Utilities.MathUtil;
 
 public class Groundhog {
@@ -126,7 +128,9 @@ public class Groundhog {
             if (isHit) {
                 // groundhog is hit
                 canvas.drawBitmap(GameView.GroundhogHitBitmaps[status], null, drawArea, null);
-                canvas.drawBitmap(GameView.scoreBitmaps[status], null, scoreArea, null);
+                // the following is displaying score image
+                Bitmap tempBm = FontAndBitmapUtil.getBitmapFromBitmapWithText(GameView.score_board, String.valueOf(GameView.hitScores[status]), Color.BLACK);
+                canvas.drawBitmap(tempBm, null, scoreArea, null);
             } else {
                 // not hit
                 canvas.drawBitmap(GameView.GroundhogBitmaps[status], null, drawArea, null);
