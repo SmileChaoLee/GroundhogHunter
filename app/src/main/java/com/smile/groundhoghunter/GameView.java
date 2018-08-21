@@ -337,6 +337,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         Log.d(TAG, "releaseResources() is called.\n");
     }
 
+    public int getRunningStatus() {
+        return runningStatus;
+    }
+
     // private methods
     private void doDraw(Canvas canvas) {
 
@@ -399,6 +403,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         scoreSQLite.addScore(et.getText().toString(), score);
+                        scoreSQLite.deleteAllAfterTop10();  // only keep the top 10
                         if (currentScore > highestScore) {
                             highestScore = currentScore;
                             mainActivity.setHighestScore(highestScore);

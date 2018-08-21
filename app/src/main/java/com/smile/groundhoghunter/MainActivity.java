@@ -239,7 +239,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getTop10ScoreList() {
-        ArrayList<Pair<String, Integer>> top10 = scoreSQLite.readTop10ScoreList();
+
+        if (gameView.getRunningStatus() == 1) {
+            // client is playing game
+            return;
+        }
+
+        // ArrayList<Pair<String, Integer>> top10 = scoreSQLite.readTop10ScoreList();
+        // boolean isTop10 = true;
+        ArrayList<Pair<String, Integer>> top10 = scoreSQLite.readAllScores();
+        boolean isTop10 = false;
         ArrayList<String> playerNames = new ArrayList<String>();
         ArrayList<Integer> playerScores = new ArrayList<Integer>();
         for (Pair pair : top10) {
@@ -251,12 +260,11 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, Top10ScoreActivity.class);
         Bundle extras = new Bundle();
+        extras.putBoolean("IsTop10", isTop10);
         extras.putStringArrayList("Top10Players", playerNames);
         extras.putIntegerArrayList("Top10Scores", playerScores);
         extras.putFloat("FontSizeForText", textFontSize);
         intent.putExtras(extras);
-
-        Log.d(TAG, "Starting Top10ScoreActivity ......");
 
         startActivity(intent);
     }

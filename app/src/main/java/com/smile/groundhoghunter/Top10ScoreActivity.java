@@ -21,11 +21,12 @@ import java.util.ArrayList;
 public class Top10ScoreActivity extends AppCompatActivity {
 
     private static final String TAG = "Top10ScoreActivity";
+    private boolean isTop10 = true;
     private ArrayList<String> top10Players = new ArrayList<String>();
     private ArrayList<Integer> top10Scores = new ArrayList<Integer>();
     private ArrayList<Integer> medalImageIds = new ArrayList<Integer>();
-    private ListView listView = null;
     private float fontSizeForText = 24;
+    private ListView listView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class Top10ScoreActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            isTop10 = extras.getBoolean("IsTop10");
             top10Players = extras.getStringArrayList("Top10Players");
             top10Scores = extras.getIntegerArrayList("Top10Scores");
             fontSizeForText = extras.getFloat("FontSizeForText");
@@ -142,8 +144,9 @@ public class Top10ScoreActivity extends AppCompatActivity {
 
             pTextView.setText(players.get(position));
             sTextView.setText(String.valueOf(scores.get(position)));
-            medalImage.setImageResource(medals.get(position));
-
+            if (isTop10) {
+                medalImage.setImageResource(medals.get(position));
+            }
 
             return view;
         }
