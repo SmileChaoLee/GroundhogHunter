@@ -1,5 +1,6 @@
 package com.smile.groundhoghunter;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -9,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,9 +28,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.smile.facebookadsutil.FacebookInterstitialAds;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
-import com.smile.groundhoghunter.Utilities.ScoreSQLite;
 import com.smile.groundhoghunter.Utilities.ScreenUtil;
+import com.smile.scoresqlite.ScoreSQLite;
 
 import org.w3c.dom.Text;
 
@@ -49,9 +52,15 @@ public class MainActivity extends AppCompatActivity {
     private TextView timerTextView;
     private TextView hitNumTextView;
 
+    // private properties facebook ads
+    private FacebookInterstitialAds facebookInterstitialAds;
+
     // default properties (package modifiers)
     final Handler activityHandler;
     boolean gamePause = false;
+
+    // public methods
+    public static final int Top10RequestCode = 0;
 
     public MainActivity() {
         activityHandler = new Handler();
@@ -59,6 +68,23 @@ public class MainActivity extends AppCompatActivity {
         // until onCreate() in activity, so use the context in Application class
         scoreSQLite = new ScoreSQLite(GroundhogHunterApp.AppContext);
         highestScore = scoreSQLite.readHighestScore();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // show ads
+        if (requestCode == Top10RequestCode) {
+            if (resultCode == Activity.RESULT_OK) {
+                Log.i(TAG, "Top10ScoreActivity returned successfully.");
+            } else {
+                Log.i(TAG, "Top10ScoreActivity did not return successfully.");
+            }
+        } else {
+            Log.i(TAG, "not returned from Top10ScoreActivity.");
+        }
+        Log.i(TAG, "Facebook showing ads");
+        facebookInterstitialAds.showAd(TAG);
     }
 
     @Override
@@ -169,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 gameView.newGame();
+                facebookInterstitialAds.showAd(TAG);
             }
         });
 
@@ -179,9 +206,19 @@ public class MainActivity extends AppCompatActivity {
         quitGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // show ads
+                facebookInterstitialAds.showAd(TAG);
                 finish();
             }
         });
+
+
+        // Facebook ads (Interstitial ads)
+        // Placement ID:	308861513197370_308861586530696
+        String facebookPlacementID = new String("308861513197370_308861586530696"); // groundhog hunter for free
+
+        facebookInterstitialAds = new FacebookInterstitialAds(this, facebookPlacementID);
+
     }
 
     @Override
@@ -208,15 +245,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
+
         // release and destroy threads and resources before destroy activity
 
-        System.out.println("onDestroy --> Setting Screen orientation to User");
-
-        /*
-        if (facebookBannerAdView != null) {
-            facebookBannerAdView.close();
+        if (isFinishing()) {
+            if (facebookInterstitialAds != null) {
+                facebookInterstitialAds.close();
+            }
         }
-        */
 
         finishApplication();
 
@@ -266,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
         extras.putFloat("FontSizeForText", textFontSize);
         intent.putExtras(extras);
 
-        startActivity(intent);
+        startActivityForResult(intent, MainActivity.Top10RequestCode);
     }
 
     // public methods

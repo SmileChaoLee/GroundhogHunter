@@ -1,5 +1,6 @@
 package com.smile.groundhoghunter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -47,6 +48,9 @@ public class Top10ScoreActivity extends AppCompatActivity {
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Intent returnIntent = new Intent();
+                // setResult(Activity.RESULT_OK, returnIntent);
+                setResult(Activity.RESULT_OK);
                 finish();
             }
         });

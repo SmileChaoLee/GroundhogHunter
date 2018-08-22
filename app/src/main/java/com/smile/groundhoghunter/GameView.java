@@ -25,7 +25,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.smile.groundhoghunter.Model.Groundhog;
-import com.smile.groundhoghunter.Utilities.ScoreSQLite;
+import com.smile.scoresqlite.ScoreSQLite;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 

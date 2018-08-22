@@ -50,7 +50,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintHeight_percent="0.15"
         app:layout_constraintTop_toBottomOf="@id/upperButtonLayout"
         android:weightSum="2">
 
@@ -230,7 +230,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintHeight_percent="0.15"
         app:layout_constraintTop_toBottomOf="@id/gameViewAreaFrameLayout"
         android:weightSum="3">
 
@@ -242,9 +242,9 @@
             android:layout_gravity="center"
             android:scaleType="fitXY"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="30dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="15dp"
             android:background="@android:color/transparent">
         </ImageButton>
 
@@ -256,9 +256,9 @@
             android:layout_gravity="center"
             android:scaleType="fitXY"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="30dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="15dp"
             android:background="@android:color/transparent">
         </ImageButton>
 
@@ -270,22 +270,12 @@
             android:layout_gravity="center"
             android:scaleType="fitXY"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="30dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="15dp"
             android:background="@android:color/transparent">
         </ImageButton>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/showAdsLinearLayout"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="#ff9100"
-        app:layout_constraintHeight_percent="0.1"
-        app:layout_constraintTop_toBottomOf="@id/buttonLinearLayout">
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
