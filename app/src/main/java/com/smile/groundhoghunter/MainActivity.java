@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 gameView.newGame();
-                facebookInterstitialAds.showAd(TAG);
+                // facebookInterstitialAds.showAd(TAG);     // removed on 2018-08-22
             }
         });
 
