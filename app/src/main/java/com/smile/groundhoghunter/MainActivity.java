@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -29,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.smile.facebookadsutil.FacebookInterstitialAds;
+import com.smile.groundhoghunter.Model.CustomImageButton;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.groundhoghunter.Utilities.ScreenUtil;
 import com.smile.scoresqlite.ScoreSQLite;
@@ -40,8 +43,12 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     // private properties
-    private final String TAG = new String("com.smile.groundhoghunter.MainActivity");
+    private final static String TAG = "MainActivity";
+    private final static int colorFilterChanged = Color.argb(100, 155, 155, 155);
+    private final static int colorFilterOriginal = Color.argb(0, 155, 155, 155);
+
     private final ScoreSQLite scoreSQLite;
+
     private GameView gameView;
     private int rowNum;
     private int colNum;
@@ -110,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
         // upper buttons layout
         String top10Str = getString(R.string.top10Str);
-        ImageButton top10Button = findViewById(R.id.top10Button);
+        final CustomImageButton top10Button = findViewById(R.id.top10Button);
         Bitmap top10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.top10_button, top10Str, Color.RED);
         top10Button.setImageBitmap(top10Bitmap);
         top10Button.setOnClickListener(new View.OnClickListener() {
@@ -175,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
         String pauseGameStr = getString(R.string.pause_game_string);
         String resumeGameStr = getString(R.string.resume_game_string);
 
-        ImageButton startGameButton = findViewById(R.id.gameControlButton);
+        CustomImageButton startGameButton = findViewById(R.id.gameControlButton);
         Bitmap startGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.start_game_button, startGameStr, Color.BLUE);
         Bitmap pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseGameStr, Color.BLUE);
         Bitmap resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeGameStr, Color.BLUE);
@@ -188,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         String newGameStr = getString(R.string.new_game_string);
-        ImageButton newGameButton = findViewById(R.id.newGameButton);
+        CustomImageButton newGameButton = findViewById(R.id.newGameButton);
         Bitmap newGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.new_game_button, newGameStr, Color.BLUE);
         newGameButton.setImageBitmap(newGameBitmap);
         newGameButton.setOnClickListener(new View.OnClickListener() {
@@ -200,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         String quitGameStr = getString(R.string.quit_game_string);
-        ImageButton quitGameButton = findViewById(R.id.quitGameButton);
+        CustomImageButton quitGameButton = findViewById(R.id.quitGameButton);
         Bitmap quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.quit_game_button, quitGameStr, Color.YELLOW);
         quitGameButton.setImageBitmap(quitGameBitmap);
         quitGameButton.setOnClickListener(new View.OnClickListener() {
