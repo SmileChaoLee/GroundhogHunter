@@ -32,8 +32,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = new String("com.smile.groundhoghunter.GameView");
     private final ScoreSQLite scoreSQLite;
     private final SurfaceHolder surfaceHolder;
-    private final Handler timerHandler;
-    private final Runnable timerRunnable;
     private final int rowNum;
     private final int colNum;
 
@@ -44,9 +42,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private int highestScore;
     private int currentScore;
     private int numOfHits;
-    private int timeRemaining;
     private GameViewDrawThread gameViewDrawThread;
     private GroundhogRandomThread groundhogRandomThread;
+    private TimerThread timerThread;
     private boolean surfaceViewCreated;
     private int runningStatus;
 
@@ -57,6 +55,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     Groundhog[] groundhogArray;
 
     // public properties
+    public static final int TimerInterval = 60; // 60 seconds
     public static final int DrawingInterval;
     public static final int NumberOfGroundhogTypes;
     public static final int TimeIntervalShown;
@@ -120,25 +119,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         highestScore = mainActivity.getHighestScore();
         currentScore = 0;
         numOfHits = 0;
-        timeRemaining = 60;
         surfaceViewCreated = false; // surfaceView has not been created yet
         runningStatus = 0;  // game is not running
-
-        // timer
-        timerHandler = new Handler(Looper.getMainLooper());
-        timerRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (timeRemaining <= 0) {
-                    gameOver();
-
-                } else {
-                    timerHandler.postDelayed(this, 1000);
-                    --timeRemaining;
-                }
-            }
-        };
-
     }
 
     @Override
@@ -226,14 +208,33 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void startGame() {
         if ( (surfaceViewCreated) && (runningStatus == 0) ) {
 
-            runningStatus = 1;  // game is running
+            runningStatus = 1;  // game is set to be running
 
             gameViewDrawThread = new GameViewDrawThread(this);
             gameViewDrawThread.start();
             groundhogRandomThread = new GroundhogRandomThread(this);
             groundhogRandomThread.start();
+            timerThread = new TimerThread(this);
+            timerThread.start();
+        }
+    }
 
-            timerHandler.postDelayed(timerRunnable, 1000);
+    public void pauseGame() {
+        if ( (surfaceViewCreated) && (runningStatus == 1) && (!gameViewPause)) {
+            // when game is running
+            synchronized (gameViewHandler) {
+                gameViewPause = true;
+            }
+        }
+    }
+
+    public void resumeGame() {
+        if ( (surfaceViewCreated) && (runningStatus == 1) && (gameViewPause) ) {
+            // when game is running
+            synchronized (gameViewHandler) {
+                gameViewPause = false;
+                gameViewHandler.notifyAll();
+            }
         }
     }
 
@@ -243,7 +244,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             // game is running or game over
             currentScore = 0;
             numOfHits = 0;
-            timeRemaining = 60;
             runningStatus = 0;  // game is not running
 
             stopThreads();
@@ -296,8 +296,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void stopThreads() {
 
-        timerHandler.removeCallbacks(timerRunnable);    // stop the timer runnable
-
         boolean retry = true;
         if (groundhogRandomThread != null) {
             groundhogRandomThread.setKeepRunning(false);
@@ -326,6 +324,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 }// continue processing until the thread ends
             }
         }
+
+        if (timerThread != null) {
+            timerThread.setKeepRunning(false);    // stop the timerThread
+            retry = true;
+            while (retry) {
+                try {
+                    timerThread.join();
+                    Log.d(TAG, "timerThread.Join()........\n");
+                    retry = false;
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }// continue processing until the thread ends
+            }
+        }
     }
 
     public void releaseResources() {
@@ -339,6 +351,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     // private methods
     private void doDraw(Canvas canvas) {
 
+        final int timeRemaining = timerThread.getTimeRemaining();
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -346,21 +359,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 mainActivity.setTextForScoreTextView(String.valueOf(currentScore));
                 mainActivity.setTextForTimerTextView(String.valueOf(timeRemaining));
                 mainActivity.setTextForHitNumTextView(String.valueOf(numOfHits));
-
             }
         });
 
-        canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-        // Game View part
-        for (Groundhog groundhog : groundhogArray) {
-            groundhog.draw(canvas);
+        if (canvas != null) {
+            canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+            // Game View part
+            for (Groundhog groundhog : groundhogArray) {
+                groundhog.draw(canvas);
+            }
         }
     }
 
-    private void gameOver() {
+    public void gameOver() {
         // game over
-        timerHandler.removeCallbacks(timerRunnable);
-        stopThreads();
+        // set threads to stop running loop
+        gameViewDrawThread.setKeepRunning(false);
+        groundhogRandomThread.setKeepRunning(false);
+        timerThread.setKeepRunning(false);
+
         runningStatus = 2;
         boolean isInTop10 = scoreSQLite.isInTop10(currentScore);
         if (isInTop10) {

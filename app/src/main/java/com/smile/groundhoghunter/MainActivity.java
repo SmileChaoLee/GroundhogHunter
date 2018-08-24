@@ -182,15 +182,79 @@ public class MainActivity extends AppCompatActivity {
         String pauseGameStr = getString(R.string.pause_game_string);
         String resumeGameStr = getString(R.string.resume_game_string);
 
-        CustomImageButton startGameButton = findViewById(R.id.gameControlButton);
-        Bitmap startGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.start_game_button, startGameStr, Color.BLUE);
-        Bitmap pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseGameStr, Color.BLUE);
-        Bitmap resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeGameStr, Color.BLUE);
+        final CustomImageButton startGameButton = findViewById(R.id.startGameButton);
+        final Bitmap startGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.start_game_button, startGameStr, Color.BLUE);
         startGameButton.setImageBitmap(startGameBitmap);
+        startGameButton.setClickable(true);
+        startGameButton.setEnabled(true);
+        startGameButton.setVisibility(View.VISIBLE);
+
+        final CustomImageButton pauseGameButton = findViewById(R.id.pauseGameButton);
+        Bitmap pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseGameStr, Color.BLUE);
+        pauseGameButton.setImageBitmap(pauseGameBitmap);
+        pauseGameButton.setClickable(false);
+        pauseGameButton.setEnabled(false);
+        pauseGameButton.setVisibility(View.GONE);
+
+        final CustomImageButton resumeGameButton = findViewById(R.id.resumeGameButton);
+        Bitmap resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeGameStr, Color.BLUE);
+        resumeGameButton.setImageBitmap(resumeGameBitmap);
+        resumeGameButton.setClickable(false);
+        resumeGameButton.setEnabled(false);
+        resumeGameButton.setVisibility(View.GONE);
+
         startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 gameView.startGame();
+
+                startGameButton.setClickable(false);
+                startGameButton.setEnabled(false);
+                startGameButton.setVisibility(View.GONE);
+
+                pauseGameButton.setClickable(true);
+                pauseGameButton.setEnabled(true);
+                pauseGameButton.setVisibility(View.VISIBLE);
+
+                resumeGameButton.setClickable(false);
+                resumeGameButton.setEnabled(false);
+                resumeGameButton.setVisibility(View.GONE);
+            }
+        });
+        pauseGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameView.pauseGame();
+
+                startGameButton.setClickable(false);
+                startGameButton.setEnabled(false);
+                startGameButton.setVisibility(View.GONE);
+
+                pauseGameButton.setClickable(false);
+                pauseGameButton.setEnabled(false);
+                pauseGameButton.setVisibility(View.GONE);
+
+                resumeGameButton.setClickable(true);
+                resumeGameButton.setEnabled(true);
+                resumeGameButton.setVisibility(View.VISIBLE);
+            }
+        });
+        resumeGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameView.resumeGame();
+
+                startGameButton.setClickable(false);
+                startGameButton.setEnabled(false);
+                startGameButton.setVisibility(View.GONE);
+
+                pauseGameButton.setClickable(true);
+                pauseGameButton.setEnabled(true);
+                pauseGameButton.setVisibility(View.VISIBLE);
+
+                resumeGameButton.setClickable(false);
+                resumeGameButton.setEnabled(false);
+                resumeGameButton.setVisibility(View.GONE);
             }
         });
 
@@ -202,6 +266,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 gameView.newGame();
+
+                startGameButton.setClickable(true);
+                startGameButton.setEnabled(true);
+                startGameButton.setVisibility(View.VISIBLE);
+
+                pauseGameButton.setClickable(false);
+                pauseGameButton.setEnabled(false);
+                pauseGameButton.setVisibility(View.GONE);
+
+                resumeGameButton.setClickable(false);
+                resumeGameButton.setEnabled(false);
+                resumeGameButton.setVisibility(View.GONE);
                 // facebookInterstitialAds.showAd(TAG);     // removed on 2018-08-22
             }
         });
