@@ -93,39 +93,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         score_board = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.score_board);
     }
 
-    public GameView(Context context) {
-        super(context);
-
-        Log.d(TAG, "GameView.GameView(Context context) is called.");
-
-        mainActivity = (MainActivity)context;
-        scoreSQLite = mainActivity.getScoreSQLite();
-        rowNum = mainActivity.getRowNum();
-        colNum = mainActivity.getColNum();
-
-        // groundhogArray = new Groundhog[rowNum * colNum];
-        groundhogArray = null;
-
-        gameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
-        gameViewPause = false;   // for synchronizing
-
-        setWillNotDraw(true);   // added on 2017-11-07 for just in case, the default is true
-
-        surfaceHolder = getHolder();
-        surfaceHolder.addCallback(this); // register the interface
-
-        setZOrderOnTop(true);
-        // surfaceHolder.setFormat(PixelFormat.TRANSPARENT);    // same effect as the following
-        surfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
-
-        highestScore = mainActivity.getHighestScore();
-        currentScore = 0;
-        numOfHits = 0;
-        surfaceViewCreated = false; // surfaceView has not been created yet
-        runningStatus = 0;  // game is not running
-        timeRemaining = GameView.TimerInterval;
-    }
-
     public GameView(Context context, int gWidth, int gHeight) {
         super(context);
 

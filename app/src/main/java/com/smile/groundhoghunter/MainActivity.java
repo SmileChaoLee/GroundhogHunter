@@ -199,14 +199,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*
-        // another way to create Game View
-        gameView = new GameView(this);
-        Log.i(TAG, "gameView created.");
-        gameFrameLayout.addView(gameView);
-        Log.i(TAG, "Added gameView to gameFrameLayout.");
-        */
-
         // buttons for start game, new game, quit game
         String startGameStr = getString(R.string.start_game_string);
         String pauseGameStr = getString(R.string.pause_game_string);
