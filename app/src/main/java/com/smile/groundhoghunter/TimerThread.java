@@ -44,11 +44,6 @@ public class TimerThread extends Thread {
 
             --timeRemaining;
         }
-
-        if ( (keepRunning) && (timeRemaining <= 0) ) {
-            // time is up
-            gameView.gameOver();
-        }
     }
 
     public int getTimeRemaining() {

@@ -33,6 +33,12 @@ public class Groundhog {
     /*
     constructor
      */
+
+    public Groundhog() {
+        status = 0;
+        setIsHiding(true);
+    }
+
     public Groundhog(RectF rectF) {
         float shrinkRatio = 36.0f;
         wholeGroundhogArea = MathUtil.shrinkRectF(rectF, shrinkRatio);
@@ -49,16 +55,7 @@ public class Groundhog {
         scoreArea.bottom = scoreArea.bottom - shift;
 
         status = 0;
-        numOfTimeIntervalShown = 0;      // hiding status
-        isHiding = true;
-        isHit = false;
-        numOfAnimationsShown = 1;
-
-        // eraserPaint.setAlpha(0);
-        // eraserPaint.setStrokeJoin(Paint.Join.ROUND);
-        // eraserPaint.setStrokeCap(Paint.Cap.ROUND);
-        // eraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        // eraserPaint.setAntiAlias(true);
+        setIsHiding(true);
     }
 
     // public methods
@@ -69,9 +66,6 @@ public class Groundhog {
 
     public void setStatus(int status) {
         this.status = status;
-        // halfOfAnimationTimes = ((float)GameView.TimeIntervalShown / (float)GameView.DrawingInterval)
-        //                         * (float)GameView.NumTimeIntervalShown[status] / 2.0f;
-
         halfOfAnimationTimes = GameView.NumTimeIntervalShown[status] / 2;
     }
 

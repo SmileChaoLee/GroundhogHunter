@@ -138,16 +138,19 @@ public class MainActivity extends AppCompatActivity {
         scoreTitleView.setTextSize(textFontSize);
         scoreTextView = findViewById(R.id.scoreText);
         scoreTextView.setTextSize(textFontSize);
+        scoreTextView.setText("0");
 
         TextView timerTitleView = findViewById(R.id.timerTitle);
         timerTitleView.setTextSize(textFontSize);
         timerTextView = findViewById(R.id.timerText);
         timerTextView.setTextSize(textFontSize);
+        timerTextView.setText(String.valueOf(GameView.TimerInterval));
 
         TextView hitNumTitleView = findViewById(R.id.num_hit_Title);
         hitNumTitleView.setTextSize(textFontSize);
         hitNumTextView = findViewById(R.id.num_hit_Text);
         hitNumTextView.setTextSize(textFontSize);
+        hitNumTextView.setText("0");
 
         FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
         // game view area
@@ -176,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
         gameView = new GameView(this);
         Log.i(TAG, "gameView created.");
         gameFrameLayout.addView(gameView);
+        Log.i(TAG, "Added gameView to gameFrameLayout.");
 
         // buttons for start game, new game, quit game
         String startGameStr = getString(R.string.start_game_string);
@@ -359,8 +363,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void getTop10ScoreList() {
 
-        if (gameView.getRunningStatus() == 1) {
-            // client is playing game
+        if ( (gameView.getRunningStatus() == 1) && (!gameView.gameViewPause) ) {
+            // client is playing game and not in pause status
             return;
         }
 
