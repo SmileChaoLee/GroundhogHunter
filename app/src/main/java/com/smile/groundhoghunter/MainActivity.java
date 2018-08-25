@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -22,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -152,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         hitNumTextView.setTextSize(textFontSize);
         hitNumTextView.setText("0");
 
-        FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
+        final FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
         // game view area
         GridLayout gameGrid = findViewById(R.id.gameAreaGridLayout);
         rowNum = gameGrid.getRowCount();
@@ -176,10 +178,34 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        gameFrameLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                    // removeGlobalOnLayoutListener() method after API 15
+                    gameFrameLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                } else {
+                    gameFrameLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+                int frameWidth = gameFrameLayout.getWidth();
+                int frameHeight = gameFrameLayout.getHeight();
+                Log.i(TAG, "The width of gameFrameLayout = " + frameWidth);
+                Log.i(TAG, "The height of gameFrameLayout = " + frameHeight);
+
+                gameView = new GameView(MainActivity.this, frameWidth, frameHeight);
+                Log.i(TAG, "gameView created.");
+                gameFrameLayout.addView(gameView);
+                Log.i(TAG, "Added gameView to gameFrameLayout.");
+            }
+        });
+
+        /*
+        // another way to create Game View
         gameView = new GameView(this);
         Log.i(TAG, "gameView created.");
         gameFrameLayout.addView(gameView);
         Log.i(TAG, "Added gameView to gameFrameLayout.");
+        */
 
         // buttons for start game, new game, quit game
         String startGameStr = getString(R.string.start_game_string);

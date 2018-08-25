@@ -34,11 +34,6 @@ public class Groundhog {
     constructor
      */
 
-    public Groundhog() {
-        status = 0;
-        setIsHiding(true);
-    }
-
     public Groundhog(RectF rectF) {
         float shrinkRatio = 36.0f;
         wholeGroundhogArea = MathUtil.shrinkRectF(rectF, shrinkRatio);

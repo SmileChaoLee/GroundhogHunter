@@ -96,7 +96,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public GameView(Context context) {
         super(context);
 
-        Log.d(TAG, "GameView.GameView(context) is called.");
+        Log.d(TAG, "GameView.GameView(Context context) is called.");
 
         mainActivity = (MainActivity)context;
         scoreSQLite = mainActivity.getScoreSQLite();
@@ -124,19 +124,46 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         surfaceViewCreated = false; // surfaceView has not been created yet
         runningStatus = 0;  // game is not running
         timeRemaining = GameView.TimerInterval;
+    }
+
+    public GameView(Context context, int gWidth, int gHeight) {
+        super(context);
+
+        Log.d(TAG, "GameView.GameView(Context context, int gWidth, int gHeight) is called.");
+
+        mainActivity = (MainActivity)context;
+        scoreSQLite = mainActivity.getScoreSQLite();
+        rowNum = mainActivity.getRowNum();
+        colNum = mainActivity.getColNum();
+
+        gameViewWidth = gWidth;
+        gameViewHeight = gHeight;
+
+        gameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
+        gameViewPause = false;   // for synchronizing
+
+        setWillNotDraw(true);   // added on 2017-11-07 for just in case, the default is true
+
+        surfaceHolder = getHolder();
+        surfaceHolder.addCallback(this); // register the interface
+
+        setZOrderOnTop(true);
+        // surfaceHolder.setFormat(PixelFormat.TRANSPARENT);    // same effect as the following
+        surfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
+
+        highestScore = mainActivity.getHighestScore();
+        currentScore = 0;
+        numOfHits = 0;
+        surfaceViewCreated = false; // surfaceView has not been created yet
+        runningStatus = 0;  // game is not running
+        timeRemaining = GameView.TimerInterval;
 
         // Creating 25 groundhogs' object
-        /*
-        int index;
-        Groundhog groundhog;
-        for (int i=0; i<rowNum; ++i) {
-            for (int j=0; j<colNum; ++j) {
-                index = rowNum * i + j;
-                groundhog = new Groundhog();
-                groundhogArray[index] = groundhog;
-            }
-        }
-        */
+        Log.d(TAG, "Creating groundhogArray....");
+        groundhogArray = new Groundhog[rowNum * colNum];
+
+        // start to initialize groundhogArray array
+        createGroundhogs();
     }
 
     @Override
@@ -149,43 +176,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         Log.i(TAG, "surfaceCreated() is called");
-        gameViewWidth = getWidth();
-        gameViewHeight = getHeight();
+        // gameViewWidth = getWidth();
+        // gameViewHeight = getHeight();
+        Log.i(TAG, "The width of GameView (SurfaceView) = " + getWidth());
+        Log.i(TAG, "The height of GameView (SurfaceView) = " + getHeight());
 
+        /*
         if (groundhogArray == null) {
-            // groundhogArray has not been created yet
-            Log.d(TAG, "Creating groundhogArray....");
-            groundhogArray = new Groundhog[rowNum * colNum];
-
-            // start to initialize groundhogArray array
-            float x;
-            float y = 0;
-            rectWidthForOneGroundhog = gameViewWidth / (float) rowNum;
-            rectHeightForOneGroundhog = gameViewHeight / (float) colNum;
-            float bottomY;
-            int index;
-            Groundhog groundhog;
-
-            RectF temp = new RectF();
-            for (int i = 0; i < rowNum; ++i) {
-                x = 0;
-                bottomY = y + rectHeightForOneGroundhog;
-                for (int j = 0; j < colNum; ++j) {
-                    index = rowNum * i + j;
-                    temp.left = x;
-                    x += rectWidthForOneGroundhog;
-                    temp.right = x;
-                    temp.top = y;
-                    temp.bottom = bottomY;
-                    groundhog = new Groundhog(temp);
-                    groundhogArray[index] = groundhog;
-                }
-                y = bottomY;
-            }
+            createGroundhogs();
         }
+        */
 
         surfaceViewCreated = true;  // surfaceView has been created
-        startDrawingScreen();
+        startDrawingScreen();       // draw screen
     }
 
     @Override
@@ -274,6 +277,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             releaseSynchronizations();
             stopThreads();
 
+            timeRemaining = GameView.TimerInterval;
+            System.out.println("timeRemaining = " + timeRemaining);
+
             if (groundhogArray != null) {
                 for (Groundhog groundhog : groundhogArray) {
                     groundhog.setIsHiding(true);
@@ -281,9 +287,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     groundhog.setNumOfTimeIntervalShown(0);
                 }
 
-                // drawGameScreen();
-                timeRemaining = GameView.TimerInterval;
-                System.out.println("timeRemaining = " + timeRemaining);
                 startDrawingScreen();
             }
         }
@@ -372,6 +375,33 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     // private methods
+    private void createGroundhogs() {
+        float x;
+        float y = 0;
+        rectWidthForOneGroundhog = gameViewWidth / (float) rowNum;
+        rectHeightForOneGroundhog = gameViewHeight / (float) colNum;
+        float bottomY;
+        int index;
+        Groundhog groundhog;
+
+        RectF temp = new RectF();
+        for (int i = 0; i < rowNum; ++i) {
+            x = 0;
+            bottomY = y + rectHeightForOneGroundhog;
+            for (int j = 0; j < colNum; ++j) {
+                index = rowNum * i + j;
+                temp.left = x;
+                x += rectWidthForOneGroundhog;
+                temp.right = x;
+                temp.top = y;
+                temp.bottom = bottomY;
+                groundhog = new Groundhog(temp);
+                groundhogArray[index] = groundhog;
+            }
+            y = bottomY;
+        }
+    }
+
     private void startDrawingScreen() {
         Canvas canvas = null;
         try {
