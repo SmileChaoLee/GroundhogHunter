@@ -250,8 +250,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if (groundhogArray != null) {
                 for (Groundhog groundhog : groundhogArray) {
                     groundhog.setIsHiding(true);
-                    groundhog.setIsHit(false);
-                    groundhog.setNumOfTimeIntervalShown(0);
                 }
 
                 startDrawingScreen();
