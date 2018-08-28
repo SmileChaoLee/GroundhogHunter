@@ -72,10 +72,12 @@ public class Groundhog {
         if (numTimeInterval < GameView.NumTimeIntervalShown[status]) {
             numOfTimeIntervalShown = numTimeInterval;
             // if ( (numOfTimeIntervalShown >= halfOfAnimationTimes) && (addOne > 0) ){
-            if (numOfTimeIntervalShown >= halfOfAnimationTimes){
+            if (numOfTimeIntervalShown > halfOfAnimationTimes) {
                 --numOfAnimationsShown;
-            } else {
+            } else if (numOfTimeIntervalShown < halfOfAnimationTimes) {
                 numOfAnimationsShown = numOfTimeIntervalShown + 1;
+            } else {
+                // numOfAnimationsShown no changes
             }
             // calculate the coordinate
             float diff = (wholeGroundhogArea.bottom - wholeGroundhogArea.top) / halfOfAnimationTimes * numOfAnimationsShown;
