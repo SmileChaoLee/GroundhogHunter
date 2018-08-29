@@ -2,6 +2,7 @@ package com.smile.groundhoghunter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -50,8 +51,9 @@ public class Top10ScoreActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Intent returnIntent = new Intent();
                 // setResult(Activity.RESULT_OK, returnIntent);
-                setResult(Activity.RESULT_OK);
-                finish();
+                // setResult(Activity.RESULT_OK);
+                // finish();
+                returnToPrevious();
             }
         });
 
@@ -74,6 +76,18 @@ public class Top10ScoreActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        returnToPrevious();
+    }
+
+    private void returnToPrevious() {
+        Intent returnIntent = new Intent();
+        setResult(Activity.RESULT_OK, returnIntent);    // can bundle some data to previous activity
+        // setResult(Activity.RESULT_OK);   // no bundle data
+        finish();
     }
 
     private class myListAdapter extends ArrayAdapter {  // changed name to MyListAdapter from myListAdapter
