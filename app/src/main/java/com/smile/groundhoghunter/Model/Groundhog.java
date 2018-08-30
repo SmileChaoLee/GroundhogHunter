@@ -43,7 +43,9 @@ public class Groundhog {
         drawArea = new RectF(wholeGroundhogArea);
 
         // score position
-        shrinkRatio = 100.0f * ( 1.0f - (wholeGroundhogArea.top - rectF.top) / rectF.height());
+        // double the area of showing score by reduce the shrinking ratio
+        shrinkRatio = 100.0f * ( 1.0f - (wholeGroundhogArea.top - rectF.top) / rectF.height()) * 0.5f;
+        // shrinkRatio = 100.0f * ( 1.0f - (wholeGroundhogArea.top - rectF.top) / rectF.height());
         scoreArea = MathUtil.shrinkRectF(rectF, shrinkRatio);
         shift = scoreArea.top - rectF.top;
         scoreArea.top = rectF.top;
@@ -70,19 +72,27 @@ public class Groundhog {
 
     public void setNumOfTimeIntervalShown(int numTimeInterval) {
         if (numTimeInterval < GameView.NumTimeIntervalShown[status]) {
-            numOfTimeIntervalShown = numTimeInterval;
-            // if ( (numOfTimeIntervalShown >= halfOfAnimationTimes) && (addOne > 0) ){
-            if (numOfTimeIntervalShown > halfOfAnimationTimes) {
+            if (isHit) {
+                // when it is hit, then it start hiding
                 --numOfAnimationsShown;
-            } else if (numOfTimeIntervalShown < halfOfAnimationTimes) {
-                numOfAnimationsShown = numOfTimeIntervalShown + 1;
             } else {
-                // numOfAnimationsShown no changes
+                numOfTimeIntervalShown = numTimeInterval;
+                if (numOfTimeIntervalShown > halfOfAnimationTimes) {
+                    --numOfAnimationsShown;
+                } else if (numOfTimeIntervalShown < halfOfAnimationTimes) {
+                    numOfAnimationsShown = numOfTimeIntervalShown + 1;
+                } else {
+                    // numOfAnimationsShown no changes
+                }
             }
-            // calculate the coordinate
-            float diff = (wholeGroundhogArea.bottom - wholeGroundhogArea.top) / halfOfAnimationTimes * numOfAnimationsShown;
-            drawArea = new RectF(wholeGroundhogArea);
-            drawArea.top = wholeGroundhogArea.bottom - diff;
+            if (numOfAnimationsShown <= 0 ) {
+                setIsHiding(true);
+            } else {
+                // calculate the coordinate
+                float diff = (wholeGroundhogArea.bottom - wholeGroundhogArea.top) / halfOfAnimationTimes * numOfAnimationsShown;
+                drawArea = new RectF(wholeGroundhogArea);
+                drawArea.top = wholeGroundhogArea.bottom - diff;
+            }
         } else {
             setIsHiding(true);      // groundhog becomes hiding
         }
