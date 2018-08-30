@@ -44,7 +44,7 @@ public class Groundhog {
 
         // score position
         // double the area of showing score by reduce the shrinking ratio
-        shrinkRatio = 100.0f * ( 1.0f - (wholeGroundhogArea.top - rectF.top) / rectF.height()) * 0.5f;
+        shrinkRatio = 100.0f * ( 1.0f - (wholeGroundhogArea.top - rectF.top) / rectF.height()) * 0.7f;
         // shrinkRatio = 100.0f * ( 1.0f - (wholeGroundhogArea.top - rectF.top) / rectF.height());
         scoreArea = MathUtil.shrinkRectF(rectF, shrinkRatio);
         shift = scoreArea.top - rectF.top;
@@ -82,7 +82,8 @@ public class Groundhog {
                 } else if (numOfTimeIntervalShown < halfOfAnimationTimes) {
                     numOfAnimationsShown = numOfTimeIntervalShown + 1;
                 } else {
-                    // numOfAnimationsShown no changes
+                    // when numOfTimeIntervalShown = halfOfAnimationTimes
+                    // then numOfAnimationsShown no changes
                 }
             }
             if (numOfAnimationsShown <= 0 ) {
