@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.smile.groundhoghunter.Model.Groundhog;
+import com.smile.groundhoghunter.Utilities.SoundUtil;
 import com.smile.scoresqlite.ScoreSQLite;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
@@ -179,11 +180,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 groundhog = groundhogArray[index];
                 if (!groundhog.getIsHiding()) {
                     // showing but not hiding
-                    if (groundhog.getDrawArea().contains(x,y)) {
-                        // hit
-                        groundhog.setIsHit(true);
-                        ++numOfHits;
-                        currentScore += hitScores[groundhog.getStatus()];
+                    if (!groundhog.getIsHit()) {
+                        // not hit
+                        if (groundhog.getDrawArea().contains(x, y)) {
+                            // hit
+                            SoundUtil.playSound(mainActivity, R.raw.ouh);
+                            groundhog.setIsHit(true);
+                            ++numOfHits;
+                            currentScore += hitScores[groundhog.getStatus()];
+                        }
                     }
                 }
                 break;
@@ -197,6 +202,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         Log.i(TAG, "surfaceDestroyed() is called");
+        SoundUtil.releaseMediaPlayer();
     }
 
     public void startGame() {
