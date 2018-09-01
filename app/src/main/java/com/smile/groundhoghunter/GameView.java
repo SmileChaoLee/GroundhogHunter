@@ -70,12 +70,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     static {
         DrawingInterval = 80;
         NumberOfGroundhogTypes = 4;     // including hiding
-        TimeIntervalShown = 350;        // 500 milli seconds
+        TimeIntervalShown = 300;        // 300 milli seconds
         NumTimeIntervalShown = new int[NumberOfGroundhogTypes];
-        NumTimeIntervalShown[0] = 4;    // has to be even (4 frames for animation, total time is 350 * 4 milliseconds)
-        NumTimeIntervalShown[1] = 6;    // has to be even (6 frames for animation, total time is 350 * 6 milliseconds)
-        NumTimeIntervalShown[2] = 8;    // has to be even (8 frames for animation, total time is 350 * 8 milliseconds)
-        NumTimeIntervalShown[3] = 10;   // has to be even (10 frames for animation, total time is 350 * 10 milliseconds)
+        NumTimeIntervalShown[0] = 4;    // has to be even (4 frames for animation, total time is 300 * 4 milliseconds)
+        NumTimeIntervalShown[1] = 6;    // has to be even (6 frames for animation, total time is 300 * 6 milliseconds)
+        NumTimeIntervalShown[2] = 8;    // has to be even (8 frames for animation, total time is 300 * 8 milliseconds)
+        NumTimeIntervalShown[3] = 10;   // has to be even (10 frames for animation, total time is 300 * 10 milliseconds)
         GroundhogBitmaps = new Bitmap[NumberOfGroundhogTypes];
         GroundhogBitmaps[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_0);
         GroundhogBitmaps[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.groundhog_1);
@@ -166,34 +166,39 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int x = (int) event.getX();
-        int y = (int) event.getY();
-        int action = event.getAction();
-        Groundhog groundhog;
 
-        switch (action & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_BUTTON_PRESS:
-            case MotionEvent.ACTION_DOWN:
-                int i = (int)(y / rectHeightForOneGroundhog);   // row
-                int j = (int)(x / rectWidthForOneGroundhog);    // col
-                int index = rowNum * i + j;
-                groundhog = groundhogArray[index];
-                if (!groundhog.getIsHiding()) {
-                    // showing but not hiding
-                    if (!groundhog.getIsHit()) {
-                        // not hit
-                        if (groundhog.getDrawArea().contains(x, y)) {
-                            // hit
-                            SoundUtil.playSound(mainActivity, R.raw.ouh);
-                            groundhog.setIsHit(true);
-                            ++numOfHits;
-                            currentScore += hitScores[groundhog.getStatus()];
+        // the if statement is added on 2018-08-31
+        if (runningStatus == 1) {
+            // game is running
+            int x = (int) event.getX();
+            int y = (int) event.getY();
+            int action = event.getAction();
+            Groundhog groundhog;
+
+            switch (action & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_BUTTON_PRESS:
+                case MotionEvent.ACTION_DOWN:
+                    int i = (int) (y / rectHeightForOneGroundhog);   // row
+                    int j = (int) (x / rectWidthForOneGroundhog);    // col
+                    int index = rowNum * i + j;
+                    groundhog = groundhogArray[index];
+                    if (!groundhog.getIsHiding()) {
+                        // showing but not hiding
+                        if (!groundhog.getIsHit()) {
+                            // not hit
+                            if (groundhog.getDrawArea().contains(x, y)) {
+                                // hit
+                                SoundUtil.playSound(mainActivity, R.raw.ouh);
+                                groundhog.setIsHit(true);
+                                ++numOfHits;
+                                currentScore += hitScores[groundhog.getStatus()];
+                            }
                         }
                     }
-                }
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
+            }
         }
 
         return super.onTouchEvent(event);
