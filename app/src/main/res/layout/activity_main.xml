@@ -17,8 +17,8 @@
         app:layout_constraintTop_toTopOf="parent"
         android:weightSum="2">
 
-        <ImageButton
-            android:id="@+id/difficultLevelButton"
+        <com.smile.groundhoghunter.Model.SmileImageButton
+            android:id="@+id/settingButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -29,8 +29,9 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:background="@android:color/transparent">
-        </ImageButton>
-        <com.smile.groundhoghunter.Model.CustomImageButton
+        </com.smile.groundhoghunter.Model.SmileImageButton>
+
+        <com.smile.groundhoghunter.Model.SmileImageButton
             android:id="@+id/top10Button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -42,7 +43,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:background="@android:color/transparent">
-        </com.smile.groundhoghunter.Model.CustomImageButton>
+        </com.smile.groundhoghunter.Model.SmileImageButton>
     </LinearLayout>
 
     <LinearLayout
@@ -79,7 +80,6 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:textColor="@color/darkGreen"
-                        android:textSize="30dp"
                         android:text="@string/highest_string">
                     </TextView>
                     <TextView
@@ -89,7 +89,6 @@
                         android:layout_toRightOf="@+id/highestScoreTitle"
                         android:layout_alignTop="@+id/highestScoreTitle"
                         android:textColor="@color/darkRed"
-                        android:textSize="30dp"
                         android:text="1000">
                     </TextView>
                 </RelativeLayout>
@@ -112,7 +111,6 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:textColor="@color/darkGreen"
-                        android:textSize="30dp"
                         android:text="@string/score_string">
                     </TextView>
                     <TextView
@@ -122,7 +120,6 @@
                         android:layout_toRightOf="@+id/scoreTitle"
                         android:layout_alignTop="@+id/scoreTitle"
                         android:textColor="@color/blue"
-                        android:textSize="30dp"
                         android:text="0">
                     </TextView>
                 </RelativeLayout>
@@ -154,7 +151,6 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:textColor="@color/darkGreen"
-                        android:textSize="30dp"
                         android:text="@string/timer_string">
                     </TextView>
                     <TextView
@@ -164,7 +160,6 @@
                         android:layout_toRightOf="@+id/timerTitle"
                         android:layout_alignTop="@+id/timerTitle"
                         android:textColor="@color/blue"
-                        android:textSize="30dp"
                         android:text="60">
                     </TextView>
                 </RelativeLayout>
@@ -187,7 +182,6 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:textColor="@color/darkGreen"
-                        android:textSize="30dp"
                         android:text="@string/num_hit_string">
                     </TextView>
                     <TextView
@@ -197,7 +191,6 @@
                         android:layout_toRightOf="@+id/num_hit_Title"
                         android:layout_alignTop="@+id/num_hit_Title"
                         android:textColor="@color/red"
-                        android:textSize="30dp"
                         android:text="0">
                     </TextView>
                 </RelativeLayout>
@@ -239,7 +232,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <com.smile.groundhoghunter.Model.CustomImageButton
+            <com.smile.groundhoghunter.Model.SmileImageButton
                 android:id="@+id/startGameButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -253,9 +246,9 @@
                 android:clickable="true"
                 android:visibility="visible"
                 android:background="@android:color/transparent">
-            </com.smile.groundhoghunter.Model.CustomImageButton>
+            </com.smile.groundhoghunter.Model.SmileImageButton>
 
-            <com.smile.groundhoghunter.Model.CustomImageButton
+            <com.smile.groundhoghunter.Model.SmileImageButton
                 android:id="@+id/pauseGameButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -269,9 +262,9 @@
                 android:clickable="false"
                 android:visibility="gone"
                 android:background="@android:color/transparent">
-            </com.smile.groundhoghunter.Model.CustomImageButton>
+            </com.smile.groundhoghunter.Model.SmileImageButton>
 
-            <com.smile.groundhoghunter.Model.CustomImageButton
+            <com.smile.groundhoghunter.Model.SmileImageButton
                 android:id="@+id/resumeGameButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -285,11 +278,11 @@
                 android:clickable="false"
                 android:visibility="gone"
                 android:background="@android:color/transparent">
-            </com.smile.groundhoghunter.Model.CustomImageButton>
+            </com.smile.groundhoghunter.Model.SmileImageButton>
 
         </FrameLayout>
 
-        <com.smile.groundhoghunter.Model.CustomImageButton
+        <com.smile.groundhoghunter.Model.SmileImageButton
             android:id="@+id/newGameButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -301,9 +294,9 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="15dp"
             android:background="@android:color/transparent">
-        </com.smile.groundhoghunter.Model.CustomImageButton>
+        </com.smile.groundhoghunter.Model.SmileImageButton>
 
-        <com.smile.groundhoghunter.Model.CustomImageButton
+        <com.smile.groundhoghunter.Model.SmileImageButton
             android:id="@+id/quitGameButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -315,7 +308,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="15dp"
             android:background="@android:color/transparent">
-        </com.smile.groundhoghunter.Model.CustomImageButton>
+        </com.smile.groundhoghunter.Model.SmileImageButton>
 
     </LinearLayout>
 

@@ -17,17 +17,18 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.smile.groundhoghunter.Utilities.ScreenUtil;
+
 import java.util.ArrayList;
 
 
 public class Top10ScoreActivity extends AppCompatActivity {
 
     private static final String TAG = "Top10ScoreActivity";
-    private boolean isTop10 = true;
     private ArrayList<String> top10Players = new ArrayList<String>();
     private ArrayList<Integer> top10Scores = new ArrayList<Integer>();
     private ArrayList<Integer> medalImageIds = new ArrayList<Integer>();
-    private float fontSizeForText = 24;
+    private float textFontSize;
     private ListView listView = null;
 
     @Override
@@ -36,16 +37,22 @@ public class Top10ScoreActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_top10_score);
 
+        textFontSize = 30;
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            isTop10 = extras.getBoolean("IsTop10");
             top10Players = extras.getStringArrayList("Top10Players");
             top10Scores = extras.getIntegerArrayList("Top10Scores");
-            fontSizeForText = extras.getFloat("FontSizeForText");
+            textFontSize = extras.getFloat("TextFontSize");
+        }
+
+        setTheme(R.style.ThemeTextSize30Transparent);
+        if (textFontSize == 50) {
+            // not a cell phone, it is a tablet
+            setTheme(R.style.ThemeTextSize50Transparent);
         }
 
         Button okButton = (Button)findViewById(R.id.top10OkButton);
-        okButton.setTextSize(fontSizeForText);
+        // okButton.setTextSize(textFontSize);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,16 +162,14 @@ public class Top10ScoreActivity extends AppCompatActivity {
             // view.setLayoutParams(layoutParams);  // no needed
 
             TextView pTextView = view.findViewById(R.id.playerTextView);
-            pTextView.setTextSize(fontSizeForText);
+            pTextView.setTextSize(textFontSize);
             TextView sTextView = view.findViewById(R.id.scoreTextView);
-            sTextView.setTextSize(fontSizeForText);
+            sTextView.setTextSize(textFontSize);
             ImageView medalImage = view.findViewById(R.id.medalImage);
 
             pTextView.setText(players.get(position));
             sTextView.setText(String.valueOf(scores.get(position)));
-            if (isTop10) {
-                medalImage.setImageResource(medals.get(position));
-            }
+            medalImage.setImageResource(medals.get(position));
 
             return view;
         }

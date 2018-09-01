@@ -30,4 +30,6 @@
     <string name="top_10_score_str">前10名最高分</string>        <!-- for menu item -->
     <string name="activity_top_10_score">前10名最高分</string>   <!-- for activity name -->
     <string name="top_10_score_title">前10名最高分</string>      <!-- for title of list view -->
+
+    <string name="settingStr">設定</string>
 </resources>

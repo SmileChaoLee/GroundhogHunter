@@ -437,7 +437,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             @Override
             public void run() {
                 final EditText et = new EditText(mainActivity);
-                et.setTextSize(mainActivity.getTextFontSize());
+                // et.setTextSize(mainActivity.getTextFontSize());
                 // et.setHeight(200);
                 et.setTextColor(Color.BLUE);
                 // et.setBackground(new ColorDrawable(Color.TRANSPARENT));
@@ -488,9 +488,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         dlg.getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
         dlg.getWindow().setBackgroundDrawableResource(R.drawable.dialogbackground);
 
-        float fontSize = mainActivity.getTextFontSize();
+        // float fontSize = mainActivity.getTextFontSize();
         Button nBtn = dlg.getButton(DialogInterface.BUTTON_NEGATIVE);
-        nBtn.setTextSize(fontSize);
+        // nBtn.setTextSize(fontSize);
         nBtn.setTypeface(Typeface.DEFAULT_BOLD);
         nBtn.setTextColor(Color.RED);
 
@@ -499,7 +499,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         nBtn.setLayoutParams(layoutParams);
 
         Button pBtn = dlg.getButton(DialogInterface.BUTTON_POSITIVE);
-        pBtn.setTextSize(fontSize);
+        // pBtn.setTextSize(fontSize);
         pBtn.setTypeface(Typeface.DEFAULT_BOLD);
         pBtn.setTextColor(Color.rgb(0x00,0x64,0x00));
         pBtn.setLayoutParams(layoutParams);

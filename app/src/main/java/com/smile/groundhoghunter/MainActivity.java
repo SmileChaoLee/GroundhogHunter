@@ -1,44 +1,28 @@
 package com.smile.groundhoghunter;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.Point;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.util.Pair;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.smile.facebookadsutil.FacebookInterstitialAds;
-import com.smile.groundhoghunter.Model.CustomImageButton;
+import com.smile.groundhoghunter.Model.SmileImageButton;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.groundhoghunter.Utilities.ScreenUtil;
 import com.smile.scoresqlite.ScoreSQLite;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -70,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
     // public methods
     public static final int Top10RequestCode = 0;
+    public static final int SettingRequestCode = 1;
 
     public MainActivity() {
         activityHandler = new Handler();
@@ -80,23 +65,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // show ads
-        if (requestCode == Top10RequestCode) {
-            if (resultCode == Activity.RESULT_OK) {
-                Log.i(TAG, "Top10ScoreActivity returned successfully.");
-            } else {
-                Log.i(TAG, "Top10ScoreActivity did not return successfully.");
-            }
-        } else {
-            Log.i(TAG, "not returned from Top10ScoreActivity.");
-        }
-        Log.i(TAG, "Facebook showing ads");
-        facebookInterstitialAds.showAd(TAG);
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // the following 2 statements have been moved to AndroidManifest.xml
@@ -104,10 +72,12 @@ public class MainActivity extends AppCompatActivity {
         // getSupportActionBar().hide();
 
         textFontSize = 30;
+        setTheme(R.style.ThemeTextSize30);
         boolean isTable = ScreenUtil.isTablet(this);
         if (isTable) {
             // not a cell phone, it is a tablet
             textFontSize = 50;
+            setTheme(R.style.ThemeTextSize50);
         }
 
         setContentView(R.layout.activity_main);
@@ -118,40 +88,63 @@ public class MainActivity extends AppCompatActivity {
         int darkRed = getResources().getColor(R.color.darkRed);
 
         // upper buttons layout
+        // for setting button
+        String settingStr = getString(R.string.settingStr);
+        final SmileImageButton settingButton = findViewById(R.id.settingButton);
+        Bitmap settingBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.setting_button, settingStr, Color.BLUE);
+        settingButton.setImageBitmap(settingBitmap);
+        settingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if ( (gameView.getRunningStatus() != 1) || (gameView.gameViewPause) ) {
+                    // client is not playing game or not pause status
+                    Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+                    Bundle extras = new Bundle();
+                    extras.putFloat("TextFontSize", textFontSize);
+                    intent.putExtras(extras);
+                    startActivityForResult(intent, SettingRequestCode);
+                }
+            }
+        });
+
+        // for top 10 button
         String top10Str = getString(R.string.top10Str);
-        final CustomImageButton top10Button = findViewById(R.id.top10Button);
-        Bitmap top10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.top10_button, top10Str, Color.RED);
+        final SmileImageButton top10Button = findViewById(R.id.top10Button);
+        Bitmap top10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.top10_button, top10Str, darkRed);
         top10Button.setImageBitmap(top10Bitmap);
         top10Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getTop10ScoreList();
+                if ( (gameView.getRunningStatus() != 1) || (gameView.gameViewPause) ) {
+                    // client is not playing game or not pause status
+                    getTop10ScoreList();
+                }
             }
         });
 
         // score layout
         TextView highScoreTitleView = findViewById(R.id.highestScoreTitle);
-        highScoreTitleView.setTextSize(textFontSize);
+        // highScoreTitleView.setTextSize(textFontSize);
         highScoreTextView = findViewById(R.id.highestScoreText);
-        highScoreTextView.setTextSize(textFontSize);
+        // highScoreTextView.setTextSize(textFontSize);
         highScoreTextView.setText(String.valueOf(highestScore));
 
         TextView scoreTitleView = findViewById(R.id.scoreTitle);
-        scoreTitleView.setTextSize(textFontSize);
+        // scoreTitleView.setTextSize(textFontSize);
         scoreTextView = findViewById(R.id.scoreText);
-        scoreTextView.setTextSize(textFontSize);
+        // scoreTextView.setTextSize(textFontSize);
         scoreTextView.setText("0");
 
         TextView timerTitleView = findViewById(R.id.timerTitle);
-        timerTitleView.setTextSize(textFontSize);
+        // timerTitleView.setTextSize(textFontSize);
         timerTextView = findViewById(R.id.timerText);
-        timerTextView.setTextSize(textFontSize);
+        // timerTextView.setTextSize(textFontSize);
         timerTextView.setText(String.valueOf(GameView.TimerInterval));
 
         TextView hitNumTitleView = findViewById(R.id.num_hit_Title);
-        hitNumTitleView.setTextSize(textFontSize);
+        // hitNumTitleView.setTextSize(textFontSize);
         hitNumTextView = findViewById(R.id.num_hit_Text);
-        hitNumTextView.setTextSize(textFontSize);
+        // hitNumTextView.setTextSize(textFontSize);
         hitNumTextView.setText("0");
 
         final FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
@@ -204,21 +197,21 @@ public class MainActivity extends AppCompatActivity {
         String pauseGameStr = getString(R.string.pause_game_string);
         String resumeGameStr = getString(R.string.resume_game_string);
 
-        final CustomImageButton startGameButton = findViewById(R.id.startGameButton);
+        final SmileImageButton startGameButton = findViewById(R.id.startGameButton);
         final Bitmap startGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.start_game_button, startGameStr, Color.BLUE);
         startGameButton.setImageBitmap(startGameBitmap);
         startGameButton.setClickable(true);
         startGameButton.setEnabled(true);
         startGameButton.setVisibility(View.VISIBLE);
 
-        final CustomImageButton pauseGameButton = findViewById(R.id.pauseGameButton);
+        final SmileImageButton pauseGameButton = findViewById(R.id.pauseGameButton);
         Bitmap pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseGameStr, Color.BLUE);
         pauseGameButton.setImageBitmap(pauseGameBitmap);
         pauseGameButton.setClickable(false);
         pauseGameButton.setEnabled(false);
         pauseGameButton.setVisibility(View.GONE);
 
-        final CustomImageButton resumeGameButton = findViewById(R.id.resumeGameButton);
+        final SmileImageButton resumeGameButton = findViewById(R.id.resumeGameButton);
         Bitmap resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeGameStr, Color.BLUE);
         resumeGameButton.setImageBitmap(resumeGameBitmap);
         resumeGameButton.setClickable(false);
@@ -230,15 +223,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 gameView.startGame();
 
-                startGameButton.setClickable(false);
                 startGameButton.setEnabled(false);
                 startGameButton.setVisibility(View.GONE);
 
-                pauseGameButton.setClickable(true);
                 pauseGameButton.setEnabled(true);
                 pauseGameButton.setVisibility(View.VISIBLE);
 
-                resumeGameButton.setClickable(false);
                 resumeGameButton.setEnabled(false);
                 resumeGameButton.setVisibility(View.GONE);
             }
@@ -248,15 +238,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 gameView.pauseGame();
 
-                startGameButton.setClickable(false);
                 startGameButton.setEnabled(false);
                 startGameButton.setVisibility(View.GONE);
 
-                pauseGameButton.setClickable(false);
                 pauseGameButton.setEnabled(false);
                 pauseGameButton.setVisibility(View.GONE);
 
-                resumeGameButton.setClickable(true);
                 resumeGameButton.setEnabled(true);
                 resumeGameButton.setVisibility(View.VISIBLE);
             }
@@ -266,22 +253,19 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 gameView.resumeGame();
 
-                startGameButton.setClickable(false);
                 startGameButton.setEnabled(false);
                 startGameButton.setVisibility(View.GONE);
 
-                pauseGameButton.setClickable(true);
                 pauseGameButton.setEnabled(true);
                 pauseGameButton.setVisibility(View.VISIBLE);
 
-                resumeGameButton.setClickable(false);
                 resumeGameButton.setEnabled(false);
                 resumeGameButton.setVisibility(View.GONE);
             }
         });
 
         String newGameStr = getString(R.string.new_game_string);
-        CustomImageButton newGameButton = findViewById(R.id.newGameButton);
+        SmileImageButton newGameButton = findViewById(R.id.newGameButton);
         Bitmap newGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.new_game_button, newGameStr, Color.BLUE);
         newGameButton.setImageBitmap(newGameBitmap);
         newGameButton.setOnClickListener(new View.OnClickListener() {
@@ -289,23 +273,21 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 gameView.newGame();
 
-                startGameButton.setClickable(true);
                 startGameButton.setEnabled(true);
                 startGameButton.setVisibility(View.VISIBLE);
 
-                pauseGameButton.setClickable(false);
                 pauseGameButton.setEnabled(false);
                 pauseGameButton.setVisibility(View.GONE);
 
-                resumeGameButton.setClickable(false);
                 resumeGameButton.setEnabled(false);
                 resumeGameButton.setVisibility(View.GONE);
+
                 // facebookInterstitialAds.showAd(TAG);     // removed on 2018-08-22
             }
         });
 
         String quitGameStr = getString(R.string.quit_game_string);
-        CustomImageButton quitGameButton = findViewById(R.id.quitGameButton);
+        SmileImageButton quitGameButton = findViewById(R.id.quitGameButton);
         Bitmap quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.quit_game_button, quitGameStr, Color.YELLOW);
         quitGameButton.setImageBitmap(quitGameBitmap);
         quitGameButton.setOnClickListener(new View.OnClickListener() {
@@ -324,6 +306,27 @@ public class MainActivity extends AppCompatActivity {
 
         facebookInterstitialAds = new FacebookInterstitialAds(this, facebookPlacementID);
 
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case Top10RequestCode:
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.i(TAG, "Top10ScoreActivity returned successfully.");
+                } else {
+                    Log.i(TAG, "Top10ScoreActivity did not return successfully.");
+                }
+                break;
+            case SettingRequestCode:
+                break;
+        }
+
+        Log.i(TAG, "Facebook showing ads");
+        facebookInterstitialAds.showAd(TAG);
     }
 
     @Override
@@ -381,15 +384,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void getTop10ScoreList() {
 
-        if ( (gameView.getRunningStatus() == 1) && (!gameView.gameViewPause) ) {
-            // client is playing game and not in pause status
-            return;
-        }
-
         ArrayList<Pair<String, Integer>> top10 = scoreSQLite.readTop10ScoreList();
-        boolean isTop10 = true;
-        // ArrayList<Pair<String, Integer>> top10 = scoreSQLite.readAllScores();
-        // boolean isTop10 = false;
         ArrayList<String> playerNames = new ArrayList<String>();
         ArrayList<Integer> playerScores = new ArrayList<Integer>();
         for (Pair pair : top10) {
@@ -401,10 +396,9 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, Top10ScoreActivity.class);
         Bundle extras = new Bundle();
-        extras.putBoolean("IsTop10", isTop10);
         extras.putStringArrayList("Top10Players", playerNames);
         extras.putIntegerArrayList("Top10Scores", playerScores);
-        extras.putFloat("FontSizeForText", textFontSize);
+        extras.putFloat("TextFontSize", textFontSize);
         intent.putExtras(extras);
 
         startActivityForResult(intent, MainActivity.Top10RequestCode);
@@ -420,9 +414,11 @@ public class MainActivity extends AppCompatActivity {
     public int getColNum() {
         return colNum;
     }
-    public float getTextFontSize() {
-        return textFontSize;
-    }
+
+    // public float getTextFontSize() {
+    //     return textFontSize;
+    // }
+
     public int getHighestScore() {
         return highestScore;
     }

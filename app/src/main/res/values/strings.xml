@@ -27,5 +27,7 @@
 
     <string name="top_10_score_str">Top 10 scores</string>              <!-- for menu item -->
     <string name="activity_top_10_score">Top10ScoreActivity</string>    <!-- for activity name -->
-    <string name="top_10_score_title">Top 10 Scores</string>            <!-- for title of list view -->
+    <string name="top_10_score_title">Top 10 Scores</string>
+
+    <string name="settingStr">Settings</string>
 </resources>
