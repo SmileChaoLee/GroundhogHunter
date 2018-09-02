@@ -66,19 +66,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // the following 2 statements have been moved to AndroidManifest.xml
-        // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        // getSupportActionBar().hide();
 
-        textFontSize = 30;
-        setTheme(R.style.ThemeTextSize30);
         boolean isTable = ScreenUtil.isTablet(this);
         if (isTable) {
             // not a cell phone, it is a tablet
             textFontSize = 50;
             setTheme(R.style.ThemeTextSize50);
+        } else {
+            textFontSize = 30;
+            setTheme(R.style.ThemeTextSize30);
         }
+
+        super.onCreate(savedInstanceState);
+        // the following 2 statements have been moved to AndroidManifest.xml
+        // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // getSupportActionBar().hide();
 
         setContentView(R.layout.activity_main);
 

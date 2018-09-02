@@ -33,9 +33,6 @@ public class Top10ScoreActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_top10_score);
 
         textFontSize = 30;
         Bundle extras = getIntent().getExtras();
@@ -45,11 +42,16 @@ public class Top10ScoreActivity extends AppCompatActivity {
             textFontSize = extras.getFloat("TextFontSize");
         }
 
-        setTheme(R.style.ThemeTextSize30Transparent);
         if (textFontSize == 50) {
             // not a cell phone, it is a tablet
-            setTheme(R.style.ThemeTextSize50Transparent);
+            setTheme(R.style.ThemeTextSize50);
+        } else {
+            setTheme(R.style.ThemeTextSize30);
         }
+
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_top10_score);
 
         Button okButton = (Button)findViewById(R.id.top10OkButton);
         // okButton.setTextSize(textFontSize);

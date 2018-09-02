@@ -27,7 +27,7 @@
             android:label="@string/settingStr"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:theme="@style/ThemeTextSize30Transparent" />
+            android:theme="@style/ThemeTextSize30Transparent"/>
     </application>
 
 </manifest>

@@ -14,6 +14,7 @@
     <string name="resume_game_string">Resume</string>
     <string name="new_game_string">New</string>
     <string name="quit_game_string">Quit</string>
+    <string name="okStr">Ok</string>
     <string name="cancelStr">Cancel</string>
     <string name="submitStr">Send</string>
     <string name="nameStr">Input your name</string>
@@ -30,4 +31,12 @@
     <string name="top_10_score_title">Top 10 Scores</string>
 
     <string name="settingStr">Settings</string>
+    <string name="soundStr">Sound</string>
+    <string name="onStr">On</string>
+    <string name="offStr">Off</string>
+
+    <string-array name="soundOptionList">
+        <item>@string/onStr</item>
+        <item>@string/offStr</item>
+    </string-array>
 </resources>

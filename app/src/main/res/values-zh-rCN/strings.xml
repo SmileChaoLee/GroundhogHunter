@@ -16,6 +16,7 @@
     <string name="resume_game_string">恢复</string>
     <string name="new_game_string">新遊戏</string>
     <string name="quit_game_string">离开</string>
+    <string name="okStr">确定</string>
     <string name="cancelStr">取消</string>
     <string name="submitStr">提交</string>
     <string name="nameStr">输入你的名字</string>
@@ -32,4 +33,12 @@
     <string name="top_10_score_title">前10名最高分</string>      <!-- for title of list view -->
 
     <string name="settingStr">设定</string>
+    <string name="soundStr">声音</string>
+    <string name="onStr">开</string>
+    <string name="offStr">关</string>
+
+    <string-array name="soundOptionList">
+        <item>@string/onStr</item>
+        <item>@string/offStr</item>
+    </string-array>
 </resources>
