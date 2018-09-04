@@ -49,6 +49,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private TimerThread timerThread;
     private boolean surfaceViewCreated;
     private int runningStatus;
+    private boolean hasSound;
 
     // default properties (package modifier)
     final MainActivity mainActivity;
@@ -126,6 +127,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         runningStatus = 0;  // game is not running
         timeRemaining = GameView.TimerInterval;
 
+        hasSound = true;    // default is having sound
+
         // Creating 25 groundhogs' object
         Log.d(TAG, "Creating groundhogArray....");
         groundhogArray = new Groundhog[rowNum * colNum];
@@ -188,7 +191,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                             // not hit
                             if (groundhog.getDrawArea().contains(x, y)) {
                                 // hit
-                                SoundUtil.playSound(mainActivity, R.raw.ouh);
+                                if (hasSound) {
+                                    // needs to play sound for hitting
+                                    SoundUtil.playSound(mainActivity, R.raw.ouh);
+                                }
                                 groundhog.setIsHit(true);
                                 ++numOfHits;
                                 currentScore += hitScores[groundhog.getStatus()];
@@ -208,6 +214,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         Log.i(TAG, "surfaceDestroyed() is called");
         SoundUtil.releaseMediaPlayer();
+    }
+
+    public boolean getHasSound() {
+        return hasSound;
+    }
+
+    public void setHasSound(boolean hasSound)
+    {
+        this.hasSound = hasSound;
     }
 
     public void startGame() {

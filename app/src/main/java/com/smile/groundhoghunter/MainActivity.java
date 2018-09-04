@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, SettingActivity.class);
                     Bundle extras = new Bundle();
                     extras.putFloat("TextFontSize", textFontSize);
+                    extras.putBoolean("HasSound", gameView.getHasSound());
                     intent.putExtras(extras);
                     startActivityForResult(intent, SettingRequestCode);
                 }
@@ -324,6 +325,16 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case SettingRequestCode:
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.i(TAG, "SettingActivity returned successfully.");
+                    Bundle extras = data.getExtras();
+                    if (extras != null) {
+                        boolean hasSound = extras.getBoolean("HasSound");
+                        gameView.setHasSound(hasSound);
+                    }
+                } else {
+                    Log.i(TAG, "SettingActivity did not return successfully.");
+                }
                 break;
         }
 

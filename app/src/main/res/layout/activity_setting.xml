@@ -102,7 +102,7 @@
                     android:textAllCaps="false"
                     android:textColor="@color/green"
                     android:background="@color/transparent"
-                    android:text="@string/onStr" >
+                    android:text="@string/okStr" >
                 </Button>
             </LinearLayout>
         </LinearLayout>

@@ -17,14 +17,18 @@ public class SettingActivity extends AppCompatActivity {
 
     private float textFontSize;
     private ToggleButton soundSwitch;
+    private boolean hasSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         textFontSize = 30;
+        hasSound = true;
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             textFontSize = extras.getFloat("TextFontSize");
+            hasSound = extras.getBoolean("HasSound");
         }
 
         if (textFontSize == 50) {
@@ -40,12 +44,19 @@ public class SettingActivity extends AppCompatActivity {
 
         soundSwitch = findViewById(R.id.soundSwitch);
         soundSwitch.setTextSize(textFontSize);
+        soundSwitch.setChecked(hasSound);
+        soundSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hasSound = ((ToggleButton)view).isChecked();
+            }
+        });
 
         Button confirmButton = findViewById(R.id.confirmSettingButton);
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                returnToPrevious();
+                returnToPrevious(true);
             }
         });
 
@@ -53,7 +64,7 @@ public class SettingActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                returnToPrevious();
+                returnToPrevious(false);
             }
         });
 
@@ -61,12 +72,23 @@ public class SettingActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        returnToPrevious();
+        returnToPrevious(false);
     }
 
-    private void returnToPrevious() {
+    private void returnToPrevious(boolean confirmed) {
+
         Intent returnIntent = new Intent();
-        setResult(Activity.RESULT_OK, returnIntent);    // can bundle some data to previous activity
+        Bundle extras = new Bundle();
+        extras.putBoolean("HasSound", hasSound);
+        returnIntent.putExtras(extras);
+
+        int resultYn = Activity.RESULT_OK;
+        if (!confirmed) {
+            // cancelled
+            resultYn = Activity.RESULT_CANCELED;
+        }
+
+        setResult(resultYn, returnIntent);    // can bundle some data to previous activity
         finish();
     }
 }
