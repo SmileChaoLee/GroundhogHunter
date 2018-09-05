@@ -36,6 +36,7 @@
     <string name="soundStr">声音</string>
     <string name="onStr">开</string>
     <string name="offStr">关</string>
+    <string name="multiUserStr">多人游戏</string>
 
     <string-array name="soundOptionList">
         <item>@string/onStr</item>

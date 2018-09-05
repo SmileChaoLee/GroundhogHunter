@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
         int darkOrange = getResources().getColor(R.color.darkOrange);
         int darkRed = getResources().getColor(R.color.darkRed);
+        int darkGreen = getResources().getColor(R.color.darkGreen);
 
         // upper buttons layout
         // for setting button
@@ -107,6 +108,17 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtras(extras);
                     startActivityForResult(intent, SettingRequestCode);
                 }
+            }
+        });
+
+        String multiUserStr = getString(R.string.multiUserStr);
+        final SmileImageButton multiUserButton = findViewById(R.id.multiUserButton);
+        Bitmap multiUserBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.multi_user_button, multiUserStr, darkOrange);
+        multiUserButton.setImageBitmap(multiUserBitmap);
+        multiUserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 

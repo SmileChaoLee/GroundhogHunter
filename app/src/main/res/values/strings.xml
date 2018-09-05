@@ -34,6 +34,7 @@
     <string name="soundStr">Sound</string>
     <string name="onStr">On</string>
     <string name="offStr">Off</string>
+    <string name="multiUserStr">Multi-User</string>
 
     <string-array name="soundOptionList">
         <item>@string/onStr</item>
