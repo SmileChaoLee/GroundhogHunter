@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     // public methods
     public static final int Top10RequestCode = 0;
     public static final int SettingRequestCode = 1;
+    public static final int MultiUserRequestCode = 2;
 
     public MainActivity() {
         activityHandler = new Handler();
@@ -118,7 +119,14 @@ public class MainActivity extends AppCompatActivity {
         multiUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if ( (gameView.getRunningStatus() != 1) || (gameView.gameViewPause) ) {
+                    // client is not playing game or not pause status
+                    Intent intent = new Intent(MainActivity.this, MultiUserActivity.class);
+                    Bundle extras = new Bundle();
+                    extras.putFloat("TextFontSize", textFontSize);
+                    intent.putExtras(extras);
+                    startActivityForResult(intent, MultiUserRequestCode);
+                }
             }
         });
 
@@ -335,6 +343,9 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     Log.i(TAG, "Top10ScoreActivity did not return successfully.");
                 }
+                Log.i(TAG, "Facebook showing ads");
+                facebookInterstitialAds.showAd(TAG);
+
                 break;
             case SettingRequestCode:
                 if (resultCode == Activity.RESULT_OK) {
@@ -348,10 +359,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.i(TAG, "SettingActivity did not return successfully.");
                 }
                 break;
+            case MultiUserRequestCode:
+                Log.i(TAG, "Facebook showing ads");
+                facebookInterstitialAds.showAd(TAG);
+                break;
         }
-
-        Log.i(TAG, "Facebook showing ads");
-        facebookInterstitialAds.showAd(TAG);
     }
 
     @Override

@@ -18,16 +18,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".Top10ScoreActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+        </activity>
+
         <activity
             android:name=".SettingActivity"
-            android:label="@string/settingStr"
             android:configChanges="orientation"
+            android:label="@string/settingStr"
             android:screenOrientation="portrait"
-            android:theme="@style/ThemeTextSize30Transparent"/>
+            android:theme="@style/ThemeTextSize30Transparent">
+        </activity>
+
+        <activity android:name=".MultiUserActivity"
+            android:configChanges="orientation"
+            android:label="@string/multiUserStr"
+            android:screenOrientation="portrait"
+            android:theme="@style/ThemeTextSize30Transparent">
+        </activity>
+
     </application>
 
 </manifest>
