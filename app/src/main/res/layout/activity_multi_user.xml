@@ -58,7 +58,7 @@
                 android:layout_height="0dp"
                 android:divider="@drawable/layout_horizontal_divider"
                 android:showDividers="beginning|end"
-                android:layout_weight="4">
+                android:layout_weight="3">
                 <RadioGroup
                     android:id="@+id/networkMediaTypeRadioGroup"
                     android:layout_width="wrap_content"
@@ -71,7 +71,7 @@
                         android:buttonTint="@color/yellow"
                         android:textColor="@color/yellow"
                         android:textAllCaps="false"
-                        android:text="Bluetooth">
+                        android:text="@string/bluetoothStr">
                     </RadioButton>
                     <RadioButton
                         android:id="@+id/lanRadioButton"
@@ -80,7 +80,7 @@
                         android:buttonTint="@color/yellow"
                         android:textColor="@color/yellow"
                         android:textAllCaps="false"
-                        android:text="Local Network">
+                        android:text="@string/lanStr">
                     </RadioButton>
                     <RadioButton
                         android:id="@+id/internetRadioButton"
@@ -89,7 +89,7 @@
                         android:buttonTint="@color/yellow"
                         android:textColor="@color/yellow"
                         android:textAllCaps="false"
-                        android:text="Internet">
+                        android:text="@string/internetStr">
                     </RadioButton>
                 </RadioGroup>
             </LinearLayout>
@@ -98,7 +98,47 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="4">
+                android:layout_weight="5"
+                android:weightSum="5">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:weightSum="2">
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAllCaps="false"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:background="@drawable/normal_button_image"
+                        android:text="@string/createGameStr">
+                    </Button>
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAllCaps="false"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:background="@drawable/normal_button_image"
+                        android:text="@string/joinGameStr">
+                    </Button>
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="4">
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -116,7 +156,11 @@
                     android:gravity="center"
                     android:textAllCaps="false"
                     android:textColor="@color/red"
-                    android:background="@color/transparent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@drawable/normal_button_image"
                     android:text="@string/cancelStr" >
                 </Button>
                 <Button
@@ -126,8 +170,12 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:textAllCaps="false"
-                    android:textColor="@color/green"
-                    android:background="@color/transparent"
+                    android:textColor="@color/darkGreen"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@drawable/normal_button_image"
                     android:text="@string/okStr" >
                 </Button>
             </LinearLayout>
