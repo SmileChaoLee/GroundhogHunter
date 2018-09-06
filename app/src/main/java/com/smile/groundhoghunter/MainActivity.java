@@ -124,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, MultiUserActivity.class);
                     Bundle extras = new Bundle();
                     extras.putFloat("TextFontSize", textFontSize);
+                    extras.putInt("MediaType", gameView.getMediaType());
                     intent.putExtras(extras);
                     startActivityForResult(intent, MultiUserRequestCode);
                 }
@@ -349,17 +350,27 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case SettingRequestCode:
                 if (resultCode == Activity.RESULT_OK) {
-                    Log.i(TAG, "SettingActivity returned successfully.");
+                    Log.i(TAG, "SettingActivity returned ok.");
                     Bundle extras = data.getExtras();
                     if (extras != null) {
                         boolean hasSound = extras.getBoolean("HasSound");
                         gameView.setHasSound(hasSound);
                     }
                 } else {
-                    Log.i(TAG, "SettingActivity did not return successfully.");
+                    Log.i(TAG, "SettingActivity returned cancel.");
                 }
                 break;
             case MultiUserRequestCode:
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.i(TAG, "MultiUserActivity returned ok.");
+                    Bundle extras = data.getExtras();
+                    if (extras != null) {
+                        int mediaType = extras.getInt("MediaType");
+                        gameView.setMediaType(mediaType);
+                    }
+                } else {
+                    Log.i(TAG, "MultiUserActivity returned cancel.");
+                }
                 Log.i(TAG, "Facebook showing ads");
                 facebookInterstitialAds.showAd(TAG);
                 break;

@@ -12,27 +12,24 @@ public class MultiUserActivity extends AppCompatActivity {
 
     // private properties
     private float textFontSize;
+    private int mediaType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         textFontSize = 30;
-        float scaleX = 1.0f;
-        float scaleY = 1.0f;
+        mediaType = GameView.BluetoothMediaType;
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             textFontSize = extras.getFloat("TextFontSize");
+            mediaType = extras.getInt("MediaType");
         }
 
         if (textFontSize == 50) {
             // not a cell phone, it is a tablet
             setTheme(R.style.ThemeTextSize50Transparent);
-            scaleX = 2.0f;
-            scaleY = 2.0f;
         } else {
             setTheme(R.style.ThemeTextSize30Transparent);
-            scaleX = 1.0f;
-            scaleY = 1.0f;
         }
 
         super.onCreate(savedInstanceState);
@@ -40,8 +37,41 @@ public class MultiUserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_multi_user);
 
         final RadioButton bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
+        bluetoothRadioButton.setChecked(false);
+        bluetoothRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mediaType = GameView.BluetoothMediaType;
+            }
+        });
         final RadioButton lanRadioButton = findViewById(R.id.lanRadioButton);
+        lanRadioButton.setChecked(false);
+        lanRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mediaType = GameView.LanMediaType;
+            }
+        });
         final RadioButton internetRadioButton = findViewById(R.id.internetRadioButton);
+        internetRadioButton.setChecked(false);
+        internetRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mediaType = GameView.InternetMediaType;
+            }
+        });
+
+        switch (mediaType) {
+            case GameView.BluetoothMediaType:
+                bluetoothRadioButton.setChecked(true);
+                break;
+            case GameView.LanMediaType:
+                lanRadioButton.setChecked(true);
+                break;
+            case GameView.InternetMediaType:
+                internetRadioButton.setChecked(true);
+                break;
+        }
 
         final Button cancelButton = findViewById(R.id.cancelMultiUserButton);
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -69,6 +99,7 @@ public class MultiUserActivity extends AppCompatActivity {
 
         Intent returnIntent = new Intent();
         Bundle extras = new Bundle();
+        extras.putInt("MediaType", mediaType);
         returnIntent.putExtras(extras);
 
         int resultYn = Activity.RESULT_OK;

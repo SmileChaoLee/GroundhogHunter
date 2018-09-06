@@ -50,6 +50,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean surfaceViewCreated;
     private int runningStatus;
     private boolean hasSound;
+    private int mediaType;
 
     // default properties (package modifier)
     final MainActivity mainActivity;
@@ -58,6 +59,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     Groundhog[] groundhogArray;
 
     // public properties
+    public static final int BluetoothMediaType = 0;
+    public static final int LanMediaType = 1;
+    public static final int InternetMediaType = 2;
+
     public static final int TimerInterval = 60; // 60 seconds
     public static final int DrawingInterval;
     public static final int NumberOfGroundhogTypes;
@@ -128,6 +133,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         timeRemaining = GameView.TimerInterval;
 
         hasSound = true;    // default is having sound
+        mediaType = BluetoothMediaType;
 
         // Creating 25 groundhogs' object
         Log.d(TAG, "Creating groundhogArray....");
@@ -223,6 +229,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void setHasSound(boolean hasSound)
     {
         this.hasSound = hasSound;
+    }
+
+    public int getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(int mediaType) {
+        this.mediaType = mediaType;
     }
 
     public void startGame() {
