@@ -15,6 +15,7 @@ import android.util.Pair;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,8 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
     // private properties
     private final static String TAG = "MainActivity";
-    private final static int colorFilterChanged = Color.argb(100, 155, 155, 155);
-    private final static int colorFilterOriginal = Color.argb(0, 155, 155, 155);
 
     private final ScoreSQLite scoreSQLite;
 
@@ -44,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView scoreTextView;
     private TextView timerTextView;
     private TextView hitNumTextView;
+    private SmileImageButton settingButton;
+    private SmileImageButton multiUserButton;
+    private SmileImageButton top10Button;
 
     // private properties facebook ads
     private FacebookInterstitialAds facebookInterstitialAds;
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         // upper buttons layout
         // for setting button
         String settingStr = getString(R.string.settingStr);
-        final SmileImageButton settingButton = findViewById(R.id.settingButton);
+        settingButton = findViewById(R.id.settingButton);
         Bitmap settingBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.setting_button, settingStr, Color.BLUE);
         settingButton.setImageBitmap(settingBitmap);
         settingButton.setOnClickListener(new View.OnClickListener() {
@@ -106,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                     Bundle extras = new Bundle();
                     extras.putFloat("TextFontSize", textFontSize);
                     extras.putBoolean("HasSound", gameView.getHasSound());
+                    extras.putBoolean("IsSingleUser", gameView.getIsSingleUser());
                     intent.putExtras(extras);
                     startActivityForResult(intent, SettingRequestCode);
                 }
@@ -113,27 +116,29 @@ public class MainActivity extends AppCompatActivity {
         });
 
         String multiUserStr = getString(R.string.multiUserStr);
-        final SmileImageButton multiUserButton = findViewById(R.id.multiUserButton);
+        multiUserButton = findViewById(R.id.multiUserButton);
         Bitmap multiUserBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.multi_user_button, multiUserStr, darkOrange);
         multiUserButton.setImageBitmap(multiUserBitmap);
         multiUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if ( (gameView.getRunningStatus() != 1) || (gameView.gameViewPause) ) {
-                    // client is not playing game or not pause status
-                    Intent intent = new Intent(MainActivity.this, MultiUserActivity.class);
-                    Bundle extras = new Bundle();
-                    extras.putFloat("TextFontSize", textFontSize);
-                    extras.putInt("MediaType", gameView.getMediaType());
-                    intent.putExtras(extras);
-                    startActivityForResult(intent, MultiUserRequestCode);
+                if (!gameView.getIsSingleUser()) {
+                    if ((gameView.getRunningStatus() != 1) || (gameView.gameViewPause)) {
+                        // client is not playing game or not pause status
+                        Intent intent = new Intent(MainActivity.this, MultiUserActivity.class);
+                        Bundle extras = new Bundle();
+                        extras.putFloat("TextFontSize", textFontSize);
+                        extras.putInt("MediaType", gameView.getMediaType());
+                        intent.putExtras(extras);
+                        startActivityForResult(intent, MultiUserRequestCode);
+                    }
                 }
             }
         });
 
         // for top 10 button
         String top10Str = getString(R.string.top10Str);
-        final SmileImageButton top10Button = findViewById(R.id.top10Button);
+        top10Button = findViewById(R.id.top10Button);
         Bitmap top10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.top10_button, top10Str, darkRed);
         top10Button.setImageBitmap(top10Bitmap);
         top10Button.setOnClickListener(new View.OnClickListener() {
@@ -354,7 +359,9 @@ public class MainActivity extends AppCompatActivity {
                     Bundle extras = data.getExtras();
                     if (extras != null) {
                         boolean hasSound = extras.getBoolean("HasSound");
+                        boolean isSingleUser = extras.getBoolean("IsSingleUser");
                         gameView.setHasSound(hasSound);
+                        gameView.setIsSingleUser(isSingleUser);
                     }
                 } else {
                     Log.i(TAG, "SettingActivity returned cancel.");

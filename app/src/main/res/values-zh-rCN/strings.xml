@@ -36,7 +36,10 @@
     <string name="soundStr">声音</string>
     <string name="onStr">开</string>
     <string name="offStr">关</string>
+    <string name="numPlayersStr">游戏人数</string>
+    <string name="singleUserStr">单人游戏</string>
     <string name="multiUserStr">多人游戏</string>
+
     <string name="bluetoothStr">蓝芽</string>
     <string name="lanStr">区域网络</string>
     <string name="internetStr">网际网络</string>

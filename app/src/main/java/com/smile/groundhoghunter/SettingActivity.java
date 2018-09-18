@@ -17,18 +17,22 @@ public class SettingActivity extends AppCompatActivity {
 
     private float textFontSize;
     private ToggleButton soundSwitch;
+    private ToggleButton mutiUserSwitch;
     private boolean hasSound;
+    private boolean isSingleUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         textFontSize = 30;
         hasSound = true;
+        isSingleUser = true;
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             textFontSize = extras.getFloat("TextFontSize");
             hasSound = extras.getBoolean("HasSound");
+            isSingleUser = extras.getBoolean("IsSingleUser");
         }
 
         if (textFontSize == 50) {
@@ -49,6 +53,16 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 hasSound = ((ToggleButton)view).isChecked();
+            }
+        });
+
+        mutiUserSwitch = findViewById(R.id.multiUserSwitch);
+        mutiUserSwitch.setTextSize(textFontSize);
+        mutiUserSwitch.setChecked(isSingleUser);
+        mutiUserSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isSingleUser = ((ToggleButton)view).isChecked();
             }
         });
 
@@ -80,6 +94,7 @@ public class SettingActivity extends AppCompatActivity {
         Intent returnIntent = new Intent();
         Bundle extras = new Bundle();
         extras.putBoolean("HasSound", hasSound);
+        extras.putBoolean("IsSingleUser", isSingleUser);
         returnIntent.putExtras(extras);
 
         int resultYn = Activity.RESULT_OK;

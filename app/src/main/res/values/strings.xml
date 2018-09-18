@@ -34,7 +34,10 @@
     <string name="soundStr">Sound</string>
     <string name="onStr">On</string>
     <string name="offStr">Off</string>
+    <string name="numPlayersStr">#Players</string>
+    <string name="singleUserStr">1 User</string>
     <string name="multiUserStr">Multi-User</string>
+
     <string name="bluetoothStr">Bluetooth</string>
     <string name="lanStr">Local Network</string>
     <string name="internetStr">Internet</string>

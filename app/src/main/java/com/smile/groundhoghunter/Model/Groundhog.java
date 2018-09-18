@@ -86,13 +86,12 @@ public class Groundhog {
                     // then numOfAnimationsShown no changes
                 }
             }
+            // calculate the coordinate
+            float diff = (wholeGroundhogArea.bottom - wholeGroundhogArea.top) / halfOfAnimationTimes * numOfAnimationsShown;
+            drawArea = new RectF(wholeGroundhogArea);
+            drawArea.top = wholeGroundhogArea.bottom - diff;
             if (numOfAnimationsShown <= 0 ) {
                 setIsHiding(true);
-            } else {
-                // calculate the coordinate
-                float diff = (wholeGroundhogArea.bottom - wholeGroundhogArea.top) / halfOfAnimationTimes * numOfAnimationsShown;
-                drawArea = new RectF(wholeGroundhogArea);
-                drawArea.top = wholeGroundhogArea.bottom - diff;
             }
         } else {
             setIsHiding(true);      // groundhog becomes hiding
