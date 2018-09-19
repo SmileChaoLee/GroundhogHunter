@@ -37,14 +37,18 @@
     <string name="onStr">開</string>
     <string name="offStr">關</string>
     <string name="numPlayersStr">遊戲人數</string>
-    <string name="singleUserStr">單人遊戲</string>
-    <string name="multiUserStr">多人遊戲</string>
+    <string name="singleStr">單人</string>
+    <string name="multipleStr">多人</string>
+    <string name="singlePlayerStr">單人</string>
+    <string name="multiPlayerStr">多人</string>
 
     <string name="bluetoothStr">藍芽</string>
     <string name="lanStr">區域網路</string>
     <string name="internetStr">網際網路</string>
     <string name="createGameStr">創立</string>
     <string name="joinGameStr">加入</string>
+
+    <string name="gameStatusStr">狀態:</string>
 
     <string-array name="soundOptionList">
         <item>@string/onStr</item>

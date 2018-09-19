@@ -50,7 +50,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean surfaceViewCreated;
     private int runningStatus;
     private boolean hasSound;
-    private boolean isSingleUser;
+    private boolean isSinglePlayer;
     private int mediaType;
 
     // default properties (package modifier)
@@ -134,7 +134,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         timeRemaining = GameView.TimerInterval;
 
         hasSound = true;    // default is having sound
-        isSingleUser = true;    // default is single user
+        isSinglePlayer = true;    // default is single player
 
         mediaType = BluetoothMediaType;
 
@@ -233,11 +233,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         this.hasSound = hasSound;
     }
 
-    public boolean getIsSingleUser() {
-        return isSingleUser;
+    public boolean getIsSinglePlayer() {
+        return isSinglePlayer;
     }
-    public void setIsSingleUser(boolean isSingleUser) {
-        this.isSingleUser = isSingleUser;
+    public void setIsSinglePlayer(boolean isSinglePlayer) {
+        this.isSinglePlayer = isSinglePlayer;
     }
 
     public int getMediaType() {

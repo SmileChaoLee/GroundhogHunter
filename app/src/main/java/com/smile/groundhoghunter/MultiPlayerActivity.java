@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 
-public class MultiUserActivity extends AppCompatActivity {
+public class MultiPlayerActivity extends AppCompatActivity {
 
     // private properties
     private float textFontSize;
@@ -34,7 +34,7 @@ public class MultiUserActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_multi_user);
+        setContentView(R.layout.activity_multi_player);
 
         final RadioButton bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
         bluetoothRadioButton.setChecked(false);
@@ -73,7 +73,7 @@ public class MultiUserActivity extends AppCompatActivity {
                 break;
         }
 
-        final Button cancelButton = findViewById(R.id.cancelMultiUserButton);
+        final Button cancelButton = findViewById(R.id.cancelMultiPlayerButton);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,7 +81,7 @@ public class MultiUserActivity extends AppCompatActivity {
             }
         });
 
-        final Button confirmButton = findViewById(R.id.confirmMultiUserButton);
+        final Button confirmButton = findViewById(R.id.confirmMultiPlayerButton);
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

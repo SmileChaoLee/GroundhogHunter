@@ -102,7 +102,7 @@
                         android:text="@string/numPlayersStr">
                     </TextView>
                     <ToggleButton
-                        android:id="@+id/multiUserSwitch"
+                        android:id="@+id/multiPlayerSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="right|center_vertical"
@@ -111,8 +111,8 @@
                         android:background="@color/transparent"
                         android:textColor="@color/white"
                         android:textAllCaps="false"
-                        android:textOn="@string/singleUserStr"
-                        android:textOff="@string/multiUserStr">
+                        android:textOn="@string/singleStr"
+                        android:textOff="@string/multipleStr">
                     </ToggleButton>
                 </RelativeLayout>
 

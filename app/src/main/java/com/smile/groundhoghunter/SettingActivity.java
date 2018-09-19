@@ -2,6 +2,7 @@ package com.smile.groundhoghunter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
@@ -17,22 +18,22 @@ public class SettingActivity extends AppCompatActivity {
 
     private float textFontSize;
     private ToggleButton soundSwitch;
-    private ToggleButton mutiUserSwitch;
+    private ToggleButton mutiPlayerSwitch;
     private boolean hasSound;
-    private boolean isSingleUser;
+    private boolean isSinglePlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         textFontSize = 30;
         hasSound = true;
-        isSingleUser = true;
+        isSinglePlayer = true;
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             textFontSize = extras.getFloat("TextFontSize");
             hasSound = extras.getBoolean("HasSound");
-            isSingleUser = extras.getBoolean("IsSingleUser");
+            isSinglePlayer = extras.getBoolean("IsSinglePlayer");
         }
 
         if (textFontSize == 50) {
@@ -56,15 +57,22 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
-        mutiUserSwitch = findViewById(R.id.multiUserSwitch);
-        mutiUserSwitch.setTextSize(textFontSize);
-        mutiUserSwitch.setChecked(isSingleUser);
-        mutiUserSwitch.setOnClickListener(new View.OnClickListener() {
+        mutiPlayerSwitch = findViewById(R.id.multiPlayerSwitch);
+        mutiPlayerSwitch.setTextSize(textFontSize);
+        mutiPlayerSwitch.setChecked(isSinglePlayer);
+        mutiPlayerSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isSingleUser = ((ToggleButton)view).isChecked();
+                isSinglePlayer = ((ToggleButton)view).isChecked();
             }
         });
+        ApplicationInfo appInfo = getApplicationContext().getApplicationInfo();
+        boolean isDebuggable = (appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        if (!isDebuggable) {
+            // release mode
+            mutiPlayerSwitch.setEnabled(false);
+            mutiPlayerSwitch.setVisibility(View.GONE);
+        }
 
         Button confirmButton = findViewById(R.id.confirmSettingButton);
         confirmButton.setOnClickListener(new View.OnClickListener() {
@@ -94,7 +102,7 @@ public class SettingActivity extends AppCompatActivity {
         Intent returnIntent = new Intent();
         Bundle extras = new Bundle();
         extras.putBoolean("HasSound", hasSound);
-        extras.putBoolean("IsSingleUser", isSingleUser);
+        extras.putBoolean("IsSinglePlayer", isSinglePlayer);
         returnIntent.putExtras(extras);
 
         int resultYn = Activity.RESULT_OK;

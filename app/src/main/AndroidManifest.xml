@@ -33,9 +33,9 @@
             android:theme="@style/ThemeTextSize30Transparent">
         </activity>
 
-        <activity android:name=".MultiUserActivity"
+        <activity android:name=".MultiPlayerActivity"
             android:configChanges="orientation"
-            android:label="@string/multiUserStr"
+            android:label="@string/multipleStr"
             android:screenOrientation="portrait"
             android:theme="@style/ThemeTextSize30Transparent">
         </activity>

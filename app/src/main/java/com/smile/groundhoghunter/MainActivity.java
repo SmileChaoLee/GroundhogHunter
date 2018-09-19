@@ -2,6 +2,7 @@ package com.smile.groundhoghunter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
@@ -15,7 +16,6 @@ import android.util.Pair;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,12 +39,14 @@ public class MainActivity extends AppCompatActivity {
     private int colNum;
     private float textFontSize;
     private int highestScore;
+    private ImageView numPlayersImageView;
+    private ImageView soundOnOffImageView;
     private TextView highScoreTextView;
     private TextView scoreTextView;
     private TextView timerTextView;
     private TextView hitNumTextView;
     private SmileImageButton settingButton;
-    private SmileImageButton multiUserButton;
+    private SmileImageButton multiPlayerButton;
     private SmileImageButton top10Button;
 
     // private properties facebook ads
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     // public methods
     public static final int Top10RequestCode = 0;
     public static final int SettingRequestCode = 1;
-    public static final int MultiUserRequestCode = 2;
+    public static final int MultiPlayerRequestCode = 2;
 
     public MainActivity() {
         activityHandler = new Handler();
@@ -108,33 +110,41 @@ public class MainActivity extends AppCompatActivity {
                     Bundle extras = new Bundle();
                     extras.putFloat("TextFontSize", textFontSize);
                     extras.putBoolean("HasSound", gameView.getHasSound());
-                    extras.putBoolean("IsSingleUser", gameView.getIsSingleUser());
+                    extras.putBoolean("IsSinglePlayer", gameView.getIsSinglePlayer());
                     intent.putExtras(extras);
                     startActivityForResult(intent, SettingRequestCode);
                 }
             }
         });
 
-        String multiUserStr = getString(R.string.multiUserStr);
-        multiUserButton = findViewById(R.id.multiUserButton);
-        Bitmap multiUserBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.multi_user_button, multiUserStr, darkOrange);
-        multiUserButton.setImageBitmap(multiUserBitmap);
-        multiUserButton.setOnClickListener(new View.OnClickListener() {
+        String multiPlayerStr = getString(R.string.multiPlayerStr);
+        multiPlayerButton = findViewById(R.id.multiPlayerButton);
+        Bitmap multiPlayerBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.multi_player_button, multiPlayerStr, darkOrange);
+        multiPlayerButton.setImageBitmap(multiPlayerBitmap);
+        multiPlayerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!gameView.getIsSingleUser()) {
+                if (!gameView.getIsSinglePlayer()) {
                     if ((gameView.getRunningStatus() != 1) || (gameView.gameViewPause)) {
                         // client is not playing game or not pause status
-                        Intent intent = new Intent(MainActivity.this, MultiUserActivity.class);
+                        Intent intent = new Intent(MainActivity.this, MultiPlayerActivity.class);
                         Bundle extras = new Bundle();
                         extras.putFloat("TextFontSize", textFontSize);
                         extras.putInt("MediaType", gameView.getMediaType());
                         intent.putExtras(extras);
-                        startActivityForResult(intent, MultiUserRequestCode);
+                        startActivityForResult(intent, MultiPlayerRequestCode);
                     }
                 }
             }
         });
+
+        ApplicationInfo appInfo = getApplicationContext().getApplicationInfo();
+        boolean isDebuggable = (appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        if (!isDebuggable) {
+            // release mode
+            multiPlayerButton.setEnabled(false);
+            multiPlayerButton.setVisibility(View.GONE);
+        }
 
         // for top 10 button
         String top10Str = getString(R.string.top10Str);
@@ -152,6 +162,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // score layout
+        soundOnOffImageView = findViewById(R.id.soundOnOffImageView);
+        numPlayersImageView = findViewById(R.id.numPlayerImageView);
+
         TextView highScoreTitleView = findViewById(R.id.highestScoreTitle);
         // highScoreTitleView.setTextSize(textFontSize);
         highScoreTextView = findViewById(R.id.highestScoreText);
@@ -218,6 +231,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "gameView created.");
                 gameFrameLayout.addView(gameView);
                 Log.i(TAG, "Added gameView to gameFrameLayout.");
+                numPlayersImageView.setImageResource(R.drawable.single_player_image);
+                soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
             }
         });
 
@@ -359,28 +374,40 @@ public class MainActivity extends AppCompatActivity {
                     Bundle extras = data.getExtras();
                     if (extras != null) {
                         boolean hasSound = extras.getBoolean("HasSound");
-                        boolean isSingleUser = extras.getBoolean("IsSingleUser");
+                        boolean isSinglePlayer = extras.getBoolean("IsSinglePlayer");
                         gameView.setHasSound(hasSound);
-                        gameView.setIsSingleUser(isSingleUser);
+                        gameView.setIsSinglePlayer(isSinglePlayer);
                     }
                 } else {
                     Log.i(TAG, "SettingActivity returned cancel.");
                 }
                 break;
-            case MultiUserRequestCode:
+            case MultiPlayerRequestCode:
                 if (resultCode == Activity.RESULT_OK) {
-                    Log.i(TAG, "MultiUserActivity returned ok.");
+                    Log.i(TAG, "MultiPlayerActivity returned ok.");
                     Bundle extras = data.getExtras();
                     if (extras != null) {
                         int mediaType = extras.getInt("MediaType");
                         gameView.setMediaType(mediaType);
                     }
                 } else {
-                    Log.i(TAG, "MultiUserActivity returned cancel.");
+                    Log.i(TAG, "MultiPlayerActivity returned cancel.");
                 }
                 Log.i(TAG, "Facebook showing ads");
                 facebookInterstitialAds.showAd(TAG);
                 break;
+        }
+
+        // update Main UI
+        if (gameView.getHasSound()) {
+            soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
+        } else {
+            soundOnOffImageView.setImageResource(R.drawable.sound_off_image);
+        }
+        if (gameView.getIsSinglePlayer()) {
+            numPlayersImageView.setImageResource(R.drawable.single_player_image);
+        } else {
+            numPlayersImageView.setImageResource(R.drawable.multi_players_image);
         }
     }
 
