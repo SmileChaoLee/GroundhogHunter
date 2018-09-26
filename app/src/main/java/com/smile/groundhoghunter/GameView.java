@@ -26,12 +26,13 @@ import android.widget.LinearLayout;
 
 import com.smile.groundhoghunter.Model.Groundhog;
 import com.smile.groundhoghunter.Utilities.SoundUtil;
-import com.smile.scoresqlite.ScoreSQLite;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = "GameView";
+
     private final SurfaceHolder surfaceHolder;
+    private final MainActivity mainActivity;
     private final int rowNum;
     private final int colNum;
 
@@ -53,16 +54,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private int mediaType;
 
     // default properties (package modifier)
-    final MainActivity mainActivity;
     final Handler gameViewHandler;  // for synchronizing
-    boolean gameViewPause;    // for synchronizing
     Groundhog[] groundhogArray;
 
-    // public properties
+    // public static properties
+    public static boolean GameViewPause = false;    // for synchronizing
+
+    // public static final properties
     public static final int BluetoothMediaType = 0;
     public static final int LanMediaType = 1;
     public static final int InternetMediaType = 2;
-
     public static final int TimerInterval = 60; // 60 seconds
     public static final int DrawingInterval;
     public static final int NumberOfGroundhogTypes;
@@ -113,7 +114,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         gameViewHeight = gHeight;
 
         gameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
-        gameViewPause = false;   // for synchronizing
+        GameViewPause = false;   // for synchronizing
 
         setWillNotDraw(true);   // added on 2017-11-07 for just in case, the default is true
 
@@ -262,19 +263,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void pauseGame() {
-        if ( (surfaceViewCreated) && (runningStatus == 1) && (!gameViewPause)) {
+        if ( (surfaceViewCreated) && (runningStatus == 1) && (!GameViewPause)) {
             // when game is running
             synchronized (gameViewHandler) {
-                gameViewPause = true;
+                GameViewPause = true;
             }
         }
     }
 
     public void resumeGame() {
-        if ( (surfaceViewCreated) && (runningStatus == 1) && (gameViewPause) ) {
+        if ( (surfaceViewCreated) && (runningStatus == 1) && (GameViewPause) ) {
             // when game is running
             synchronized (gameViewHandler) {
-                gameViewPause = false;
+                GameViewPause = false;
                 gameViewHandler.notifyAll();
             }
         }
@@ -323,10 +324,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
 
-        if (gameViewPause) {
+        if (GameViewPause) {
             // GameView in pause status
             synchronized (gameViewHandler) {
-                gameViewPause = false;
+                GameViewPause = false;
                 gameViewHandler.notifyAll();
             }
         }

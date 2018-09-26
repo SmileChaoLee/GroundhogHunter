@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         settingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if ( (gameView.getRunningStatus() != 1) || (gameView.gameViewPause) ) {
+                if ( (gameView.getRunningStatus() != 1) || (GameView.GameViewPause) ) {
                     // client is not playing game or not pause status
                     Intent intent = new Intent(MainActivity.this, SettingActivity.class);
                     Bundle extras = new Bundle();
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!gameView.getIsSinglePlayer()) {
-                    if ((gameView.getRunningStatus() != 1) || (gameView.gameViewPause)) {
+                    if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
                         // client is not playing game or not pause status
                         Intent intent = new Intent(MainActivity.this, MultiPlayerActivity.class);
                         Bundle extras = new Bundle();
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         top10Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if ( (gameView.getRunningStatus() != 1) || (gameView.gameViewPause) ) {
+                if ( (gameView.getRunningStatus() != 1) || (GameView.GameViewPause) ) {
                     // client is not playing game or not pause status
                     getTop10ScoreList();
                 }

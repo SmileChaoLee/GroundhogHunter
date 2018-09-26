@@ -35,7 +35,7 @@ public class GroundhogRandomThread extends Thread {
 
             synchronized (gameView.gameViewHandler) {
                 // for GameView's synchronizing
-                while (gameView.gameViewPause) {
+                while (GameView.GameViewPause) {
                     try {
                         gameView.gameViewHandler.wait();
                     } catch (InterruptedException e) {
