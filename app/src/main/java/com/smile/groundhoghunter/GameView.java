@@ -31,7 +31,6 @@ import com.smile.scoresqlite.ScoreSQLite;
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = "GameView";
-    private final ScoreSQLite scoreSQLite;
     private final SurfaceHolder surfaceHolder;
     private final int rowNum;
     private final int colNum;
@@ -107,7 +106,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         Log.d(TAG, "GameView.GameView(Context context, int gWidth, int gHeight) is called.");
 
         mainActivity = (MainActivity)context;
-        scoreSQLite = mainActivity.getScoreSQLite();
         rowNum = mainActivity.getRowNum();
         colNum = mainActivity.getColNum();
 
@@ -462,7 +460,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         timerThread.setKeepRunning(false);
 
         runningStatus = 2;
-        boolean isInTop10 = scoreSQLite.isInTop10(currentScore);
+        boolean isInTop10 = MainActivity.ScoreSQLiteDB.isInTop10(currentScore);
         if (isInTop10) {
             // record the current score
             recordScore(currentScore);
@@ -497,8 +495,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        scoreSQLite.addScore(et.getText().toString(), score);
-                        scoreSQLite.deleteAllAfterTop10();  // only keep the top 10
+                        MainActivity.ScoreSQLiteDB.addScore(et.getText().toString(), score);
+                        MainActivity.ScoreSQLiteDB.deleteAllAfterTop10();  // only keep the top 10
                         if (currentScore > highestScore) {
                             highestScore = currentScore;
                             mainActivity.setHighestScore(highestScore);

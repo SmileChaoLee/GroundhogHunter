@@ -32,8 +32,6 @@ public class MainActivity extends AppCompatActivity {
     // private properties
     private final static String TAG = "MainActivity";
 
-    private final ScoreSQLite scoreSQLite;
-
     private GameView gameView;
     private int rowNum;
     private int colNum;
@@ -57,15 +55,15 @@ public class MainActivity extends AppCompatActivity {
 
     // public static final properties
     public static final Handler ActivityHandler = new Handler();
+    // cannot use this as a parameter of context for SQLite because context has not been created yet
+    // until onCreate() in activity, so use the context in Application class
+    public static final ScoreSQLite ScoreSQLiteDB = new ScoreSQLite(GroundhogHunterApp.AppContext);
     public static final int Top10RequestCode = 0;
     public static final int SettingRequestCode = 1;
     public static final int MultiPlayerRequestCode = 2;
 
     public MainActivity() {
-        // cannot use this as a parameter of context for SQLite because context has not been created yet
-        // until onCreate() in activity, so use the context in Application class
-        scoreSQLite = new ScoreSQLite(GroundhogHunterApp.AppContext);
-        highestScore = scoreSQLite.readHighestScore();
+        highestScore = ScoreSQLiteDB.readHighestScore();
     }
 
     @Override
@@ -467,7 +465,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void getTop10ScoreList() {
 
-        ArrayList<Pair<String, Integer>> top10 = scoreSQLite.readTop10ScoreList();
+        ArrayList<Pair<String, Integer>> top10 = ScoreSQLiteDB.readTop10ScoreList();
         ArrayList<String> playerNames = new ArrayList<String>();
         ArrayList<Integer> playerScores = new ArrayList<Integer>();
         for (Pair pair : top10) {
@@ -488,9 +486,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // public methods
-    public ScoreSQLite getScoreSQLite() {
-        return scoreSQLite;
-    }
     public int getRowNum() {
         return rowNum;
     }
