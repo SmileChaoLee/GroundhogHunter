@@ -66,6 +66,8 @@ public class SettingActivity extends AppCompatActivity {
                 isSinglePlayer = ((ToggleButton)view).isChecked();
             }
         });
+
+        /*
         ApplicationInfo appInfo = getApplicationContext().getApplicationInfo();
         boolean isDebuggable = (appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         if (!isDebuggable) {
@@ -73,6 +75,7 @@ public class SettingActivity extends AppCompatActivity {
             mutiPlayerSwitch.setEnabled(false);
             mutiPlayerSwitch.setVisibility(View.GONE);
         }
+        */
 
         Button confirmButton = findViewById(R.id.confirmSettingButton);
         confirmButton.setOnClickListener(new View.OnClickListener() {

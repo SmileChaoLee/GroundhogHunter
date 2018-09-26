@@ -317,11 +317,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void releaseSynchronizations() {
-        if (mainActivity.gamePause) {
+        if (MainActivity.GamePause) {
             // in pause status
-            synchronized (mainActivity.activityHandler) {
-                mainActivity.gamePause = false;
-                mainActivity.activityHandler.notifyAll();
+            synchronized (MainActivity.ActivityHandler) {
+                MainActivity.GamePause = false;
+                MainActivity.ActivityHandler.notifyAll();
             }
         }
 

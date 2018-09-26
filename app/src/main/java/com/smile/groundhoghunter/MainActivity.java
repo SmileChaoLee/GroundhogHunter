@@ -52,17 +52,16 @@ public class MainActivity extends AppCompatActivity {
     // private properties facebook ads
     private FacebookInterstitialAds facebookInterstitialAds;
 
-    // default properties (package modifiers)
-    final Handler activityHandler;
-    boolean gamePause = false;
+    // public static properties
+    public static boolean GamePause = false;
 
-    // public methods
+    // public static final properties
+    public static final Handler ActivityHandler = new Handler();
     public static final int Top10RequestCode = 0;
     public static final int SettingRequestCode = 1;
     public static final int MultiPlayerRequestCode = 2;
 
     public MainActivity() {
-        activityHandler = new Handler();
         // cannot use this as a parameter of context for SQLite because context has not been created yet
         // until onCreate() in activity, so use the context in Application class
         scoreSQLite = new ScoreSQLite(GroundhogHunterApp.AppContext);
@@ -89,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        gamePause = false;
+        GamePause = false;
 
         int darkOrange = getResources().getColor(R.color.darkOrange);
         int darkRed = getResources().getColor(R.color.darkRed);
@@ -138,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /*
         ApplicationInfo appInfo = getApplicationContext().getApplicationInfo();
         boolean isDebuggable = (appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         if (!isDebuggable) {
@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
             multiPlayerButton.setEnabled(false);
             multiPlayerButton.setVisibility(View.GONE);
         }
+        */
 
         // for top 10 button
         String top10Str = getString(R.string.top10Str);
@@ -416,9 +417,9 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         System.out.println("onResume() is called.");
 
-        synchronized (activityHandler) {
-            gamePause = false;
-            activityHandler.notifyAll();
+        synchronized (ActivityHandler) {
+            GamePause = false;
+            ActivityHandler.notifyAll();
         }
     }
 
@@ -427,8 +428,8 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         System.out.println("onPause() is called.");
 
-        synchronized (activityHandler) {
-            gamePause = true;
+        synchronized (ActivityHandler) {
+            GamePause = true;
         }
         // super.onPause();
     }

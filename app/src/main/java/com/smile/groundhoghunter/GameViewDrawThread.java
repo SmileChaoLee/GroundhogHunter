@@ -1,31 +1,23 @@
 package com.smile.groundhoghunter;
 
-import android.graphics.Canvas;
-import android.view.SurfaceHolder;
-
-import com.smile.groundhoghunter.GameView;
-import com.smile.groundhoghunter.MainActivity;
-
 public class GameViewDrawThread extends Thread {
 
-    private MainActivity mainActivity;
     private GameView gameView;
     private boolean keepRunning;
     private int synchronizeTime = GameView.DrawingInterval;
 
     public GameViewDrawThread(GameView gView) {
         this.gameView = gView;
-        this.mainActivity = gView.mainActivity;
         keepRunning = true; // keepRunning = true -> loop in run() still going
     }
 
     public void run() {
         while (keepRunning) {
-            synchronized (mainActivity.activityHandler) {
+            synchronized (MainActivity.ActivityHandler) {
                 // for application's (Main activity) synchronizing
-                while (mainActivity.gamePause) {
+                while (MainActivity.GamePause) {
                     try {
-                        mainActivity.activityHandler.wait();
+                        MainActivity.ActivityHandler.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
