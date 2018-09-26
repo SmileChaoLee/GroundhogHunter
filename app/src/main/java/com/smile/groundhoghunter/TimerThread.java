@@ -26,11 +26,11 @@ public class TimerThread extends Thread {
                 }
             }
 
-            synchronized (gameView.gameViewHandler) {
+            synchronized (GameView.GameViewHandler) {
                 // for GameView's synchronizing
                 while (GameView.GameViewPause) {
                     try {
-                        gameView.gameViewHandler.wait();
+                        GameView.GameViewHandler.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

@@ -54,13 +54,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private int mediaType;
 
     // default properties (package modifier)
-    final Handler gameViewHandler;  // for synchronizing
     Groundhog[] groundhogArray;
 
     // public static properties
     public static boolean GameViewPause = false;    // for synchronizing
 
     // public static final properties
+    public static final Handler GameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
     public static final int BluetoothMediaType = 0;
     public static final int LanMediaType = 1;
     public static final int InternetMediaType = 2;
@@ -113,7 +113,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         gameViewWidth = gWidth;
         gameViewHeight = gHeight;
 
-        gameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
         GameViewPause = false;   // for synchronizing
 
         setWillNotDraw(true);   // added on 2017-11-07 for just in case, the default is true
@@ -265,7 +264,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void pauseGame() {
         if ( (surfaceViewCreated) && (runningStatus == 1) && (!GameViewPause)) {
             // when game is running
-            synchronized (gameViewHandler) {
+            synchronized (GameViewHandler) {
                 GameViewPause = true;
             }
         }
@@ -274,9 +273,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void resumeGame() {
         if ( (surfaceViewCreated) && (runningStatus == 1) && (GameViewPause) ) {
             // when game is running
-            synchronized (gameViewHandler) {
+            synchronized (GameViewHandler) {
                 GameViewPause = false;
-                gameViewHandler.notifyAll();
+                GameViewHandler.notifyAll();
             }
         }
     }
@@ -326,9 +325,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         if (GameViewPause) {
             // GameView in pause status
-            synchronized (gameViewHandler) {
+            synchronized (GameViewHandler) {
                 GameViewPause = false;
-                gameViewHandler.notifyAll();
+                GameViewHandler.notifyAll();
             }
         }
     }
