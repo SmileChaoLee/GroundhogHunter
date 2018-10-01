@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.smile.groundhoghunter.Utilities.ScreenUtil;
@@ -18,7 +19,7 @@ public class SettingActivity extends AppCompatActivity {
 
     private float textFontSize;
     private ToggleButton soundSwitch;
-    private ToggleButton mutiPlayerSwitch;
+    private ToggleButton multiPlayerSwitch;
     private boolean hasSound;
     private boolean isSinglePlayer;
 
@@ -57,25 +58,23 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
-        mutiPlayerSwitch = findViewById(R.id.multiPlayerSwitch);
-        mutiPlayerSwitch.setTextSize(textFontSize);
-        mutiPlayerSwitch.setChecked(isSinglePlayer);
-        mutiPlayerSwitch.setOnClickListener(new View.OnClickListener() {
+        TextView numPlayerTextView = findViewById(R.id.numPlayerTextView);
+        multiPlayerSwitch = findViewById(R.id.multiPlayerSwitch);
+        multiPlayerSwitch.setTextSize(textFontSize);
+        multiPlayerSwitch.setChecked(isSinglePlayer);
+        multiPlayerSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 isSinglePlayer = ((ToggleButton)view).isChecked();
             }
         });
 
-        /*
-        ApplicationInfo appInfo = getApplicationContext().getApplicationInfo();
-        boolean isDebuggable = (appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-        if (!isDebuggable) {
+        if (!BuildConfig.DEBUG) {
             // release mode
-            mutiPlayerSwitch.setEnabled(false);
-            mutiPlayerSwitch.setVisibility(View.GONE);
+            numPlayerTextView.setVisibility(View.GONE);
+            multiPlayerSwitch.setEnabled(false);
+            multiPlayerSwitch.setVisibility(View.GONE);
         }
-        */
 
         Button confirmButton = findViewById(R.id.confirmSettingButton);
         confirmButton.setOnClickListener(new View.OnClickListener() {

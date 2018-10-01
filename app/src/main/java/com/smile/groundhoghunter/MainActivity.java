@@ -145,6 +145,11 @@ public class MainActivity extends AppCompatActivity {
         }
         */
 
+        if (!BuildConfig.DEBUG) {
+            multiPlayerButton.setEnabled(false);
+            multiPlayerButton.setVisibility(View.GONE);
+        }
+
         // for top 10 button
         String top10Str = getString(R.string.top10Str);
         top10Button = findViewById(R.id.top10Button);

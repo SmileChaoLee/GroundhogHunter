@@ -58,10 +58,6 @@ public class Top10ScoreActivity extends AppCompatActivity {
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Intent returnIntent = new Intent();
-                // setResult(Activity.RESULT_OK, returnIntent);
-                // setResult(Activity.RESULT_OK);
-                // finish();
                 returnToPrevious();
             }
         });
