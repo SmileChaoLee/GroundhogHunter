@@ -10,7 +10,7 @@ android {
         }
     }
     compileSdkVersion 28
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.smile.groundhoghunter"
         minSdkVersion 14
@@ -19,6 +19,23 @@ android {
         versionName "1.30"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+        applicationId "com.smile.groundhoghunter"
+        manifestPlaceholders = [ appName:"@string/app_name"]
+
+        flavorDimensions("groundhoghunter")
+        productFlavors {
+            groundhoghunter {
+                dimension "groundhoghunter"
+                applicationId "com.smile.groundhoghunter"
+                manifestPlaceholders = [ appNameSuffix:""]
+            }
+            groundhoghunter_pro {
+                dimension "groundhoghunter"
+                applicationId "com.smile.groundhoghunter_pro"
+                manifestPlaceholders = [ appNameSuffix:"_pro"]
+            }
+        }
     }
     buildTypes {
         release {

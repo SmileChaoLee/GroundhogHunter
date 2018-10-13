@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">土拨鼠猎人</string>
+    <string name="app_name_pro">土拨鼠猎人_专业版</string>
 
     <string-array name="stageLevels">
         <item>开始</item>
@@ -49,9 +50,5 @@
     <string name="joinGameStr">加入</string>
 
     <string name="gameStatusStr">状态:</string>
-
-    <string-array name="soundOptionList">
-        <item>@string/onStr</item>
-        <item>@string/offStr</item>
-    </string-array>
+    <string name="showingAdsStr">广告显示中 ...</string>
 </resources>

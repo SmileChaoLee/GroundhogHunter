@@ -330,7 +330,9 @@ public class MainActivity extends AppCompatActivity {
                 resumeGameButton.setEnabled(false);
                 resumeGameButton.setVisibility(View.GONE);
 
-                // facebookInterstitialAds.showAd(TAG);     // removed on 2018-08-22
+                // if (facebookInterstitialAds != null) {
+                //    facebookInterstitialAds.showAd(TAG);     // removed on 2018-08-22
+                // }
             }
         });
 
@@ -341,8 +343,10 @@ public class MainActivity extends AppCompatActivity {
         quitGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // show ads
-                facebookInterstitialAds.showAd(TAG);
+                if (facebookInterstitialAds != null) {
+                    // show ads
+                    facebookInterstitialAds.showAd(TAG);
+                }
                 finish();
             }
         });
@@ -351,8 +355,12 @@ public class MainActivity extends AppCompatActivity {
         // Facebook ads (Interstitial ads)
         // Placement ID:	308861513197370_308861586530696
         String facebookPlacementID = new String("308861513197370_308861586530696"); // groundhog hunter for free
-
-        facebookInterstitialAds = new FacebookInterstitialAds(this, facebookPlacementID);
+        if (BuildConfig.APPLICATION_ID == "com.smile.groundhoghunter") {
+            facebookInterstitialAds = new FacebookInterstitialAds(this, facebookPlacementID);
+        } else {
+            // null stands for this is professional version (needs to be paid for it)
+            facebookInterstitialAds = null;
+        }
 
     }
 
@@ -369,7 +377,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.i(TAG, "Top10ScoreActivity did not return successfully.");
                 }
                 Log.i(TAG, "Facebook showing ads");
-                facebookInterstitialAds.showAd(TAG);
+                if (facebookInterstitialAds != null) {
+                    facebookInterstitialAds.showAd(TAG);
+                }
 
                 break;
             case SettingRequestCode:
@@ -398,7 +408,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.i(TAG, "MultiPlayerActivity returned cancel.");
                 }
                 Log.i(TAG, "Facebook showing ads");
-                facebookInterstitialAds.showAd(TAG);
                 break;
         }
 
@@ -445,6 +454,9 @@ public class MainActivity extends AppCompatActivity {
         if (isFinishing()) {
             if (facebookInterstitialAds != null) {
                 facebookInterstitialAds.close();
+            }
+            if (ScoreSQLiteDB != null) {
+                ScoreSQLiteDB.close();
             }
         }
 

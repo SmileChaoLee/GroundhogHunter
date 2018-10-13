@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">GroundhogHunter</string>
+    <string name="app_name_pro">GroundhogHunter_pro</string>
 
     <string-array name="stageLevels">
         <item>Start</item>
@@ -47,9 +48,6 @@
     <string name="joinGameStr">Join</string>
 
     <string name="gameStatusStr">Status:</string>
+    <string name="showingAdsStr">Showing Ads ...</string>
 
-    <string-array name="soundOptionList">
-        <item>@string/onStr</item>
-        <item>@string/offStr</item>
-    </string-array>
 </resources>

@@ -6,7 +6,7 @@
         android:name=".GroundhogHunterApp"
         android:allowBackup="true"
         android:icon="@drawable/groundhog_icon"
-        android:label="@string/app_name"
+        android:label="${appName}${appNameSuffix}"
         android:theme="@style/ThemeTextSize30">
         <activity
             android:name=".MainActivity"
