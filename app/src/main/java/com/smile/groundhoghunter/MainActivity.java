@@ -2,12 +2,14 @@ package com.smile.groundhoghunter;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
@@ -15,15 +17,16 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.smile.facebookadsutil.FacebookInterstitialAds;
+import com.smile.alertdialogfragment.AlertDialogFragment;
 import com.smile.groundhoghunter.Model.SmileImageButton;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.groundhoghunter.Utilities.ScreenUtil;
-import com.smile.scoresqlite.ScoreSQLite;
 
 import java.util.ArrayList;
 
@@ -43,27 +46,32 @@ public class MainActivity extends AppCompatActivity {
     private TextView scoreTextView;
     private TextView timerTextView;
     private TextView hitNumTextView;
+
+    private SmileImageButton startGameButton;
+    private SmileImageButton pauseGameButton;
+    private SmileImageButton resumeGameButton;
+    private SmileImageButton newGameButton;
+    private SmileImageButton quitGameButton;
     private SmileImageButton settingButton;
     private SmileImageButton multiPlayerButton;
     private SmileImageButton top10Button;
 
-    // private properties facebook ads
-    private FacebookInterstitialAds facebookInterstitialAds;
+    private final String showingAdsString;
+    private final String loadingString;
+
+    private final int Top10RequestCode = 0;
+    private final int SettingRequestCode = 1;
+    private final int MultiPlayerRequestCode = 2;
 
     // public static properties
     public static boolean GamePause = false;
-
     // public static final properties
     public static final Handler ActivityHandler = new Handler();
-    // cannot use this as a parameter of context for SQLite because context has not been created yet
-    // until onCreate() in activity, so use the context in Application class
-    public static final ScoreSQLite ScoreSQLiteDB = new ScoreSQLite(GroundhogHunterApp.AppContext);
-    public static final int Top10RequestCode = 0;
-    public static final int SettingRequestCode = 1;
-    public static final int MultiPlayerRequestCode = 2;
 
     public MainActivity() {
-        highestScore = ScoreSQLiteDB.readHighestScore();
+        highestScore = GroundhogHunterApp.ScoreSQLiteDB.readHighestScore();
+        showingAdsString = GroundhogHunterApp.AppResources.getString(R.string.showingAdsString);
+        loadingString = GroundhogHunterApp.AppResources.getString(R.string.loadingString);
     }
 
     @Override
@@ -88,9 +96,9 @@ public class MainActivity extends AppCompatActivity {
 
         GamePause = false;
 
-        int darkOrange = getResources().getColor(R.color.darkOrange);
-        int darkRed = getResources().getColor(R.color.darkRed);
-        int darkGreen = getResources().getColor(R.color.darkGreen);
+        int darkOrange = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkOrange);
+        int darkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed);
+        int darkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
 
         // upper buttons layout
         // for setting button
@@ -103,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if ( (gameView.getRunningStatus() != 1) || (GameView.GameViewPause) ) {
                     // client is not playing game or not pause status
+                    disableAllButtons();
                     Intent intent = new Intent(MainActivity.this, SettingActivity.class);
                     Bundle extras = new Bundle();
                     extras.putFloat("TextFontSize", textFontSize);
@@ -124,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!gameView.getIsSinglePlayer()) {
                     if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
                         // client is not playing game or not pause status
+                        disableAllButtons();
                         Intent intent = new Intent(MainActivity.this, MultiPlayerActivity.class);
                         Bundle extras = new Bundle();
                         extras.putFloat("TextFontSize", textFontSize);
@@ -160,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if ( (gameView.getRunningStatus() != 1) || (GameView.GameViewPause) ) {
                     // client is not playing game or not pause status
+                    disableAllButtons();
                     getTop10ScoreList();
                 }
             }
@@ -221,9 +232,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onGlobalLayout() {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                    // removeGlobalOnLayoutListener() method after API 15
+                    // ICE_CREAM_SANDWICH_MR1 is API 15
+                    // removeGlobalOnLayoutListener() deprecated after API 16
                     gameFrameLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 } else {
+                    // hove to use removeGlobalOnLayoutListener() method after API 16 or is API 16
                     gameFrameLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
                 int frameWidth = gameFrameLayout.getWidth();
@@ -245,21 +258,21 @@ public class MainActivity extends AppCompatActivity {
         String pauseGameStr = getString(R.string.pause_game_string);
         String resumeGameStr = getString(R.string.resume_game_string);
 
-        final SmileImageButton startGameButton = findViewById(R.id.startGameButton);
+        startGameButton = findViewById(R.id.startGameButton);
         final Bitmap startGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.start_game_button, startGameStr, Color.BLUE);
         startGameButton.setImageBitmap(startGameBitmap);
         startGameButton.setClickable(true);
         startGameButton.setEnabled(true);
         startGameButton.setVisibility(View.VISIBLE);
 
-        final SmileImageButton pauseGameButton = findViewById(R.id.pauseGameButton);
+        pauseGameButton = findViewById(R.id.pauseGameButton);
         Bitmap pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseGameStr, Color.BLUE);
         pauseGameButton.setImageBitmap(pauseGameBitmap);
         pauseGameButton.setClickable(false);
         pauseGameButton.setEnabled(false);
         pauseGameButton.setVisibility(View.GONE);
 
-        final SmileImageButton resumeGameButton = findViewById(R.id.resumeGameButton);
+        resumeGameButton = findViewById(R.id.resumeGameButton);
         Bitmap resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeGameStr, Color.BLUE);
         resumeGameButton.setImageBitmap(resumeGameBitmap);
         resumeGameButton.setClickable(false);
@@ -313,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         String newGameStr = getString(R.string.new_game_string);
-        SmileImageButton newGameButton = findViewById(R.id.newGameButton);
+        newGameButton = findViewById(R.id.newGameButton);
         Bitmap newGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.new_game_button, newGameStr, Color.BLUE);
         newGameButton.setImageBitmap(newGameBitmap);
         newGameButton.setOnClickListener(new View.OnClickListener() {
@@ -329,41 +342,36 @@ public class MainActivity extends AppCompatActivity {
 
                 resumeGameButton.setEnabled(false);
                 resumeGameButton.setVisibility(View.GONE);
-
-                // if (facebookInterstitialAds != null) {
-                //    facebookInterstitialAds.showAd(TAG);     // removed on 2018-08-22
-                // }
             }
         });
 
         String quitGameStr = getString(R.string.quit_game_string);
-        SmileImageButton quitGameButton = findViewById(R.id.quitGameButton);
-        Bitmap quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.quit_game_button, quitGameStr, Color.YELLOW);
+        quitGameButton = findViewById(R.id.quitGameButton);
+        final Bitmap quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.quit_game_button, quitGameStr, Color.YELLOW);
         quitGameButton.setImageBitmap(quitGameBitmap);
         quitGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (facebookInterstitialAds != null) {
-                    // show ads
-                    facebookInterstitialAds.showAd(TAG);
+                if (GroundhogHunterApp.FacebookAds != null) {
+                    // free version
+                    disableAllButtons();
+                    int entryPoint = 0; //  no used
+                    ShowFacebookAdsAsyncTask showAdsAsyncTask = new ShowFacebookAdsAsyncTask(entryPoint, new AfterDismissFunctionOfShowFacebookAds() {
+                        @Override
+                        public void executeAfterDismissAds(int endPoint) {
+                            enableAllButtons();
+                            quitApplication();
+                        }
+                    });
+                    showAdsAsyncTask.execute();
+                } else {
+                    // professional version
+                    quitApplication();
                 }
-                finish();
             }
         });
 
-
-        // Facebook ads (Interstitial ads)
-        // Placement ID:	308861513197370_308861586530696
-        String facebookPlacementID = new String("308861513197370_308861586530696"); // groundhog hunter for free
-        if (BuildConfig.APPLICATION_ID == "com.smile.groundhoghunter") {
-            facebookInterstitialAds = new FacebookInterstitialAds(this, facebookPlacementID);
-        } else {
-            // null stands for this is professional version (needs to be paid for it)
-            facebookInterstitialAds = null;
-        }
-
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -377,12 +385,22 @@ public class MainActivity extends AppCompatActivity {
                     Log.i(TAG, "Top10ScoreActivity did not return successfully.");
                 }
                 Log.i(TAG, "Facebook showing ads");
-                if (facebookInterstitialAds != null) {
-                    facebookInterstitialAds.showAd(TAG);
+                if (GroundhogHunterApp.FacebookAds != null) {
+                    int entryPoint = 0; //  no used
+                    ShowFacebookAdsAsyncTask showAdsAsyncTask = new ShowFacebookAdsAsyncTask(entryPoint, new AfterDismissFunctionOfShowFacebookAds() {
+                        @Override
+                        public void executeAfterDismissAds(int endPoint) {
+                            enableAllButtons();
+                        }
+                    });
+                    showAdsAsyncTask.execute();
+                } else {
+                    enableAllButtons();
                 }
 
                 break;
             case SettingRequestCode:
+                enableAllButtons();
                 if (resultCode == Activity.RESULT_OK) {
                     Log.i(TAG, "SettingActivity returned ok.");
                     Bundle extras = data.getExtras();
@@ -397,6 +415,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case MultiPlayerRequestCode:
+                enableAllButtons();
                 if (resultCode == Activity.RESULT_OK) {
                     Log.i(TAG, "MultiPlayerActivity returned ok.");
                     Bundle extras = data.getExtras();
@@ -427,7 +446,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println("onResume() is called.");
+        System.out.println("MainActivity.onResume() is called.");
 
         synchronized (ActivityHandler) {
             GamePause = false;
@@ -438,7 +457,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        System.out.println("onPause() is called.");
+        System.out.println("MainActivity.onPause() is called.");
 
         synchronized (ActivityHandler) {
             GamePause = true;
@@ -450,13 +469,12 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
 
         // release and destroy threads and resources before destroy activity
-
         if (isFinishing()) {
-            if (facebookInterstitialAds != null) {
-                facebookInterstitialAds.close();
+            if (GroundhogHunterApp.FacebookAds != null) {
+                GroundhogHunterApp.FacebookAds.close();
             }
-            if (ScoreSQLiteDB != null) {
-                ScoreSQLiteDB.close();
+            if (GroundhogHunterApp.ScoreSQLiteDB != null) {
+                GroundhogHunterApp.ScoreSQLiteDB.close();
             }
         }
 
@@ -466,10 +484,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        System.out.println("MainActivity.onSaveInstanceState() is called.");
+    }
+
+    @Override
     public void onBackPressed() {
         // capture the event of back button when it is pressed
         // change back button behavior
-        finish();
+        quitApplication();
     }
 
     // private methods
@@ -480,9 +504,13 @@ public class MainActivity extends AppCompatActivity {
         gameView.releaseResources();
     }
 
+    private void quitApplication() {
+        finish();
+    }
+
     private void getTop10ScoreList() {
 
-        ArrayList<Pair<String, Integer>> top10 = ScoreSQLiteDB.readTop10ScoreList();
+        ArrayList<Pair<String, Integer>> top10 = GroundhogHunterApp.ScoreSQLiteDB.readTop10ScoreList();
         ArrayList<String> playerNames = new ArrayList<String>();
         ArrayList<Integer> playerScores = new ArrayList<Integer>();
         for (Pair pair : top10) {
@@ -499,7 +527,28 @@ public class MainActivity extends AppCompatActivity {
         extras.putFloat("TextFontSize", textFontSize);
         intent.putExtras(extras);
 
-        startActivityForResult(intent, MainActivity.Top10RequestCode);
+        startActivityForResult(intent, Top10RequestCode);
+    }
+
+    private void disableAllButtons() {
+        startGameButton.setEnabled(false);
+        pauseGameButton.setEnabled(false);
+        resumeGameButton.setEnabled(false);
+        newGameButton.setEnabled(false);
+        quitGameButton.setEnabled(false);
+        settingButton.setEnabled(false);
+        multiPlayerButton.setEnabled(false);
+        top10Button.setEnabled(false);
+    }
+    private void enableAllButtons() {
+        startGameButton.setEnabled(true);
+        pauseGameButton.setEnabled(true);
+        resumeGameButton.setEnabled(true);
+        newGameButton.setEnabled(true);
+        quitGameButton.setEnabled(true);
+        settingButton.setEnabled(true);
+        multiPlayerButton.setEnabled(true);
+        top10Button.setEnabled(true);
     }
 
     // public methods
@@ -509,11 +558,6 @@ public class MainActivity extends AppCompatActivity {
     public int getColNum() {
         return colNum;
     }
-
-    // public float getTextFontSize() {
-    //     return textFontSize;
-    // }
-
     public int getHighestScore() {
         return highestScore;
     }
@@ -531,5 +575,151 @@ public class MainActivity extends AppCompatActivity {
     }
     public void setTextForHitNumTextView(String text) {
         hitNumTextView.setText(text);
+    }
+
+    // interface for showing Facebook ads
+    public interface AfterDismissFunctionOfShowFacebookAds {
+        void executeAfterDismissAds(int endPoint);
+    }
+    public class ShowFacebookAdsAsyncTask_OLD extends AsyncTask<Void, Void, Void> {
+
+        private final int endPoint;
+        private final AfterDismissFunctionOfShowFacebookAds afterDismissFunction;
+
+        public ShowFacebookAdsAsyncTask_OLD(final int endPoint, final AfterDismissFunctionOfShowFacebookAds afterDismissFunction) {
+            this.endPoint = endPoint;
+            this.afterDismissFunction = afterDismissFunction;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // showingAdsMessage();
+            GroundhogHunterApp.FacebookAds.showAd(TAG);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            final int timeDelay = 300;
+            while (!GroundhogHunterApp.FacebookAds.adsShowDismissedOrStopped()) {
+                publishProgress();
+                SystemClock.sleep(timeDelay);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+            // showingAdsMessage();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            // dismissShowingAdsMessage();
+
+            afterDismissFunction.executeAfterDismissAds(endPoint);
+        }
+        // end of showing facebook ads
+    }
+
+
+    private class ShowFacebookAdsAsyncTask extends AsyncTask<Void, Integer, Void> {
+
+        private final String LoadingDialogTag = "LoadingDialogTag";
+        private TextView loadingTextView = null;
+        private Animation animationText = null;
+        private AlertDialogFragment loadingDialog = null;
+
+        private final int endPoint;
+        private final AfterDismissFunctionOfShowFacebookAds afterDismissFunction;
+
+        public ShowFacebookAdsAsyncTask(final int endPoint, final AfterDismissFunctionOfShowFacebookAds afterDismissFunction) {
+            loadingDialog = new AlertDialogFragment();
+            Bundle args = new Bundle();
+            args.putString("textContent", showingAdsString);
+            args.putFloat("textSize", textFontSize);
+            args.putInt("color", Color.RED);
+            args.putInt("width", 0);    // wrap_content
+            args.putInt("height", 0);   // wrap_content
+            args.putInt("numButtons", 0);
+            loadingDialog.setArguments(args);
+
+            this.endPoint = endPoint;
+            this.afterDismissFunction = afterDismissFunction;
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+            animationText = new AlphaAnimation(0.0f,1.0f);
+            animationText.setDuration(300);
+            animationText.setStartOffset(0);
+            animationText.setRepeatMode(Animation.REVERSE);
+            animationText.setRepeatCount(Animation.INFINITE);
+            loadingDialog.show(getSupportFragmentManager(), LoadingDialogTag);
+
+            GroundhogHunterApp.FacebookAds.showAd(TAG);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            final int timeDelay = 300;
+            int i = 0;
+
+            publishProgress(i);
+            // wait for one second
+            try { Thread.sleep(timeDelay); } catch (InterruptedException ex) { ex.printStackTrace(); }
+
+            i = 1;
+            while (loadingTextView == null) {
+                loadingTextView = loadingDialog.getText_shown();
+                SystemClock.sleep(timeDelay);
+            }
+            publishProgress(i);
+
+            i = 2;
+            while (!GroundhogHunterApp.FacebookAds.adsShowDismissedOrStopped()) {
+                SystemClock.sleep(timeDelay);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+            if (!isCancelled()) {
+                try {
+                    if (progress[0] == 1) {
+                        if (animationText != null) {
+                            loadingTextView.startAnimation(animationText);
+                        }
+                    }
+                } catch (Exception ex) {
+                    System.out.println("MyActivity.ShowFacebookAdsAsyncTask.onProgressUpdate() failed --> textLoad animation");
+                    ex.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            if (!isCancelled()) {
+                if (animationText != null) {
+                    if (loadingTextView != null) {
+                        loadingTextView.clearAnimation();
+                        loadingTextView.setText("");
+                    }
+                    animationText = null;
+                }
+                loadingDialog.dismissAllowingStateLoss();
+            }
+
+            afterDismissFunction.executeAfterDismissAds(endPoint);
+        }
     }
 }

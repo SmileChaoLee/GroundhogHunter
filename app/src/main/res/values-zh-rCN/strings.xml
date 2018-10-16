@@ -50,5 +50,6 @@
     <string name="joinGameStr">加入</string>
 
     <string name="gameStatusStr">状态:</string>
-    <string name="showingAdsStr">广告显示中 ...</string>
+    <string name="loadingString">下载中 ...</string>
+    <string name="showingAdsString">广告显示中 ...</string>
 </resources>

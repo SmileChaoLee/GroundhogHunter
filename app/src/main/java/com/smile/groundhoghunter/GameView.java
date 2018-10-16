@@ -460,7 +460,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         timerThread.setKeepRunning(false);
 
         runningStatus = 2;
-        boolean isInTop10 = MainActivity.ScoreSQLiteDB.isInTop10(currentScore);
+        boolean isInTop10 = GroundhogHunterApp.ScoreSQLiteDB.isInTop10(currentScore);
         if (isInTop10) {
             // record the current score
             recordScore(currentScore);
@@ -495,8 +495,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        MainActivity.ScoreSQLiteDB.addScore(et.getText().toString(), score);
-                        MainActivity.ScoreSQLiteDB.deleteAllAfterTop10();  // only keep the top 10
+                        GroundhogHunterApp.ScoreSQLiteDB.addScore(et.getText().toString(), score);
+                        GroundhogHunterApp.ScoreSQLiteDB.deleteAllAfterTop10();  // only keep the top 10
                         if (currentScore > highestScore) {
                             highestScore = currentScore;
                             mainActivity.setHighestScore(highestScore);

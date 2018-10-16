@@ -48,6 +48,7 @@
     <string name="joinGameStr">Join</string>
 
     <string name="gameStatusStr">Status:</string>
-    <string name="showingAdsStr">Showing Ads ...</string>
+    <string name="loadingString">Loading ...</string>
+    <string name="showingAdsString">Showing Ads ...</string>
 
 </resources>
