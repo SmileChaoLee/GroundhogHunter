@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,16 +15,14 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.smile.alertdialogfragment.AlertDialogFragment;
 import com.smile.groundhoghunter.Model.SmileImageButton;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.groundhoghunter.Utilities.ScreenUtil;
+import com.smile.smilepublicclasseslibrary.facebookadsutil.FacebookInterstitialAds;
 
 import java.util.ArrayList;
 
@@ -356,7 +352,10 @@ public class MainActivity extends AppCompatActivity {
                     // free version
                     disableAllButtons();
                     int entryPoint = 0; //  no used
-                    ShowFacebookAdsAsyncTask showAdsAsyncTask = new ShowFacebookAdsAsyncTask(entryPoint, new AfterDismissFunctionOfShowFacebookAds() {
+                    FacebookInterstitialAds.ShowFacebookAdsAsyncTask_DialogFragment showAdsAsyncTask =
+                            GroundhogHunterApp.FacebookAds.new ShowFacebookAdsAsyncTask_DialogFragment(MainActivity.this
+                                    , showingAdsString, textFontSize, entryPoint
+                                    , new FacebookInterstitialAds.AfterDismissFunctionOfShowFacebookAds() {
                         @Override
                         public void executeAfterDismissAds(int endPoint) {
                             enableAllButtons();
@@ -387,7 +386,10 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "Facebook showing ads");
                 if (GroundhogHunterApp.FacebookAds != null) {
                     int entryPoint = 0; //  no used
-                    ShowFacebookAdsAsyncTask showAdsAsyncTask = new ShowFacebookAdsAsyncTask(entryPoint, new AfterDismissFunctionOfShowFacebookAds() {
+                    FacebookInterstitialAds.ShowFacebookAdsAsyncTask_DialogFragment showAdsAsyncTask =
+                            GroundhogHunterApp.FacebookAds.new ShowFacebookAdsAsyncTask_DialogFragment(MainActivity.this
+                                    , showingAdsString, textFontSize, entryPoint
+                                    , new FacebookInterstitialAds.AfterDismissFunctionOfShowFacebookAds() {
                         @Override
                         public void executeAfterDismissAds(int endPoint) {
                             enableAllButtons();
@@ -575,151 +577,5 @@ public class MainActivity extends AppCompatActivity {
     }
     public void setTextForHitNumTextView(String text) {
         hitNumTextView.setText(text);
-    }
-
-    // interface for showing Facebook ads
-    public interface AfterDismissFunctionOfShowFacebookAds {
-        void executeAfterDismissAds(int endPoint);
-    }
-    public class ShowFacebookAdsAsyncTask_OLD extends AsyncTask<Void, Void, Void> {
-
-        private final int endPoint;
-        private final AfterDismissFunctionOfShowFacebookAds afterDismissFunction;
-
-        public ShowFacebookAdsAsyncTask_OLD(final int endPoint, final AfterDismissFunctionOfShowFacebookAds afterDismissFunction) {
-            this.endPoint = endPoint;
-            this.afterDismissFunction = afterDismissFunction;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // showingAdsMessage();
-            GroundhogHunterApp.FacebookAds.showAd(TAG);
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            final int timeDelay = 300;
-            while (!GroundhogHunterApp.FacebookAds.adsShowDismissedOrStopped()) {
-                publishProgress();
-                SystemClock.sleep(timeDelay);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-            // showingAdsMessage();
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            // dismissShowingAdsMessage();
-
-            afterDismissFunction.executeAfterDismissAds(endPoint);
-        }
-        // end of showing facebook ads
-    }
-
-
-    private class ShowFacebookAdsAsyncTask extends AsyncTask<Void, Integer, Void> {
-
-        private final String LoadingDialogTag = "LoadingDialogTag";
-        private TextView loadingTextView = null;
-        private Animation animationText = null;
-        private AlertDialogFragment loadingDialog = null;
-
-        private final int endPoint;
-        private final AfterDismissFunctionOfShowFacebookAds afterDismissFunction;
-
-        public ShowFacebookAdsAsyncTask(final int endPoint, final AfterDismissFunctionOfShowFacebookAds afterDismissFunction) {
-            loadingDialog = new AlertDialogFragment();
-            Bundle args = new Bundle();
-            args.putString("textContent", showingAdsString);
-            args.putFloat("textSize", textFontSize);
-            args.putInt("color", Color.RED);
-            args.putInt("width", 0);    // wrap_content
-            args.putInt("height", 0);   // wrap_content
-            args.putInt("numButtons", 0);
-            loadingDialog.setArguments(args);
-
-            this.endPoint = endPoint;
-            this.afterDismissFunction = afterDismissFunction;
-        }
-
-        @Override
-        protected void onPreExecute() {
-
-            animationText = new AlphaAnimation(0.0f,1.0f);
-            animationText.setDuration(300);
-            animationText.setStartOffset(0);
-            animationText.setRepeatMode(Animation.REVERSE);
-            animationText.setRepeatCount(Animation.INFINITE);
-            loadingDialog.show(getSupportFragmentManager(), LoadingDialogTag);
-
-            GroundhogHunterApp.FacebookAds.showAd(TAG);
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            final int timeDelay = 300;
-            int i = 0;
-
-            publishProgress(i);
-            // wait for one second
-            try { Thread.sleep(timeDelay); } catch (InterruptedException ex) { ex.printStackTrace(); }
-
-            i = 1;
-            while (loadingTextView == null) {
-                loadingTextView = loadingDialog.getText_shown();
-                SystemClock.sleep(timeDelay);
-            }
-            publishProgress(i);
-
-            i = 2;
-            while (!GroundhogHunterApp.FacebookAds.adsShowDismissedOrStopped()) {
-                SystemClock.sleep(timeDelay);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... progress) {
-            if (!isCancelled()) {
-                try {
-                    if (progress[0] == 1) {
-                        if (animationText != null) {
-                            loadingTextView.startAnimation(animationText);
-                        }
-                    }
-                } catch (Exception ex) {
-                    System.out.println("MyActivity.ShowFacebookAdsAsyncTask.onProgressUpdate() failed --> textLoad animation");
-                    ex.printStackTrace();
-                }
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-
-            if (!isCancelled()) {
-                if (animationText != null) {
-                    if (loadingTextView != null) {
-                        loadingTextView.clearAnimation();
-                        loadingTextView.setText("");
-                    }
-                    animationText = null;
-                }
-                loadingDialog.dismissAllowingStateLoss();
-            }
-
-            afterDismissFunction.executeAfterDismissAds(endPoint);
-        }
     }
 }

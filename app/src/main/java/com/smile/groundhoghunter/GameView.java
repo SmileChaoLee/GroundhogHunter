@@ -522,7 +522,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         dlg.getWindow().setDimAmount(0.0f); // no dim for background screen
 
         dlg.getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
-        dlg.getWindow().setBackgroundDrawableResource(R.drawable.dialogbackground);
+        dlg.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background_image);
 
         // float fontSize = mainActivity.getTextFontSize();
         Button nBtn = dlg.getButton(DialogInterface.BUTTON_NEGATIVE);

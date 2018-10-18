@@ -4,8 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
 
-import com.smile.facebookadsutil.FacebookInterstitialAds;
-import com.smile.scoresqlite.ScoreSQLite;
+import com.smile.smilepublicclasseslibrary.facebookadsutil.*;
+import com.smile.smilepublicclasseslibrary.scoresqlite.*;
 
 public class GroundhogHunterApp extends Application {
 

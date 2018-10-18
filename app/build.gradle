@@ -70,7 +70,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.facebook.android:audience-network-sdk:4.99.0'
-    implementation(name: 'facebookadsutil-release', ext: 'aar')
-    implementation(name: 'scoresqlite-release', ext: 'aar')
-    implementation(name: 'alertdialogfragment-release', ext: 'aar')
+    implementation(name: 'smilepublicclasseslibrary-release', ext: 'aar')
 }
