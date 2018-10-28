@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView scoreTextView;
     private TextView timerTextView;
     private TextView hitNumTextView;
+    private ImageView messageImageView;
 
     private SmileImageButton startGameButton;
     private SmileImageButton pauseGameButton;
@@ -60,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
     private SmileImageButton settingButton;
     private SmileImageButton top10Button;
     private SmileImageButton globalTop10Button;
+
+    private boolean isShowingLoadingMessage;
 
     private BroadcastReceiver bReceiver;
 
@@ -83,6 +88,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        isShowingLoadingMessage = false;
+        if (savedInstanceState != null) {
+            isShowingLoadingMessage = savedInstanceState.getBoolean("IsShowingLoadingMessage");
+            if (isShowingLoadingMessage) {
+                // showing loading message
+                showLoadingMessage();
+            } else {
+                dismissShowingLoadingMessage();
+            }
+        }
 
         boolean isTable = ScreenUtil.isTablet(this);
         if (isTable) {
@@ -236,6 +252,9 @@ public class MainActivity extends AppCompatActivity {
                 soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
             }
         });
+
+        messageImageView = findViewById(R.id.messageImageView);
+        messageImageView.setVisibility(View.GONE);
 
         // buttons for start game, new game, quit game
         String startGameStr = getString(R.string.start_game_string);
@@ -480,6 +499,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean("IsShowingLoadingMessage", isShowingLoadingMessage);
         super.onSaveInstanceState(outState);
         System.out.println("MainActivity.onSaveInstanceState() is called.");
     }
@@ -504,13 +524,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getLocalTop10ScoreList() {
-        // showing loading message ( not yet)
+        // showing loading message
+        showLoadingMessage();
+
         Intent serviceIntent = new Intent(GroundhogHunterApp.AppContext, LocalTop10IntentService.class);
         startService(serviceIntent);
     }
 
     private void getGlobalTop10ScoreList() {
-        // showing loading message ( not yet)
+        // showing loading message
+        showLoadingMessage();
+
         Intent serviceIntent = new Intent(GroundhogHunterApp.AppContext, GlobalTop10IntentService.class);
         startService(serviceIntent);
     }
@@ -534,6 +558,25 @@ public class MainActivity extends AppCompatActivity {
         settingButton.setEnabled(true);
         top10Button.setEnabled(true);
         globalTop10Button.setEnabled(true);
+    }
+
+    public void showLoadingMessage() {
+        isShowingLoadingMessage = true;
+        float fontSize = textFontSize;
+        double factor = 1.2;
+        int bmWidth = (int)(fontSize * loadingString.length() * factor);
+        int bmHeight = (int)(fontSize * factor * 6.0);
+        Bitmap dialog_board_image = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.dialog_background_image);
+        Bitmap bm = Bitmap.createScaledBitmap(dialog_board_image, bmWidth, bmHeight, false );  // scale
+        Bitmap loadingBitmap = FontAndBitmapUtil.getBitmapFromBitmapWithText(bm, loadingString, Color.RED);
+        messageImageView.setVisibility(View.VISIBLE);
+        messageImageView.setImageBitmap(loadingBitmap);
+    }
+
+    public void dismissShowingLoadingMessage() {
+        isShowingLoadingMessage = false;
+        messageImageView.setImageBitmap(null);
+        messageImageView.setVisibility(View.GONE);
     }
 
     // public methods
@@ -578,6 +621,7 @@ public class MainActivity extends AppCompatActivity {
             switch (actionName) {
                 case LocalTop10IntentService.Action_Name:
                     // dismiss showing message
+                    dismissShowingLoadingMessage();
                     Intent localTop10Intent = new Intent(getApplicationContext(), Top10ScoreActivity.class);
                     Bundle localTop10Extras = new Bundle();
                     localTop10Extras.putString("Top10TitleName", getString(R.string.local_top_10_score_title));
@@ -589,6 +633,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case GlobalTop10IntentService.Action_Name:
                     // dismiss showing message
+                    dismissShowingLoadingMessage();
                     Intent globalTop10Intent = new Intent(getApplicationContext(), Top10ScoreActivity.class);
                     Bundle globalTop10Extras = new Bundle();
                     globalTop10Extras.putString("Top10TitleName", getString(R.string.global_top_10_score_title));

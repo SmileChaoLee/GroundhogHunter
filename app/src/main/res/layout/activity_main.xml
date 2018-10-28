@@ -258,6 +258,17 @@
             app:columnCount="5">
         </android.support.v7.widget.GridLayout>
 
+        <ImageView
+            android:id="@+id/messageImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            android:clickable="false"
+            android:background="@android:color/transparent">
+        </ImageView>
+
     </FrameLayout>
 
     <LinearLayout
