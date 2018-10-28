@@ -30,21 +30,6 @@
             android:layout_marginBottom="10dp"
             android:background="@android:color/transparent">
         </com.smile.groundhoghunter.Model.SmileImageButton>
-
-        <com.smile.groundhoghunter.Model.SmileImageButton
-            android:id="@+id/multiPlayerButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:scaleType="fitXY"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@android:color/transparent">
-        </com.smile.groundhoghunter.Model.SmileImageButton>
-
         <com.smile.groundhoghunter.Model.SmileImageButton
             android:id="@+id/top10Button"
             android:layout_width="0dp"
@@ -58,6 +43,20 @@
             android:layout_marginBottom="10dp"
             android:background="@android:color/transparent">
         </com.smile.groundhoghunter.Model.SmileImageButton>
+        <com.smile.groundhoghunter.Model.SmileImageButton
+            android:id="@+id/globalTop10Button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent">
+        </com.smile.groundhoghunter.Model.SmileImageButton>
+
     </LinearLayout>
 
     <LinearLayout
@@ -85,17 +84,10 @@
                 android:text="@string/gameStatusStr">
             </TextView>
             <ImageView
-                android:id="@+id/numPlayerImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/gameStatusTitle"
-                android:layout_marginLeft="10dp">
-            </ImageView>
-            <ImageView
                 android:id="@+id/soundOnOffImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/numPlayerImageView"
+                android:layout_toRightOf="@+id/gameStatusTitle"
                 android:layout_marginLeft="10dp">
             </ImageView>
         </RelativeLayout>

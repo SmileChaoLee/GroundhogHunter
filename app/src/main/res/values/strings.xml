@@ -25,11 +25,13 @@
     <string name="score_string">Score:</string>
     <string name="timer_string">Timer:</string>
     <string name="num_hit_string">Hits:</string>
-    <string name="top10Str">Top 10</string>
+    <string name="local_top10_string">Top 10</string>
+    <string name="global_top10_string">Global Top 10</string>
 
-    <string name="top_10_score_str">Top 10 scores</string>              <!-- for menu item -->
+    <string name="local_top_10_score_str">Top 10 scores</string>              <!-- for menu item -->
     <string name="activity_top_10_score">Top10ScoreActivity</string>    <!-- for activity name -->
-    <string name="top_10_score_title">Top 10 Scores</string>
+    <string name="local_top_10_score_title">Top 10 Scores</string>
+    <string name="global_top_10_score_title">Global Top 10 Scores</string>
 
     <string name="settingStr">Settings</string>
     <string name="soundStr">Sound</string>

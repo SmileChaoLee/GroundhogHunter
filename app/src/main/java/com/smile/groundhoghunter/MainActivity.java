@@ -1,13 +1,17 @@
 package com.smile.groundhoghunter;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
@@ -20,9 +24,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.smile.groundhoghunter.Model.SmileImageButton;
+import com.smile.groundhoghunter.Service.GlobalTop10IntentService;
+import com.smile.groundhoghunter.Service.LocalTop10IntentService;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.groundhoghunter.Utilities.ScreenUtil;
 import com.smile.smilepublicclasseslibrary.facebookadsutil.FacebookInterstitialAds;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -36,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     private int colNum;
     private float textFontSize;
     private int highestScore;
-    private ImageView numPlayersImageView;
     private ImageView soundOnOffImageView;
     private TextView highScoreTextView;
     private TextView scoreTextView;
@@ -49,15 +58,17 @@ public class MainActivity extends AppCompatActivity {
     private SmileImageButton newGameButton;
     private SmileImageButton quitGameButton;
     private SmileImageButton settingButton;
-    private SmileImageButton multiPlayerButton;
     private SmileImageButton top10Button;
+    private SmileImageButton globalTop10Button;
+
+    private BroadcastReceiver bReceiver;
 
     private final String showingAdsString;
     private final String loadingString;
 
-    private final int Top10RequestCode = 0;
-    private final int SettingRequestCode = 1;
-    private final int MultiPlayerRequestCode = 2;
+    private final int SettingRequestCode = 0;
+    private final int LocalTop10RequestCode = 1;
+    private final int GlobalTop10RequestCode = 2;
 
     // public static properties
     public static boolean GamePause = false;
@@ -112,52 +123,14 @@ public class MainActivity extends AppCompatActivity {
                     Bundle extras = new Bundle();
                     extras.putFloat("TextFontSize", textFontSize);
                     extras.putBoolean("HasSound", gameView.getHasSound());
-                    extras.putBoolean("IsSinglePlayer", gameView.getIsSinglePlayer());
                     intent.putExtras(extras);
                     startActivityForResult(intent, SettingRequestCode);
                 }
             }
         });
 
-        String multiPlayerStr = getString(R.string.multiPlayerStr);
-        multiPlayerButton = findViewById(R.id.multiPlayerButton);
-        Bitmap multiPlayerBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.multi_player_button, multiPlayerStr, darkOrange);
-        multiPlayerButton.setImageBitmap(multiPlayerBitmap);
-        multiPlayerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!gameView.getIsSinglePlayer()) {
-                    if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
-                        // client is not playing game or not pause status
-                        disableAllButtons();
-                        Intent intent = new Intent(MainActivity.this, MultiPlayerActivity.class);
-                        Bundle extras = new Bundle();
-                        extras.putFloat("TextFontSize", textFontSize);
-                        extras.putInt("MediaType", gameView.getMediaType());
-                        intent.putExtras(extras);
-                        startActivityForResult(intent, MultiPlayerRequestCode);
-                    }
-                }
-            }
-        });
-
-        /*
-        ApplicationInfo appInfo = getApplicationContext().getApplicationInfo();
-        boolean isDebuggable = (appInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-        if (!isDebuggable) {
-            // release mode
-            multiPlayerButton.setEnabled(false);
-            multiPlayerButton.setVisibility(View.GONE);
-        }
-        */
-
-        if (!BuildConfig.DEBUG) {
-            multiPlayerButton.setEnabled(false);
-            multiPlayerButton.setVisibility(View.GONE);
-        }
-
         // for top 10 button
-        String top10Str = getString(R.string.top10Str);
+        String top10Str = getString(R.string.local_top10_string);
         top10Button = findViewById(R.id.top10Button);
         Bitmap top10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.top10_button, top10Str, darkRed);
         top10Button.setImageBitmap(top10Bitmap);
@@ -167,14 +140,30 @@ public class MainActivity extends AppCompatActivity {
                 if ( (gameView.getRunningStatus() != 1) || (GameView.GameViewPause) ) {
                     // client is not playing game or not pause status
                     disableAllButtons();
-                    getTop10ScoreList();
+                    getLocalTop10ScoreList();
+                }
+            }
+        });
+
+        // for top 10 button
+        String globalTop10Str = getString(R.string.global_top10_string);
+        globalTop10Button = findViewById(R.id.globalTop10Button);
+        Bitmap globalTop10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.global_top10_button, globalTop10Str, darkRed);
+        globalTop10Button.setImageBitmap(globalTop10Bitmap);
+        globalTop10Button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if ( (gameView.getRunningStatus() != 1) || (GameView.GameViewPause) ) {
+                    // client is not playing game or not pause status
+                    disableAllButtons();
+                    // getGlobalTop10ScoreList();
+                    getGlobalTop10ScoreList();
                 }
             }
         });
 
         // score layout
         soundOnOffImageView = findViewById(R.id.soundOnOffImageView);
-        numPlayersImageView = findViewById(R.id.numPlayerImageView);
 
         TextView highScoreTitleView = findViewById(R.id.highestScoreTitle);
         // highScoreTitleView.setTextSize(textFontSize);
@@ -244,7 +233,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "gameView created.");
                 gameFrameLayout.addView(gameView);
                 Log.i(TAG, "Added gameView to gameFrameLayout.");
-                numPlayersImageView.setImageResource(R.drawable.single_player_image);
                 soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
             }
         });
@@ -370,6 +358,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        bReceiver = new GroundhogHunterBroadcastReceiver();
     }
 
     @Override
@@ -377,7 +366,20 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case Top10RequestCode:
+            case SettingRequestCode:
+                enableAllButtons();
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.i(TAG, "SettingActivity returned ok.");
+                    Bundle extras = data.getExtras();
+                    if (extras != null) {
+                        boolean hasSound = extras.getBoolean("HasSound");
+                        gameView.setHasSound(hasSound);
+                    }
+                } else {
+                    Log.i(TAG, "SettingActivity returned cancel.");
+                }
+                break;
+            case LocalTop10RequestCode:
                 if (resultCode == Activity.RESULT_OK) {
                     Log.i(TAG, "Top10ScoreActivity returned successfully.");
                 } else {
@@ -399,36 +401,23 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     enableAllButtons();
                 }
-
                 break;
-            case SettingRequestCode:
-                enableAllButtons();
-                if (resultCode == Activity.RESULT_OK) {
-                    Log.i(TAG, "SettingActivity returned ok.");
-                    Bundle extras = data.getExtras();
-                    if (extras != null) {
-                        boolean hasSound = extras.getBoolean("HasSound");
-                        boolean isSinglePlayer = extras.getBoolean("IsSinglePlayer");
-                        gameView.setHasSound(hasSound);
-                        gameView.setIsSinglePlayer(isSinglePlayer);
-                    }
+            case GlobalTop10RequestCode:
+                if (GroundhogHunterApp.FacebookAds != null) {
+                    int entryPoint = 0; //  no used
+                    FacebookInterstitialAds.ShowFacebookAdsAsyncTask_DialogFragment showAdsAsyncTask =
+                            GroundhogHunterApp.FacebookAds.new ShowFacebookAdsAsyncTask_DialogFragment(MainActivity.this
+                                    , showingAdsString, textFontSize, entryPoint
+                                    , new FacebookInterstitialAds.AfterDismissFunctionOfShowFacebookAds() {
+                                @Override
+                                public void executeAfterDismissAds(int endPoint) {
+                                    enableAllButtons();
+                                }
+                            });
+                    showAdsAsyncTask.execute();
                 } else {
-                    Log.i(TAG, "SettingActivity returned cancel.");
+                    enableAllButtons();
                 }
-                break;
-            case MultiPlayerRequestCode:
-                enableAllButtons();
-                if (resultCode == Activity.RESULT_OK) {
-                    Log.i(TAG, "MultiPlayerActivity returned ok.");
-                    Bundle extras = data.getExtras();
-                    if (extras != null) {
-                        int mediaType = extras.getInt("MediaType");
-                        gameView.setMediaType(mediaType);
-                    }
-                } else {
-                    Log.i(TAG, "MultiPlayerActivity returned cancel.");
-                }
-                Log.i(TAG, "Facebook showing ads");
                 break;
         }
 
@@ -438,17 +427,18 @@ public class MainActivity extends AppCompatActivity {
         } else {
             soundOnOffImageView.setImageResource(R.drawable.sound_off_image);
         }
-        if (gameView.getIsSinglePlayer()) {
-            numPlayersImageView.setImageResource(R.drawable.single_player_image);
-        } else {
-            numPlayersImageView.setImageResource(R.drawable.multi_players_image);
-        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         System.out.println("MainActivity.onResume() is called.");
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(LocalTop10IntentService.Action_Name);
+        intentFilter.addAction(GlobalTop10IntentService.Action_Name);
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(bReceiver, intentFilter);
 
         synchronized (ActivityHandler) {
             GamePause = false;
@@ -460,6 +450,9 @@ public class MainActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         System.out.println("MainActivity.onPause() is called.");
+
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.unregisterReceiver(bReceiver);
 
         synchronized (ActivityHandler) {
             GamePause = true;
@@ -510,26 +503,16 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    private void getTop10ScoreList() {
+    private void getLocalTop10ScoreList() {
+        // showing loading message ( not yet)
+        Intent serviceIntent = new Intent(GroundhogHunterApp.AppContext, LocalTop10IntentService.class);
+        startService(serviceIntent);
+    }
 
-        ArrayList<Pair<String, Integer>> top10 = GroundhogHunterApp.ScoreSQLiteDB.readTop10ScoreList();
-        ArrayList<String> playerNames = new ArrayList<String>();
-        ArrayList<Integer> playerScores = new ArrayList<Integer>();
-        for (Pair pair : top10) {
-            playerNames.add((String)pair.first);
-            playerScores.add((Integer)pair.second);
-        }
-
-        Log.d(TAG, "top10.size() = " + top10.size());
-
-        Intent intent = new Intent(this, Top10ScoreActivity.class);
-        Bundle extras = new Bundle();
-        extras.putStringArrayList("Top10Players", playerNames);
-        extras.putIntegerArrayList("Top10Scores", playerScores);
-        extras.putFloat("TextFontSize", textFontSize);
-        intent.putExtras(extras);
-
-        startActivityForResult(intent, Top10RequestCode);
+    private void getGlobalTop10ScoreList() {
+        // showing loading message ( not yet)
+        Intent serviceIntent = new Intent(GroundhogHunterApp.AppContext, GlobalTop10IntentService.class);
+        startService(serviceIntent);
     }
 
     private void disableAllButtons() {
@@ -539,8 +522,8 @@ public class MainActivity extends AppCompatActivity {
         newGameButton.setEnabled(false);
         quitGameButton.setEnabled(false);
         settingButton.setEnabled(false);
-        multiPlayerButton.setEnabled(false);
         top10Button.setEnabled(false);
+        globalTop10Button.setEnabled(false);
     }
     private void enableAllButtons() {
         startGameButton.setEnabled(true);
@@ -549,8 +532,8 @@ public class MainActivity extends AppCompatActivity {
         newGameButton.setEnabled(true);
         quitGameButton.setEnabled(true);
         settingButton.setEnabled(true);
-        multiPlayerButton.setEnabled(true);
         top10Button.setEnabled(true);
+        globalTop10Button.setEnabled(true);
     }
 
     // public methods
@@ -578,4 +561,46 @@ public class MainActivity extends AppCompatActivity {
     public void setTextForHitNumTextView(String text) {
         hitNumTextView.setText(text);
     }
+
+    // private class (Nested class)
+    private class GroundhogHunterBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent == null) {
+                return;
+            }
+
+            Bundle extras = intent.getExtras();
+
+            String actionName = intent.getAction();
+            switch (actionName) {
+                case LocalTop10IntentService.Action_Name:
+                    // dismiss showing message
+                    Intent localTop10Intent = new Intent(getApplicationContext(), Top10ScoreActivity.class);
+                    Bundle localTop10Extras = new Bundle();
+                    localTop10Extras.putString("Top10TitleName", getString(R.string.local_top_10_score_title));
+                    localTop10Extras.putStringArrayList("Top10Players", extras.getStringArrayList("PlayerNames"));
+                    localTop10Extras.putIntegerArrayList("Top10Scores", extras.getIntegerArrayList("PlayerScores"));
+                    localTop10Extras.putFloat("TextFontSize", textFontSize);
+                    localTop10Intent.putExtras(localTop10Extras);
+                    startActivityForResult(localTop10Intent, LocalTop10RequestCode);
+                    break;
+                case GlobalTop10IntentService.Action_Name:
+                    // dismiss showing message
+                    Intent globalTop10Intent = new Intent(getApplicationContext(), Top10ScoreActivity.class);
+                    Bundle globalTop10Extras = new Bundle();
+                    globalTop10Extras.putString("Top10TitleName", getString(R.string.global_top_10_score_title));
+                    globalTop10Extras.putStringArrayList("Top10Players", extras.getStringArrayList("PlayerNames"));
+                    globalTop10Extras.putIntegerArrayList("Top10Scores", extras.getIntegerArrayList("PlayerScores"));
+                    globalTop10Extras.putFloat("TextFontSize", textFontSize);
+                    globalTop10Intent.putExtras(globalTop10Extras);
+                    startActivityForResult(globalTop10Intent, GlobalTop10RequestCode);
+                    break;
+            }
+
+        }
+    }
+
 }

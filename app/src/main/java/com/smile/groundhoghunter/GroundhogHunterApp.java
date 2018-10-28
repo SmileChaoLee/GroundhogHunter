@@ -9,6 +9,10 @@ import com.smile.smilepublicclasseslibrary.scoresqlite.*;
 
 public class GroundhogHunterApp extends Application {
 
+    // public final String REST_Website = new String("http://192.168.0.11:5000/Playerscore");
+    public static final String REST_Website = "http://ec2-13-59-195-3.us-east-2.compute.amazonaws.com/Playerscore";
+    public static final int GameId = 2; // this GameId is for backend game_id in playerscore table
+
     public static Resources AppResources;
     public static Context AppContext;
     public static ScoreSQLite ScoreSQLiteDB;

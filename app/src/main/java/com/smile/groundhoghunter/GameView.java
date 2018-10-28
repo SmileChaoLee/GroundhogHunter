@@ -26,6 +26,9 @@ import android.widget.LinearLayout;
 
 import com.smile.groundhoghunter.Model.Groundhog;
 import com.smile.groundhoghunter.Utilities.SoundUtil;
+import com.smile.smilepublicclasseslibrary.player_record_rest.PlayerRecordRest;
+
+import org.json.JSONObject;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -50,8 +53,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean surfaceViewCreated;
     private int runningStatus;
     private boolean hasSound;
-    private boolean isSinglePlayer;
-    private int mediaType;
 
     // default properties (package modifier)
     Groundhog[] groundhogArray;
@@ -132,9 +133,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         timeRemaining = GameView.TimerInterval;
 
         hasSound = true;    // default is having sound
-        isSinglePlayer = true;    // default is single player
-
-        mediaType = BluetoothMediaType;
 
         // Creating 25 groundhogs' object
         Log.d(TAG, "Creating groundhogArray....");
@@ -229,21 +227,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void setHasSound(boolean hasSound)
     {
         this.hasSound = hasSound;
-    }
-
-    public boolean getIsSinglePlayer() {
-        return isSinglePlayer;
-    }
-    public void setIsSinglePlayer(boolean isSinglePlayer) {
-        this.isSinglePlayer = isSinglePlayer;
-    }
-
-    public int getMediaType() {
-        return mediaType;
-    }
-
-    public void setMediaType(int mediaType) {
-        this.mediaType = mediaType;
     }
 
     public void startGame() {
@@ -495,6 +478,26 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
+
+                        // use thread to add a record to database (remote database on AWS-EC2)
+                        Thread restThread = new Thread() {
+                            @Override
+                            public void run() {
+                                try {
+                                    String webUrl = new String(GroundhogHunterApp.REST_Website + "/AddOneRecordREST");   // ASP.NET Cor
+                                    JSONObject jsonObject = new JSONObject();
+                                    jsonObject.put("PlayerName", et.getText().toString());
+                                    jsonObject.put("Score", score);
+                                    jsonObject.put("GameId", GroundhogHunterApp.GameId);
+                                    PlayerRecordRest.addOneRecord(webUrl, jsonObject);
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                    Log.d(TAG, "Failed to add one record to Playerscore table.");
+                                }
+                            }
+                        };
+                        restThread.start();
+
                         GroundhogHunterApp.ScoreSQLiteDB.addScore(et.getText().toString(), score);
                         GroundhogHunterApp.ScoreSQLiteDB.deleteAllAfterTop10();  // only keep the top 10
                         if (currentScore > highestScore) {

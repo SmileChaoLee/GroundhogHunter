@@ -58,24 +58,6 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
-        TextView numPlayerTextView = findViewById(R.id.numPlayerTextView);
-        multiPlayerSwitch = findViewById(R.id.multiPlayerSwitch);
-        multiPlayerSwitch.setTextSize(textFontSize);
-        multiPlayerSwitch.setChecked(isSinglePlayer);
-        multiPlayerSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isSinglePlayer = ((ToggleButton)view).isChecked();
-            }
-        });
-
-        if (!BuildConfig.DEBUG) {
-            // release mode
-            numPlayerTextView.setVisibility(View.GONE);
-            multiPlayerSwitch.setEnabled(false);
-            multiPlayerSwitch.setVisibility(View.GONE);
-        }
-
         Button confirmButton = findViewById(R.id.confirmSettingButton);
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override

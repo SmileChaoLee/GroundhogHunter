@@ -25,6 +25,7 @@ import java.util.ArrayList;
 public class Top10ScoreActivity extends AppCompatActivity {
 
     private static final String TAG = "Top10ScoreActivity";
+    private String top10TitleName = "";
     private ArrayList<String> top10Players = new ArrayList<String>();
     private ArrayList<Integer> top10Scores = new ArrayList<Integer>();
     private ArrayList<Integer> medalImageIds = new ArrayList<Integer>();
@@ -37,6 +38,7 @@ public class Top10ScoreActivity extends AppCompatActivity {
         textFontSize = 30;
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            top10TitleName = extras.getString("Top10TitleName");
             top10Players = extras.getStringArrayList("Top10Players");
             top10Scores = extras.getIntegerArrayList("Top10Scores");
             textFontSize = extras.getFloat("TextFontSize");
@@ -52,6 +54,10 @@ public class Top10ScoreActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_top10_score);
+
+        TextView titleTextView = findViewById(R.id.top10TitleTextView);
+        titleTextView.setTextSize(textFontSize);
+        titleTextView.setText(top10TitleName);
 
         Button okButton = (Button)findViewById(R.id.top10OkButton);
         // okButton.setTextSize(textFontSize);
