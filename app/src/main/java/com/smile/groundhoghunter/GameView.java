@@ -176,7 +176,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public boolean onTouchEvent(MotionEvent event) {
 
         // the if statement is added on 2018-08-31
-        if (runningStatus == 1) {
+        if ( (runningStatus == 1) && (!GameViewPause) ) {
             // game is running
             int x = (int) event.getX();
             int y = (int) event.getY();
@@ -203,6 +203,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                 groundhog.setIsHit(true);
                                 ++numOfHits;
                                 currentScore += hitScores[groundhog.getStatus()];
+                                startDrawingScreen();   // added on 2018-10-29 for testing
                             }
                         }
                     }
