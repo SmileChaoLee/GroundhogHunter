@@ -54,4 +54,6 @@
     <string name="gameStatusStr">状态:</string>
     <string name="loadingString">下载中 ...</string>
     <string name="showingAdsString">广告显示中 ...</string>
+
+    <string name="google_AdMobAppID">ca-app-pub-8354869049759576~9932277958</string>
 </resources>

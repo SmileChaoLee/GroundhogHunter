@@ -4,8 +4,11 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
 
-import com.smile.smilepublicclasseslibrary.facebookadsutil.*;
+import com.google.android.gms.ads.MobileAds;
+import com.smile.smilepublicclasseslibrary.facebook_ads_util.*;
+import com.smile.smilepublicclasseslibrary.google_admob_ads_util.GoogleAdMobInterstitial;
 import com.smile.smilepublicclasseslibrary.scoresqlite.*;
+import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
 
 public class GroundhogHunterApp extends Application {
 
@@ -16,7 +19,11 @@ public class GroundhogHunterApp extends Application {
     public static Resources AppResources;
     public static Context AppContext;
     public static ScoreSQLite ScoreSQLiteDB;
-    public static FacebookInterstitialAds FacebookAds;
+
+    public static ShowingInterstitialAdsUtil InterstitialAd;
+
+    private static FacebookInterstitialAds facebookAds;
+    private static GoogleAdMobInterstitial googleInterstitialAd;
 
     @Override
     public void onCreate() {
@@ -28,10 +35,22 @@ public class GroundhogHunterApp extends Application {
         if (BuildConfig.APPLICATION_ID == "com.smile.groundhoghunter") {
             // groundhog hunter for free
             String facebookPlacementID = new String("308861513197370_308861586530696");
-            FacebookAds = new FacebookInterstitialAds(AppContext, facebookPlacementID);
+            facebookAds = new FacebookInterstitialAds(AppContext, facebookPlacementID);
+            facebookAds.loadAd();
+
+            // Google AdMob
+            String googleAdMobAppID = getString(R.string.google_AdMobAppID);
+            String googleAdMobInterstitialID = "ca-app-pub-8354869049759576/6595392508";
+            MobileAds.initialize(AppContext, googleAdMobAppID);
+            googleInterstitialAd = new GoogleAdMobInterstitial(AppContext, googleAdMobInterstitialID);
+            googleInterstitialAd.loadAd(); // load first ad
+
+            InterstitialAd = new ShowingInterstitialAdsUtil(facebookAds, googleInterstitialAd);
         } else {
             // null stands for this is professional version (needs to be paid for it)
-            FacebookAds = null;
+            facebookAds = null;
+            googleInterstitialAd = null;
+            InterstitialAd = null;
         }
     }
 }

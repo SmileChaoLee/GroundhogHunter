@@ -53,4 +53,6 @@
     <string name="loadingString">Loading ...</string>
     <string name="showingAdsString">Showing Ads ...</string>
 
+    <string name="google_AdMobAppID">ca-app-pub-8354869049759576~9932277958</string>
+
 </resources>

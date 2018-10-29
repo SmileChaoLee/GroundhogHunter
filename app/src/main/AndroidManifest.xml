@@ -8,6 +8,11 @@
         android:icon="@drawable/groundhog_icon"
         android:label="${appName}${appNameSuffix}"
         android:theme="@style/ThemeTextSize30">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/google_AdMobAppID"/>
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation"

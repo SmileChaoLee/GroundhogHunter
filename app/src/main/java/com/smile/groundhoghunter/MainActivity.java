@@ -30,13 +30,7 @@ import com.smile.groundhoghunter.Service.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Service.LocalTop10IntentService;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.groundhoghunter.Utilities.ScreenUtil;
-import com.smile.smilepublicclasseslibrary.facebookadsutil.FacebookInterstitialAds;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
+import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -355,21 +349,21 @@ public class MainActivity extends AppCompatActivity {
         quitGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (GroundhogHunterApp.FacebookAds != null) {
+                if (GroundhogHunterApp.InterstitialAd != null) {
                     // free version
                     disableAllButtons();
                     int entryPoint = 0; //  no used
-                    FacebookInterstitialAds.ShowFacebookAdsAsyncTask_DialogFragment showAdsAsyncTask =
-                            GroundhogHunterApp.FacebookAds.new ShowFacebookAdsAsyncTask_DialogFragment(MainActivity.this
-                                    , showingAdsString, textFontSize, entryPoint
-                                    , new FacebookInterstitialAds.AfterDismissFunctionOfShowFacebookAds() {
+                    ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdAsyncTask =
+                            GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(MainActivity.this
+                                    , entryPoint
+                                    , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
                         @Override
                         public void executeAfterDismissAds(int endPoint) {
                             enableAllButtons();
                             quitApplication();
                         }
                     });
-                    showAdsAsyncTask.execute();
+                    showAdAsyncTask.execute();
                 } else {
                     // professional version
                     quitApplication();
@@ -405,29 +399,29 @@ public class MainActivity extends AppCompatActivity {
                     Log.i(TAG, "Top10ScoreActivity did not return successfully.");
                 }
                 Log.i(TAG, "Facebook showing ads");
-                if (GroundhogHunterApp.FacebookAds != null) {
+                if (GroundhogHunterApp.InterstitialAd != null) {
                     int entryPoint = 0; //  no used
-                    FacebookInterstitialAds.ShowFacebookAdsAsyncTask_DialogFragment showAdsAsyncTask =
-                            GroundhogHunterApp.FacebookAds.new ShowFacebookAdsAsyncTask_DialogFragment(MainActivity.this
-                                    , showingAdsString, textFontSize, entryPoint
-                                    , new FacebookInterstitialAds.AfterDismissFunctionOfShowFacebookAds() {
+                    ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdAsyncTask =
+                            GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(MainActivity.this
+                                    , entryPoint
+                                    , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
                         @Override
                         public void executeAfterDismissAds(int endPoint) {
                             enableAllButtons();
                         }
                     });
-                    showAdsAsyncTask.execute();
+                    showAdAsyncTask.execute();
                 } else {
                     enableAllButtons();
                 }
                 break;
             case GlobalTop10RequestCode:
-                if (GroundhogHunterApp.FacebookAds != null) {
+                if (GroundhogHunterApp.InterstitialAd != null) {
                     int entryPoint = 0; //  no used
-                    FacebookInterstitialAds.ShowFacebookAdsAsyncTask_DialogFragment showAdsAsyncTask =
-                            GroundhogHunterApp.FacebookAds.new ShowFacebookAdsAsyncTask_DialogFragment(MainActivity.this
-                                    , showingAdsString, textFontSize, entryPoint
-                                    , new FacebookInterstitialAds.AfterDismissFunctionOfShowFacebookAds() {
+                    ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdsAsyncTask =
+                            GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(MainActivity.this
+                                    , entryPoint
+                                    , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
                                 @Override
                                 public void executeAfterDismissAds(int endPoint) {
                                     enableAllButtons();
@@ -484,9 +478,6 @@ public class MainActivity extends AppCompatActivity {
 
         // release and destroy threads and resources before destroy activity
         if (isFinishing()) {
-            if (GroundhogHunterApp.FacebookAds != null) {
-                GroundhogHunterApp.FacebookAds.close();
-            }
             if (GroundhogHunterApp.ScoreSQLiteDB != null) {
                 GroundhogHunterApp.ScoreSQLiteDB.close();
             }
