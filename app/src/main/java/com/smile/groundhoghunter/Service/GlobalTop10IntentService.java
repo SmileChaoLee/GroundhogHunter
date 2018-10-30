@@ -31,7 +31,8 @@ public class GlobalTop10IntentService extends IntentService {
         ArrayList<String> playerNames = new ArrayList<>();
         ArrayList<Integer> playerScores = new ArrayList<>();
 
-        String webUrl = GroundhogHunterApp.REST_Website + "/GetTop10PlayerscoresREST?gameId=2";   // ASP.NET Core
+        // String webUrl = GroundhogHunterApp.REST_Website + "/GetTop10PlayerscoresREST?gameId=2";   // ASP.NET Core
+        String webUrl = intent.getStringExtra("WebUrl");
         String[] result = PlayerRecordRest.getTop10Scores(webUrl);
 
         String status = result[0].toUpperCase();

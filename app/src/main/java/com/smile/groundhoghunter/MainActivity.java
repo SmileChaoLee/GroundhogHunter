@@ -527,6 +527,9 @@ public class MainActivity extends AppCompatActivity {
         showLoadingMessage();
 
         Intent serviceIntent = new Intent(GroundhogHunterApp.AppContext, GlobalTop10IntentService.class);
+        String webUrl = GroundhogHunterApp.REST_Website + "/GetTop10PlayerscoresREST";  // ASP.NET Core
+        webUrl += "?gameId=" + GroundhogHunterApp.GameId;   // parameters
+        serviceIntent.putExtra("WebUrl", webUrl);
         startService(serviceIntent);
     }
 
