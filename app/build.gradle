@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     signingConfigs {
@@ -15,8 +16,8 @@ android {
         applicationId "com.smile.groundhoghunter"
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 135
-        versionName "1.35"
+        versionCode 136
+        versionName "1.36"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
