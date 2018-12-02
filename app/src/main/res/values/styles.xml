@@ -23,14 +23,14 @@
         <item name="android:itemPadding">0dp</item>
     </style>
 
-    <style name="ThemeTextSize30" parent="AppTheme">
+    <style name="AppThemeTextSize30" parent="AppTheme">
         <item name="android:textSize">30dp</item>
     </style>
-    <style name="ThemeTextSize50" parent="AppTheme">
+    <style name="AppThemeTextSize50" parent="AppTheme">
         <item name="android:textSize">50dp</item>
     </style>
 
-    <style name="ThemeTextSize30Transparent" parent="ThemeTextSize30">
+    <style name="AppThemeTextSize30Transparent" parent="AppThemeTextSize30">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -38,7 +38,7 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
     </style>
 
-    <style name="ThemeTextSize50Transparent" parent="ThemeTextSize30Transparent">
+    <style name="AppThemeTextSize50Transparent" parent="AppThemeTextSize30Transparent">
         <item name="android:textSize">50dp</item>
     </style>
 

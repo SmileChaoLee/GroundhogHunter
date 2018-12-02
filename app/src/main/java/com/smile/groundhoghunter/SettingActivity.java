@@ -39,9 +39,9 @@ public class SettingActivity extends AppCompatActivity {
 
         if (textFontSize == 50) {
             // not a cell phone, it is a tablet
-            setTheme(R.style.ThemeTextSize50Transparent);
+            setTheme(R.style.AppThemeTextSize50Transparent);
         } else {
-            setTheme(R.style.ThemeTextSize30Transparent);
+            setTheme(R.style.AppThemeTextSize30Transparent);
         }
 
         super.onCreate(savedInstanceState);

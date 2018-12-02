@@ -2,12 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.smile.groundhoghunter">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:name=".GroundhogHunterApp"
         android:allowBackup="true"
         android:icon="@drawable/groundhog_icon"
         android:label="${appName}${appNameSuffix}"
-        android:theme="@style/ThemeTextSize30">
+        android:theme="@style/AppThemeTextSize30">
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -35,14 +38,14 @@
             android:configChanges="orientation"
             android:label="@string/settingStr"
             android:screenOrientation="portrait"
-            android:theme="@style/ThemeTextSize30Transparent">
+            android:theme="@style/AppThemeTextSize30Transparent">
         </activity>
 
         <activity android:name=".MultiPlayerActivity"
             android:configChanges="orientation"
             android:label="@string/multipleStr"
             android:screenOrientation="portrait"
-            android:theme="@style/ThemeTextSize30Transparent">
+            android:theme="@style/AppThemeTextSize30Transparent">
         </activity>
 
         <service android:name=".Service.LocalTop10IntentService"

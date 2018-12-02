@@ -46,9 +46,9 @@ public class Top10ScoreActivity extends AppCompatActivity {
 
         if (textFontSize == 50) {
             // not a cell phone, it is a tablet
-            setTheme(R.style.ThemeTextSize50);
+            setTheme(R.style.AppThemeTextSize50);
         } else {
-            setTheme(R.style.ThemeTextSize30);
+            setTheme(R.style.AppThemeTextSize30);
         }
 
         super.onCreate(savedInstanceState);

@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -18,7 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
-import android.util.Pair;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
@@ -98,10 +96,10 @@ public class MainActivity extends AppCompatActivity {
         if (isTable) {
             // not a cell phone, it is a tablet
             textFontSize = 50;
-            setTheme(R.style.ThemeTextSize50);
+            setTheme(R.style.AppThemeTextSize50);
         } else {
             textFontSize = 30;
-            setTheme(R.style.ThemeTextSize30);
+            setTheme(R.style.AppThemeTextSize30);
         }
 
         super.onCreate(savedInstanceState);
@@ -166,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
                 if ( (gameView.getRunningStatus() != 1) || (GameView.GameViewPause) ) {
                     // client is not playing game or not pause status
                     disableAllButtons();
-                    // getGlobalTop10ScoreList();
                     getGlobalTop10ScoreList();
                 }
             }
