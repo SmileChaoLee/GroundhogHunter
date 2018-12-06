@@ -21,6 +21,7 @@ public class GroundhogHunterApp extends Application {
     public static ScoreSQLite ScoreSQLiteDB;
 
     public static ShowingInterstitialAdsUtil InterstitialAd;
+    public static String googleAdMobBannerID = "";
 
     private static FacebookInterstitialAds facebookAds;
     private static GoogleAdMobInterstitial googleInterstitialAd;
@@ -44,6 +45,7 @@ public class GroundhogHunterApp extends Application {
             MobileAds.initialize(AppContext, googleAdMobAppID);
             googleInterstitialAd = new GoogleAdMobInterstitial(AppContext, googleAdMobInterstitialID);
             googleInterstitialAd.loadAd(); // load first ad
+            googleAdMobBannerID = "ca-app-pub-8354869049759576/7169443235";
 
             InterstitialAd = new ShowingInterstitialAdsUtil(facebookAds, googleInterstitialAd);
         } else {
@@ -51,6 +53,7 @@ public class GroundhogHunterApp extends Application {
             facebookAds = null;
             googleInterstitialAd = null;
             InterstitialAd = null;
+            googleAdMobBannerID = "";
         }
     }
 }

@@ -17,12 +17,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.smile.groundhoghunter.Model.SmileImageButton;
 import com.smile.groundhoghunter.Service.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Service.LocalTop10IntentService;
@@ -55,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
     private SmileImageButton settingButton;
     private SmileImageButton top10Button;
     private SmileImageButton globalTop10Button;
+    private LinearLayout bannerLinearLayout = null;
+    private AdView bannerAdView = null;
 
     private boolean isShowingLoadingMessage;
 
@@ -367,6 +374,20 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        if (!GroundhogHunterApp.googleAdMobBannerID.isEmpty()) {
+            bannerLinearLayout = findViewById(R.id.linearlayout_for_ads_in_myActivity);
+            bannerAdView = new AdView(this);
+
+            LinearLayout.LayoutParams bannerLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            bannerLp.gravity = Gravity.CENTER;
+            bannerAdView.setLayoutParams(bannerLp);
+            bannerAdView.setAdSize(AdSize.BANNER);
+            bannerAdView.setAdUnitId(GroundhogHunterApp.googleAdMobBannerID);
+            bannerLinearLayout.addView(bannerAdView);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            bannerAdView.loadAd(adRequest);
+        }
 
         bReceiver = new GroundhogHunterBroadcastReceiver();
     }

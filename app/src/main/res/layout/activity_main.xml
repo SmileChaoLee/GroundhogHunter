@@ -247,7 +247,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@drawable/grass"
-        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintHeight_percent="0.53"
         app:layout_constraintTop_toBottomOf="@id/scoreLayout">
 
         <android.support.v7.widget.GridLayout
@@ -276,7 +276,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.13"
+        app:layout_constraintHeight_percent="0.1"
         app:layout_constraintTop_toBottomOf="@id/gameViewAreaFrameLayout"
         android:weightSum="3">
 
@@ -292,12 +292,12 @@
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:scaleType="fitXY"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp"
                 android:clickable="true"
                 android:visibility="visible"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="0dp"
                 android:background="@android:color/transparent">
             </com.smile.groundhoghunter.Model.SmileImageButton>
 
@@ -308,12 +308,12 @@
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:scaleType="fitXY"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp"
                 android:clickable="false"
                 android:visibility="gone"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="0dp"
                 android:background="@android:color/transparent">
             </com.smile.groundhoghunter.Model.SmileImageButton>
 
@@ -324,12 +324,12 @@
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:scaleType="fitXY"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp"
                 android:clickable="false"
                 android:visibility="gone"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="0dp"
                 android:background="@android:color/transparent">
             </com.smile.groundhoghunter.Model.SmileImageButton>
 
@@ -343,9 +343,9 @@
             android:layout_gravity="center"
             android:scaleType="fitXY"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="0dp"
             android:background="@android:color/transparent">
         </com.smile.groundhoghunter.Model.SmileImageButton>
 
@@ -357,12 +357,22 @@
             android:layout_gravity="center"
             android:scaleType="fitXY"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="0dp"
             android:background="@android:color/transparent">
         </com.smile.groundhoghunter.Model.SmileImageButton>
 
+    </LinearLayout>
+
+    <!-- the banner ads showing area -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/linearlayout_for_ads_in_myActivity"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintTop_toBottomOf="@id/buttonLinearLayout">
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
