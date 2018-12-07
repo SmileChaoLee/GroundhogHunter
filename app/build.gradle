@@ -16,8 +16,8 @@ android {
         applicationId "com.smile.groundhoghunter"
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 136
-        versionName "1.36"
+        versionCode 137
+        versionName "1.37"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 

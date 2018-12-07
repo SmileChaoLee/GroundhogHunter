@@ -4,8 +4,8 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Pair;
 import com.smile.groundhoghunter.GroundhogHunterApp;
+import com.smile.smilepublicclasseslibrary.player_record_rest.PlayerRecordRest;
 
 import java.util.ArrayList;
 
@@ -21,16 +21,10 @@ public class LocalTop10IntentService extends IntentService {
 
         System.out.println("LocalTop10IntentService --> onHandleIntent() is called.");
 
-        ArrayList<Pair<String, Integer>> resultList = GroundhogHunterApp.ScoreSQLiteDB.readTop10ScoreList();
         ArrayList<String> playerNames = new ArrayList<>();
         ArrayList<Integer> playerScores = new ArrayList<>();
 
-        for (Pair pair : resultList) {
-            playerNames.add((String)pair.first);
-            playerScores.add((Integer)pair.second);
-        }
-        // wait for 3 seconds
-        try { Thread.sleep(3000); } catch (InterruptedException ex) { ex.printStackTrace(); }
+        String status = PlayerRecordRest.GetLocalTop10Scores(GroundhogHunterApp.ScoreSQLiteDB, playerNames, playerScores);
 
         Intent notificationIntent = new Intent(Action_Name);
         Bundle extras = new Bundle();
