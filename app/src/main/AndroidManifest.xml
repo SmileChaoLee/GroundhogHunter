@@ -10,7 +10,7 @@
         android:allowBackup="true"
         android:icon="@drawable/groundhog_icon"
         android:label="${appName}${appNameSuffix}"
-        android:theme="@style/AppThemeTextSize30">
+        android:theme="@style/AppTheme">
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -30,22 +30,21 @@
         <activity
             android:name=".Top10ScoreActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeForTop10">
         </activity>
 
         <activity
             android:name=".SettingActivity"
-            android:configChanges="orientation"
             android:label="@string/settingStr"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeTextSize30Transparent">
+            android:theme="@style/AppThemeTransparent">
         </activity>
 
         <activity android:name=".MultiPlayerActivity"
             android:configChanges="orientation"
             android:label="@string/multipleStr"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeTextSize30Transparent">
+            android:theme="@style/AppThemeTransparent">
         </activity>
 
         <service android:name=".Service.LocalTop10IntentService"

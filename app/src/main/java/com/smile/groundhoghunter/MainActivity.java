@@ -17,7 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
-import android.view.Gravity;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
@@ -32,7 +32,6 @@ import com.smile.groundhoghunter.Model.SmileImageButton;
 import com.smile.groundhoghunter.Service.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Service.LocalTop10IntentService;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
-import com.smile.groundhoghunter.Utilities.ScreenUtil;
 import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private int rowNum;
     private int colNum;
     private float textFontSize;
+    private float fontScale;
     private int highestScore;
     private ImageView soundOnOffImageView;
     private TextView highScoreTextView;
@@ -88,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        float defaultTextFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.getDefaultTextSizeFromTheme(this);
+        textFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontSize(this, defaultTextFontSize, 0.0f);
+        fontScale = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontScale(this, 0.0f);
+
         isShowingLoadingMessage = false;
         if (savedInstanceState != null) {
             isShowingLoadingMessage = savedInstanceState.getBoolean("IsShowingLoadingMessage");
@@ -97,16 +101,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 dismissShowingLoadingMessage();
             }
-        }
-
-        boolean isTable = ScreenUtil.isTablet(this);
-        if (isTable) {
-            // not a cell phone, it is a tablet
-            textFontSize = 50;
-            setTheme(R.style.AppThemeTextSize50);
-        } else {
-            textFontSize = 30;
-            setTheme(R.style.AppThemeTextSize30);
         }
 
         super.onCreate(savedInstanceState);
@@ -136,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
                     disableAllButtons();
                     Intent intent = new Intent(MainActivity.this, SettingActivity.class);
                     Bundle extras = new Bundle();
-                    extras.putFloat("TextFontSize", textFontSize);
                     extras.putBoolean("HasSound", gameView.getHasSound());
                     intent.putExtras(extras);
                     startActivityForResult(intent, SettingRequestCode);
@@ -179,28 +172,30 @@ public class MainActivity extends AppCompatActivity {
         // score layout
         soundOnOffImageView = findViewById(R.id.soundOnOffImageView);
 
+        TextView gameStatusTitle = findViewById(R.id.gameStatusTitle);
+        gameStatusTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         TextView highScoreTitleView = findViewById(R.id.highestScoreTitle);
-        // highScoreTitleView.setTextSize(textFontSize);
+        highScoreTitleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         highScoreTextView = findViewById(R.id.highestScoreText);
-        // highScoreTextView.setTextSize(textFontSize);
+        highScoreTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         highScoreTextView.setText(String.valueOf(highestScore));
 
         TextView scoreTitleView = findViewById(R.id.scoreTitle);
-        // scoreTitleView.setTextSize(textFontSize);
+        scoreTitleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         scoreTextView = findViewById(R.id.scoreText);
-        // scoreTextView.setTextSize(textFontSize);
+        scoreTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         scoreTextView.setText("0");
 
         TextView timerTitleView = findViewById(R.id.timerTitle);
-        // timerTitleView.setTextSize(textFontSize);
+        timerTitleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         timerTextView = findViewById(R.id.timerText);
-        // timerTextView.setTextSize(textFontSize);
+        timerTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         timerTextView.setText(String.valueOf(GameView.TimerInterval));
 
         TextView hitNumTitleView = findViewById(R.id.num_hit_Title);
-        // hitNumTitleView.setTextSize(textFontSize);
+        hitNumTitleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         hitNumTextView = findViewById(R.id.num_hit_Text);
-        // hitNumTextView.setTextSize(textFontSize);
+        hitNumTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         hitNumTextView.setText("0");
 
         final FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
@@ -353,25 +348,7 @@ public class MainActivity extends AppCompatActivity {
         quitGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (GroundhogHunterApp.InterstitialAd != null) {
-                    // free version
-                    disableAllButtons();
-                    int entryPoint = 0; //  no used
-                    ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdAsyncTask =
-                            GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(MainActivity.this
-                                    , entryPoint
-                                    , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
-                        @Override
-                        public void executeAfterDismissAds(int endPoint) {
-                            enableAllButtons();
-                            quitApplication();
-                        }
-                    });
-                    showAdAsyncTask.execute();
-                } else {
-                    // professional version
-                    quitApplication();
-                }
+                quitGame();
             }
         });
 
@@ -379,10 +356,12 @@ public class MainActivity extends AppCompatActivity {
             bannerLinearLayout = findViewById(R.id.linearlayout_for_ads_in_myActivity);
             bannerAdView = new AdView(this);
 
-            LinearLayout.LayoutParams bannerLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-            bannerLp.gravity = Gravity.CENTER;
-            bannerAdView.setLayoutParams(bannerLp);
-            bannerAdView.setAdSize(AdSize.BANNER);
+            // LinearLayout.LayoutParams bannerLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            // bannerLp.gravity = Gravity.CENTER;
+            // bannerAdView.setLayoutParams(bannerLp);
+            // bannerAdView.setAdSize(AdSize.BANNER);
+            AdSize adSize = new AdSize(AdSize.FULL_WIDTH, AdSize.AUTO_HEIGHT);
+            bannerAdView.setAdSize(adSize);
             bannerAdView.setAdUnitId(GroundhogHunterApp.googleAdMobBannerID);
             bannerLinearLayout.addView(bannerAdView);
             AdRequest adRequest = new AdRequest.Builder().build();
@@ -517,7 +496,7 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         // capture the event of back button when it is pressed
         // change back button behavior
-        quitApplication();
+        quitGame();
     }
 
     // private methods
@@ -527,7 +506,27 @@ public class MainActivity extends AppCompatActivity {
         gameView.stopThreads();
         gameView.releaseResources();
     }
-
+    private void quitGame() {
+        if (GroundhogHunterApp.InterstitialAd != null) {
+            // free version
+            disableAllButtons();
+            int entryPoint = 0; //  no used
+            ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdAsyncTask =
+                    GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(MainActivity.this
+                            , entryPoint
+                            , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
+                        @Override
+                        public void executeAfterDismissAds(int endPoint) {
+                            enableAllButtons();
+                            quitApplication();
+                        }
+                    });
+            showAdAsyncTask.execute();
+        } else {
+            // professional version
+            quitApplication();
+        }
+    }
     private void quitApplication() {
         finish();
     }
@@ -574,13 +573,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void showLoadingMessage() {
         isShowingLoadingMessage = true;
-        float fontSize = textFontSize;
-        double factor = 1.2;
-        int bmWidth = (int)(fontSize * loadingString.length() * factor);
-        int bmHeight = (int)(fontSize * factor * 6.0);
+
         Bitmap dialog_board_image = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.dialog_background_image);
-        Bitmap bm = Bitmap.createScaledBitmap(dialog_board_image, bmWidth, bmHeight, false );  // scale
-        Bitmap loadingBitmap = FontAndBitmapUtil.getBitmapFromBitmapWithText(bm, loadingString, Color.RED);
+        Bitmap loadingBitmap = FontAndBitmapUtil.getBitmapFromBitmapWithText(dialog_board_image, loadingString, Color.RED);
         messageImageView.setVisibility(View.VISIBLE);
         messageImageView.setImageBitmap(loadingBitmap);
     }
@@ -639,7 +634,6 @@ public class MainActivity extends AppCompatActivity {
                     localTop10Extras.putString("Top10TitleName", getString(R.string.local_top_10_score_title));
                     localTop10Extras.putStringArrayList("Top10Players", extras.getStringArrayList("PlayerNames"));
                     localTop10Extras.putIntegerArrayList("Top10Scores", extras.getIntegerArrayList("PlayerScores"));
-                    localTop10Extras.putFloat("TextFontSize", textFontSize);
                     localTop10Intent.putExtras(localTop10Extras);
                     startActivityForResult(localTop10Intent, LocalTop10RequestCode);
                     break;
@@ -651,7 +645,6 @@ public class MainActivity extends AppCompatActivity {
                     globalTop10Extras.putString("Top10TitleName", getString(R.string.global_top_10_score_title));
                     globalTop10Extras.putStringArrayList("Top10Players", extras.getStringArrayList("PlayerNames"));
                     globalTop10Extras.putIntegerArrayList("Top10Scores", extras.getIntegerArrayList("PlayerScores"));
-                    globalTop10Extras.putFloat("TextFontSize", textFontSize);
                     globalTop10Intent.putExtras(globalTop10Extras);
                     startActivityForResult(globalTop10Intent, GlobalTop10RequestCode);
                     break;

@@ -11,8 +11,6 @@ import java.util.ArrayList;
 public class GlobalTop10IntentService extends IntentService {
 
     public final static String Action_Name = "GlobalTop10IntentService";
-    private final String SUCCEEDED = "0";
-    private final String FAILED = "1";
 
     public GlobalTop10IntentService() {
         super(Action_Name);

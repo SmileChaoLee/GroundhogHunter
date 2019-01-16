@@ -4,39 +4,42 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 public class MultiPlayerActivity extends AppCompatActivity {
 
     // private properties
     private float textFontSize;
+    private float fontScale;
     private int mediaType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        textFontSize = 30;
+
+        float defaultTextFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.getDefaultTextSizeFromTheme(this);
+        textFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontSize(this, defaultTextFontSize, 0.0f);
+        fontScale = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontScale(this, 0.0f);
+
         mediaType = GameView.BluetoothMediaType;
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            textFontSize = extras.getFloat("TextFontSize");
             mediaType = extras.getInt("MediaType");
-        }
-
-        if (textFontSize == 50) {
-            // not a cell phone, it is a tablet
-            setTheme(R.style.AppThemeTextSize50Transparent);
-        } else {
-            setTheme(R.style.AppThemeTextSize30Transparent);
         }
 
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_multi_player);
 
+        TextView multiPlayerSettingTitle = findViewById(R.id.multiPlayerSettingTitle);
+        multiPlayerSettingTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+
         final RadioButton bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
+        bluetoothRadioButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         bluetoothRadioButton.setChecked(false);
         bluetoothRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,6 +48,7 @@ public class MultiPlayerActivity extends AppCompatActivity {
             }
         });
         final RadioButton lanRadioButton = findViewById(R.id.lanRadioButton);
+        lanRadioButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         lanRadioButton.setChecked(false);
         lanRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,6 +57,7 @@ public class MultiPlayerActivity extends AppCompatActivity {
             }
         });
         final RadioButton internetRadioButton = findViewById(R.id.internetRadioButton);
+        internetRadioButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         internetRadioButton.setChecked(false);
         internetRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,6 +79,7 @@ public class MultiPlayerActivity extends AppCompatActivity {
         }
 
         final Button cancelButton = findViewById(R.id.cancelMultiPlayerButton);
+        cancelButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,6 +88,7 @@ public class MultiPlayerActivity extends AppCompatActivity {
         });
 
         final Button confirmButton = findViewById(R.id.confirmMultiPlayerButton);
+        confirmButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

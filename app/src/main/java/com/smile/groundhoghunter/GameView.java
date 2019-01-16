@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
@@ -75,6 +76,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public static final int[] hitScores;
     public static final Bitmap score_board;
 
+    private float textFontSize;
+    private float fontScale;
+
     static {
         DrawingInterval = 80;
         NumberOfGroundhogTypes = 4;     // including hiding
@@ -108,6 +112,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         Log.d(TAG, "GameView.GameView(Context context, int gWidth, int gHeight) is called.");
 
         mainActivity = (MainActivity)context;
+
+        float defaultTextFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.getDefaultTextSizeFromTheme(mainActivity);
+        textFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontSize(mainActivity, defaultTextFontSize, 0.0f);
+        fontScale = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontScale(mainActivity, 0.0f);
+
         rowNum = mainActivity.getRowNum();
         colNum = mainActivity.getColNum();
 
@@ -457,7 +466,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             @Override
             public void run() {
                 final EditText et = new EditText(mainActivity);
-                // et.setTextSize(mainActivity.getTextFontSize());
+                et.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
                 // et.setHeight(200);
                 et.setTextColor(Color.BLUE);
                 // et.setBackground(new ColorDrawable(Color.TRANSPARENT));
@@ -528,9 +537,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         dlg.getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
         dlg.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background_image);
 
-        // float fontSize = mainActivity.getTextFontSize();
         Button nBtn = dlg.getButton(DialogInterface.BUTTON_NEGATIVE);
-        // nBtn.setTextSize(fontSize);
+        nBtn.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         nBtn.setTypeface(Typeface.DEFAULT_BOLD);
         nBtn.setTextColor(Color.RED);
 
@@ -539,7 +547,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         nBtn.setLayoutParams(layoutParams);
 
         Button pBtn = dlg.getButton(DialogInterface.BUTTON_POSITIVE);
-        // pBtn.setTextSize(fontSize);
+        pBtn.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         pBtn.setTypeface(Typeface.DEFAULT_BOLD);
         pBtn.setTextColor(Color.rgb(0x00,0x64,0x00));
         pBtn.setLayoutParams(layoutParams);

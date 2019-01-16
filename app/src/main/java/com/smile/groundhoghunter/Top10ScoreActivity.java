@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,25 +29,21 @@ public class Top10ScoreActivity extends AppCompatActivity {
     private ArrayList<Integer> top10Scores = new ArrayList<Integer>();
     private ArrayList<Integer> medalImageIds = new ArrayList<Integer>();
     private float textFontSize;
+    private float fontScale;
     private ListView listView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        textFontSize = 30;
+        float defaultTextFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.getDefaultTextSizeFromTheme(this);
+        textFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontSize(this, defaultTextFontSize, 0.0f);
+        fontScale = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontScale(this, 0.0f);
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             top10TitleName = extras.getString("Top10TitleName");
             top10Players = extras.getStringArrayList("Top10Players");
             top10Scores = extras.getIntegerArrayList("Top10Scores");
-            textFontSize = extras.getFloat("TextFontSize");
-        }
-
-        if (textFontSize == 50) {
-            // not a cell phone, it is a tablet
-            setTheme(R.style.AppThemeTextSize50);
-        } else {
-            setTheme(R.style.AppThemeTextSize30);
         }
 
         super.onCreate(savedInstanceState);
@@ -54,11 +51,11 @@ public class Top10ScoreActivity extends AppCompatActivity {
         setContentView(R.layout.activity_top10_score);
 
         TextView titleTextView = findViewById(R.id.top10TitleTextView);
-        titleTextView.setTextSize(textFontSize);
+        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         titleTextView.setText(top10TitleName);
 
         Button okButton = (Button)findViewById(R.id.top10OkButton);
-        // okButton.setTextSize(textFontSize);
+        okButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -156,7 +153,7 @@ public class Top10ScoreActivity extends AppCompatActivity {
             int listViewHeight = parent.getHeight();
             int itemNum = 4;
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                itemNum = 3;
+                itemNum = 2;
             }
             int itemHeight = listViewHeight / itemNum;    // items for one screen
             ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
@@ -164,9 +161,9 @@ public class Top10ScoreActivity extends AppCompatActivity {
             // view.setLayoutParams(layoutParams);  // no needed
 
             TextView pTextView = view.findViewById(R.id.playerTextView);
-            pTextView.setTextSize(textFontSize);
+            pTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
             TextView sTextView = view.findViewById(R.id.scoreTextView);
-            sTextView.setTextSize(textFontSize);
+            sTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
             ImageView medalImage = view.findViewById(R.id.medalImage);
 
             pTextView.setText(players.get(position));

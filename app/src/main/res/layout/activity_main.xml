@@ -17,45 +17,46 @@
         app:layout_constraintTop_toTopOf="parent"
         android:weightSum="3">
 
-        <com.smile.groundhoghunter.Model.SmileImageButton
-            android:id="@+id/settingButton"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:scaleType="fitXY"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@android:color/transparent">
-        </com.smile.groundhoghunter.Model.SmileImageButton>
-        <com.smile.groundhoghunter.Model.SmileImageButton
-            android:id="@+id/top10Button"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:scaleType="fitXY"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@android:color/transparent">
-        </com.smile.groundhoghunter.Model.SmileImageButton>
-        <com.smile.groundhoghunter.Model.SmileImageButton
-            android:id="@+id/globalTop10Button"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:scaleType="fitXY"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@android:color/transparent">
-        </com.smile.groundhoghunter.Model.SmileImageButton>
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="0dp">
+            <com.smile.groundhoghunter.Model.SmileImageButton
+                android:id="@+id/settingButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:scaleType="fitXY"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@android:color/transparent">
+            </com.smile.groundhoghunter.Model.SmileImageButton>
+            <com.smile.groundhoghunter.Model.SmileImageButton
+                android:id="@+id/top10Button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:scaleType="fitXY"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@android:color/transparent">
+            </com.smile.groundhoghunter.Model.SmileImageButton>
+            <com.smile.groundhoghunter.Model.SmileImageButton
+                android:id="@+id/globalTop10Button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:scaleType="fitXY"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@android:color/transparent">
+            </com.smile.groundhoghunter.Model.SmileImageButton>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -65,179 +66,189 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintHeight_percent="0.17"
-        app:layout_constraintTop_toBottomOf="@id/upperButtonLayout"
-        android:weightSum="3">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-            <TextView
-                android:id="@+id/gameStatusTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_alignParentLeft="true"
-                android:textAllCaps="false"
-                android:textColor="@android:color/black"
-                android:textStyle="bold"
-                android:text="@string/gameStatusStr">
-            </TextView>
-            <ImageView
-                android:id="@+id/soundOnOffImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/gameStatusTitle"
-                android:layout_marginLeft="10dp">
-            </ImageView>
-        </RelativeLayout>
+        app:layout_constraintTop_toBottomOf="@id/upperButtonLayout">
 
         <LinearLayout
-            android:id="@+id/scoreLayoutTop"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:weightSum="2">
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="5dp"
+            android:weightSum="3">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/gameStatusTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_alignParentLeft="true"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold"
+                    android:text="@string/gameStatusStr">
+                </TextView>
+                <ImageView
+                    android:id="@+id/soundOnOffImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitXY"
+                    android:adjustViewBounds="true"
+                    android:layout_toRightOf="@+id/gameStatusTitle"
+                    android:layout_marginLeft="10dp">
+                </ImageView>
+            </RelativeLayout>
 
             <LinearLayout
-                android:id="@+id/scoreLayoutLeftTop"
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-                <RelativeLayout
-                    android:gravity="center_vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:id="@+id/highestScoreTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:textColor="@color/darkGreen"
-                        android:text="@string/highest_string">
-                    </TextView>
-                    <TextView
-                        android:id="@+id/highestScoreText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/highestScoreTitle"
-                        android:layout_alignTop="@+id/highestScoreTitle"
-                        android:textColor="@color/darkRed"
-                        android:text="1000">
-                    </TextView>
-                </RelativeLayout>
+                android:id="@+id/scoreLayoutTop"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:id="@+id/scoreLayoutLeftTop"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                    <RelativeLayout
+                        android:gravity="center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/highestScoreTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:textColor="@color/lightDarkGreen"
+                            android:text="@string/highest_string">
+                        </TextView>
+                        <TextView
+                            android:id="@+id/highestScoreText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/highestScoreTitle"
+                            android:layout_alignTop="@+id/highestScoreTitle"
+                            android:textColor="@color/darkRed"
+                            android:text="1000">
+                        </TextView>
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/scoreLayoutRightTop"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                    <RelativeLayout
+                        android:gravity="center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/timerTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:textColor="@color/lightDarkGreen"
+                            android:text="@string/timer_string">
+                        </TextView>
+                        <TextView
+                            android:id="@+id/timerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/timerTitle"
+                            android:layout_alignTop="@+id/timerTitle"
+                            android:textColor="@color/blue"
+                            android:text="60">
+                        </TextView>
+                    </RelativeLayout>
+                </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/scoreLayoutRightTop"
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-                <RelativeLayout
-                    android:gravity="center_vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:id="@+id/timerTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:textColor="@color/darkGreen"
-                        android:text="@string/timer_string">
-                    </TextView>
-                    <TextView
-                        android:id="@+id/timerText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/timerTitle"
-                        android:layout_alignTop="@+id/timerTitle"
-                        android:textColor="@color/blue"
-                        android:text="60">
-                    </TextView>
-                </RelativeLayout>
+                android:id="@+id/scoreLayoutBottom"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:id="@+id/scoreLayoutLeftBottom"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                    <RelativeLayout
+                        android:gravity="center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/scoreTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:textColor="@color/lightDarkGreen"
+                            android:text="@string/score_string">
+                        </TextView>
+                        <TextView
+                            android:id="@+id/scoreText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/scoreTitle"
+                            android:layout_alignTop="@+id/scoreTitle"
+                            android:textColor="@color/blue"
+                            android:text="0">
+                        </TextView>
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/scoreLayoutRightBottom"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                    <RelativeLayout
+                        android:gravity="center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/num_hit_Title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:textColor="@color/lightDarkGreen"
+                            android:text="@string/num_hit_string">
+                        </TextView>
+                        <TextView
+                            android:id="@+id/num_hit_Text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/num_hit_Title"
+                            android:layout_alignTop="@+id/num_hit_Title"
+                            android:textColor="@color/blue"
+                            android:text="0">
+                        </TextView>
+                    </RelativeLayout>
+                </LinearLayout>
+
             </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/scoreLayoutBottom"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:weightSum="2">
-
-            <LinearLayout
-                android:id="@+id/scoreLayoutLeftBottom"
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-                <RelativeLayout
-                    android:gravity="center_vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:id="@+id/scoreTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:textColor="@color/darkGreen"
-                        android:text="@string/score_string">
-                    </TextView>
-                    <TextView
-                        android:id="@+id/scoreText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/scoreTitle"
-                        android:layout_alignTop="@+id/scoreTitle"
-                        android:textColor="@color/blue"
-                        android:text="0">
-                    </TextView>
-                </RelativeLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/scoreLayoutRightBottom"
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-                <RelativeLayout
-                    android:gravity="center_vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:id="@+id/num_hit_Title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:textColor="@color/darkGreen"
-                        android:text="@string/num_hit_string">
-                    </TextView>
-                    <TextView
-                        android:id="@+id/num_hit_Text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/num_hit_Title"
-                        android:layout_alignTop="@+id/num_hit_Title"
-                        android:textColor="@color/blue"
-                        android:text="0">
-                    </TextView>
-                </RelativeLayout>
-            </LinearLayout>
-
         </LinearLayout>
 
     </LinearLayout>
@@ -258,16 +269,30 @@
             app:columnCount="5">
         </android.support.v7.widget.GridLayout>
 
-        <ImageView
-            android:id="@+id/messageImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:scaleType="fitXY"
-            android:adjustViewBounds="true"
-            android:clickable="false"
-            android:background="@android:color/transparent">
-        </ImageView>
+        <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/messageConstraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:id="@+id/messageImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+                android:clickable="false"
+                android:background="@android:color/transparent"
+                app:layout_constraintHeight_default="percent"
+                app:layout_constraintHeight_percent="0.3"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent">>
+            </ImageView>
+        </android.support.constraint.ConstraintLayout>
 
     </FrameLayout>
 
@@ -371,6 +396,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:gravity="bottom"
         app:layout_constraintHeight_percent="0.1"
         app:layout_constraintTop_toBottomOf="@id/buttonLinearLayout">
     </LinearLayout>
