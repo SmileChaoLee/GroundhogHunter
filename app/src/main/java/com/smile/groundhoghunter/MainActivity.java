@@ -10,7 +10,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -32,12 +34,14 @@ import com.smile.groundhoghunter.Model.SmileImageButton;
 import com.smile.groundhoghunter.Service.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Service.LocalTop10IntentService;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
+import com.smile.smilepublicclasseslibrary.alertdialogfragment.AlertDialogFragment;
 import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
 
 public class MainActivity extends AppCompatActivity {
 
     // private properties
     private final static String TAG = "MainActivity";
+    private final static String LoadingDialogTag = "LoadingDialogTag";
 
     private GameView gameView;
     private int rowNum;
@@ -64,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private AdView bannerAdView = null;
 
     private boolean isShowingLoadingMessage;
+    private AlertDialogFragment loadingDialog;
 
     private BroadcastReceiver bReceiver;
 
@@ -93,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
         fontScale = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontScale(this, 0.0f);
 
         isShowingLoadingMessage = false;
+
+        /*
         if (savedInstanceState != null) {
             isShowingLoadingMessage = savedInstanceState.getBoolean("IsShowingLoadingMessage");
             if (isShowingLoadingMessage) {
@@ -102,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 dismissShowingLoadingMessage();
             }
         }
+        */
 
         super.onCreate(savedInstanceState);
         // the following 2 statements have been moved to AndroidManifest.xml
@@ -170,30 +178,31 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // score layout
+
+        TextView gameStatusTitleTextView = findViewById(R.id.gameStatusTitle);
+        gameStatusTitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         soundOnOffImageView = findViewById(R.id.soundOnOffImageView);
 
-        TextView gameStatusTitle = findViewById(R.id.gameStatusTitle);
-        gameStatusTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
-        TextView highScoreTitleView = findViewById(R.id.highestScoreTitle);
-        highScoreTitleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        TextView highScoreTitleTextView = findViewById(R.id.highestScoreTitle);
+        highScoreTitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         highScoreTextView = findViewById(R.id.highestScoreText);
         highScoreTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         highScoreTextView.setText(String.valueOf(highestScore));
 
-        TextView scoreTitleView = findViewById(R.id.scoreTitle);
-        scoreTitleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        TextView scoreTitleTextView = findViewById(R.id.scoreTitle);
+        scoreTitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         scoreTextView = findViewById(R.id.scoreText);
         scoreTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         scoreTextView.setText("0");
 
-        TextView timerTitleView = findViewById(R.id.timerTitle);
-        timerTitleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        TextView timerTitleTextView = findViewById(R.id.timerTitle);
+        timerTitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         timerTextView = findViewById(R.id.timerText);
         timerTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         timerTextView.setText(String.valueOf(GameView.TimerInterval));
 
-        TextView hitNumTitleView = findViewById(R.id.num_hit_Title);
-        hitNumTitleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        TextView hitNumTitleTextView = findViewById(R.id.num_hit_Title);
+        hitNumTitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         hitNumTextView = findViewById(R.id.num_hit_Text);
         hitNumTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
         hitNumTextView.setText("0");
@@ -574,16 +583,28 @@ public class MainActivity extends AppCompatActivity {
     public void showLoadingMessage() {
         isShowingLoadingMessage = true;
 
+        /*
         Bitmap dialog_board_image = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.dialog_background_image);
         Bitmap loadingBitmap = FontAndBitmapUtil.getBitmapFromBitmapWithText(dialog_board_image, loadingString, Color.RED);
         messageImageView.setVisibility(View.VISIBLE);
         messageImageView.setImageBitmap(loadingBitmap);
+        */
+
+        loadingDialog = AlertDialogFragment.newInstance(loadingString, textFontSize, Color.RED, 0, 0, true);
+        loadingDialog.show(getSupportFragmentManager(), LoadingDialogTag);
     }
 
     public void dismissShowingLoadingMessage() {
         isShowingLoadingMessage = false;
+
+        /*
         messageImageView.setImageBitmap(null);
         messageImageView.setVisibility(View.GONE);
+        */
+
+        if (loadingDialog != null) {
+            loadingDialog.dismissAllowingStateLoss();
+        }
     }
 
     // public methods
