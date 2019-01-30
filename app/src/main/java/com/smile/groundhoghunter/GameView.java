@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
@@ -28,6 +27,7 @@ import android.widget.LinearLayout;
 import com.smile.groundhoghunter.Model.Groundhog;
 import com.smile.groundhoghunter.Utilities.SoundUtil;
 import com.smile.smilepublicclasseslibrary.player_record_rest.PlayerRecordRest;
+import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 import org.json.JSONObject;
 
@@ -113,9 +113,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         mainActivity = (MainActivity)context;
 
-        float defaultTextFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.getDefaultTextSizeFromTheme(mainActivity);
-        textFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontSize(mainActivity, defaultTextFontSize, 0.0f);
-        fontScale = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontScale(mainActivity, 0.0f);
+        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(mainActivity, GroundhogHunterApp.FontSize_Scale_Type, null);
+        textFontSize = ScreenUtil.suitableFontSize(mainActivity, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        fontScale = ScreenUtil.suitableFontScale(mainActivity, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
 
         rowNum = mainActivity.getRowNum();
         colNum = mainActivity.getColNum();
@@ -466,7 +466,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             @Override
             public void run() {
                 final EditText et = new EditText(mainActivity);
-                et.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+                ScreenUtil.resizeTextSize(et, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
                 // et.setHeight(200);
                 et.setTextColor(Color.BLUE);
                 // et.setBackground(new ColorDrawable(Color.TRANSPARENT));
@@ -538,7 +538,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         dlg.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background_image);
 
         Button nBtn = dlg.getButton(DialogInterface.BUTTON_NEGATIVE);
-        nBtn.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(nBtn, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         nBtn.setTypeface(Typeface.DEFAULT_BOLD);
         nBtn.setTextColor(Color.RED);
 
@@ -547,7 +547,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         nBtn.setLayoutParams(layoutParams);
 
         Button pBtn = dlg.getButton(DialogInterface.BUTTON_POSITIVE);
-        pBtn.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(pBtn, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         pBtn.setTypeface(Typeface.DEFAULT_BOLD);
         pBtn.setTextColor(Color.rgb(0x00,0x64,0x00));
         pBtn.setLayoutParams(layoutParams);

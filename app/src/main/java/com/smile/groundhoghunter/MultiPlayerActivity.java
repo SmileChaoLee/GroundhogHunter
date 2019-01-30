@@ -2,6 +2,8 @@ package com.smile.groundhoghunter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -9,6 +11,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.TextView;
+
+import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class MultiPlayerActivity extends AppCompatActivity {
 
@@ -20,9 +24,9 @@ public class MultiPlayerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        float defaultTextFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.getDefaultTextSizeFromTheme(this);
-        textFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontSize(this, defaultTextFontSize, 0.0f);
-        fontScale = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontScale(this, 0.0f);
+        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
+        textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
 
         mediaType = GameView.BluetoothMediaType;
 
@@ -33,13 +37,18 @@ public class MultiPlayerActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
+        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.O) {
+            // not Oreo
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
         setContentView(R.layout.activity_multi_player);
 
         TextView multiPlayerSettingTitle = findViewById(R.id.multiPlayerSettingTitle);
-        multiPlayerSettingTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(multiPlayerSettingTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
 
         final RadioButton bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
-        bluetoothRadioButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(bluetoothRadioButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         bluetoothRadioButton.setChecked(false);
         bluetoothRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,7 +57,7 @@ public class MultiPlayerActivity extends AppCompatActivity {
             }
         });
         final RadioButton lanRadioButton = findViewById(R.id.lanRadioButton);
-        lanRadioButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(lanRadioButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         lanRadioButton.setChecked(false);
         lanRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +66,7 @@ public class MultiPlayerActivity extends AppCompatActivity {
             }
         });
         final RadioButton internetRadioButton = findViewById(R.id.internetRadioButton);
-        internetRadioButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(internetRadioButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         internetRadioButton.setChecked(false);
         internetRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,7 +88,7 @@ public class MultiPlayerActivity extends AppCompatActivity {
         }
 
         final Button cancelButton = findViewById(R.id.cancelMultiPlayerButton);
-        cancelButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(cancelButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,7 +97,7 @@ public class MultiPlayerActivity extends AppCompatActivity {
         });
 
         final Button confirmButton = findViewById(R.id.confirmMultiPlayerButton);
-        confirmButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(confirmButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

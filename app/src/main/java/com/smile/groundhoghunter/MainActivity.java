@@ -6,20 +6,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
@@ -36,6 +32,7 @@ import com.smile.groundhoghunter.Service.LocalTop10IntentService;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.alertdialogfragment.AlertDialogFragment;
 import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
+import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -93,9 +90,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        float defaultTextFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.getDefaultTextSizeFromTheme(this);
-        textFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontSize(this, defaultTextFontSize, 0.0f);
-        fontScale = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontScale(this, 0.0f);
+        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
+        textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
 
         isShowingLoadingMessage = false;
 
@@ -180,31 +177,31 @@ public class MainActivity extends AppCompatActivity {
         // score layout
 
         TextView gameStatusTitleTextView = findViewById(R.id.gameStatusTitle);
-        gameStatusTitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(gameStatusTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         soundOnOffImageView = findViewById(R.id.soundOnOffImageView);
 
         TextView highScoreTitleTextView = findViewById(R.id.highestScoreTitle);
-        highScoreTitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(highScoreTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         highScoreTextView = findViewById(R.id.highestScoreText);
-        highScoreTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(highScoreTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         highScoreTextView.setText(String.valueOf(highestScore));
 
         TextView scoreTitleTextView = findViewById(R.id.scoreTitle);
-        scoreTitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(scoreTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         scoreTextView = findViewById(R.id.scoreText);
-        scoreTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(scoreTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         scoreTextView.setText("0");
 
         TextView timerTitleTextView = findViewById(R.id.timerTitle);
-        timerTitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(timerTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         timerTextView = findViewById(R.id.timerText);
-        timerTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(timerTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         timerTextView.setText(String.valueOf(GameView.TimerInterval));
 
         TextView hitNumTitleTextView = findViewById(R.id.num_hit_Title);
-        hitNumTitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(hitNumTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         hitNumTextView = findViewById(R.id.num_hit_Text);
-        hitNumTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(hitNumTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         hitNumTextView.setText("0");
 
         final FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
@@ -378,6 +375,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         bReceiver = new GroundhogHunterBroadcastReceiver();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(LocalTop10IntentService.Action_Name);
+        intentFilter.addAction(GlobalTop10IntentService.Action_Name);
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(bReceiver, intentFilter);
     }
 
     @Override
@@ -397,14 +400,21 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     Log.i(TAG, "SettingActivity returned cancel.");
                 }
+
+                // update Main UI
+                if (gameView.getHasSound()) {
+                    soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
+                } else {
+                    soundOnOffImageView.setImageResource(R.drawable.sound_off_image);
+                }
                 break;
             case LocalTop10RequestCode:
                 if (resultCode == Activity.RESULT_OK) {
-                    Log.i(TAG, "Top10ScoreActivity returned successfully.");
+                    Log.i(TAG, "Top10ScoreActivity (Local top 10) returned successfully.");
                 } else {
-                    Log.i(TAG, "Top10ScoreActivity did not return successfully.");
+                    Log.i(TAG, "Top10ScoreActivity (Local top 10) did not return successfully.");
                 }
-                Log.i(TAG, "Facebook showing ads");
+                Log.i(TAG, "Showing ads");
                 if (GroundhogHunterApp.InterstitialAd != null) {
                     int entryPoint = 0; //  no used
                     ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdAsyncTask =
@@ -422,6 +432,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case GlobalTop10RequestCode:
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.i(TAG, "Top10ScoreActivity (Global top 10) returned successfully.");
+                } else {
+                    Log.i(TAG, "Top10ScoreActivity (Global top 10) did not return successfully.");
+                }
+                Log.i(TAG, "Showing ads");
                 if (GroundhogHunterApp.InterstitialAd != null) {
                     int entryPoint = 0; //  no used
                     ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdsAsyncTask =
@@ -439,25 +455,19 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
+    }
 
-        // update Main UI
-        if (gameView.getHasSound()) {
-            soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
-        } else {
-            soundOnOffImageView.setImageResource(R.drawable.sound_off_image);
-        }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        System.out.println("MainActivity.onStart() is called.");
     }
 
     @Override
     public void onResume() {
         super.onResume();
         System.out.println("MainActivity.onResume() is called.");
-
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(LocalTop10IntentService.Action_Name);
-        intentFilter.addAction(GlobalTop10IntentService.Action_Name);
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        localBroadcastManager.registerReceiver(bReceiver, intentFilter);
 
         synchronized (ActivityHandler) {
             GamePause = false;
@@ -470,13 +480,16 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         System.out.println("MainActivity.onPause() is called.");
 
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        localBroadcastManager.unregisterReceiver(bReceiver);
-
         synchronized (ActivityHandler) {
             GamePause = true;
         }
         // super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        System.out.println("MainActivity.onStop() is called.");
     }
 
     @Override
@@ -488,6 +501,9 @@ public class MainActivity extends AppCompatActivity {
                 GroundhogHunterApp.ScoreSQLiteDB.close();
             }
         }
+
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.unregisterReceiver(bReceiver);
 
         finishApplication();
 
@@ -590,7 +606,7 @@ public class MainActivity extends AppCompatActivity {
         messageImageView.setImageBitmap(loadingBitmap);
         */
 
-        loadingDialog = AlertDialogFragment.newInstance(loadingString, textFontSize, Color.RED, 0, 0, true);
+        loadingDialog = AlertDialogFragment.newInstance(loadingString, GroundhogHunterApp.FontSize_Scale_Type, textFontSize, Color.RED, 0, 0, true);
         loadingDialog.show(getSupportFragmentManager(), LoadingDialogTag);
     }
 
@@ -603,7 +619,11 @@ public class MainActivity extends AppCompatActivity {
         */
 
         if (loadingDialog != null) {
-            loadingDialog.dismissAllowingStateLoss();
+            if (loadingDialog.isStateSaved()) {
+                loadingDialog.dismissAllowingStateLoss();
+            } else {
+                loadingDialog.dismiss();
+            }
         }
     }
 

@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -17,6 +16,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 import java.util.ArrayList;
 
@@ -35,9 +36,9 @@ public class Top10ScoreActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        float defaultTextFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.getDefaultTextSizeFromTheme(this);
-        textFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontSize(this, defaultTextFontSize, 0.0f);
-        fontScale = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontScale(this, 0.0f);
+        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
+        textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -51,11 +52,11 @@ public class Top10ScoreActivity extends AppCompatActivity {
         setContentView(R.layout.activity_top10_score);
 
         TextView titleTextView = findViewById(R.id.top10TitleTextView);
-        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(titleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         titleTextView.setText(top10TitleName);
 
         Button okButton = (Button)findViewById(R.id.top10OkButton);
-        okButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(okButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -161,9 +162,9 @@ public class Top10ScoreActivity extends AppCompatActivity {
             // view.setLayoutParams(layoutParams);  // no needed
 
             TextView pTextView = view.findViewById(R.id.playerTextView);
-            pTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+            ScreenUtil.resizeTextSize(pTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
             TextView sTextView = view.findViewById(R.id.scoreTextView);
-            sTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+            ScreenUtil.resizeTextSize(sTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
             ImageView medalImage = view.findViewById(R.id.medalImage);
 
             pTextView.setText(players.get(position));

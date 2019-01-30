@@ -3,20 +3,15 @@ package com.smile.groundhoghunter;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-
-import com.smile.groundhoghunter.Utilities.ScreenUtil;
+import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class SettingActivity extends AppCompatActivity {
 
@@ -30,9 +25,9 @@ public class SettingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        float defaultTextFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.getDefaultTextSizeFromTheme(this);
-        textFontSize = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontSize(this, defaultTextFontSize, 0.0f);
-        fontScale = com.smile.smilepublicclasseslibrary.utilities.ScreenUtil.suitableFontScale(this, 0.0f);
+        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
+        textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
 
         hasSound = true;
         isSinglePlayer = true;
@@ -53,11 +48,11 @@ public class SettingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_setting);
 
         TextView settingTitle = findViewById(R.id.settingTitle);
-        settingTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(settingTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         TextView soundSettingTitle = findViewById(R.id.soundSettingTitle);
-        soundSettingTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(soundSettingTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         soundSwitch = findViewById(R.id.soundSwitch);
-        soundSwitch.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(soundSwitch, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         soundSwitch.setChecked(hasSound);
         soundSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,7 +62,7 @@ public class SettingActivity extends AppCompatActivity {
         });
 
         Button confirmButton = findViewById(R.id.confirmSettingButton);
-        confirmButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(confirmButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -76,7 +71,7 @@ public class SettingActivity extends AppCompatActivity {
         });
 
         Button cancelButton = findViewById(R.id.cancelSettingButton);
-        cancelButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textFontSize);
+        ScreenUtil.resizeTextSize(cancelButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

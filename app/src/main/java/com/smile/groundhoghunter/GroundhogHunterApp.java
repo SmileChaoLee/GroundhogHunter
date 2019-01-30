@@ -9,6 +9,7 @@ import com.smile.smilepublicclasseslibrary.facebook_ads_util.*;
 import com.smile.smilepublicclasseslibrary.google_admob_ads_util.GoogleAdMobInterstitial;
 import com.smile.smilepublicclasseslibrary.scoresqlite.*;
 import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
+import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class GroundhogHunterApp extends Application {
 
@@ -16,6 +17,7 @@ public class GroundhogHunterApp extends Application {
     // public static final String REST_Website = "http://ec2-13-59-195-3.us-east-2.compute.amazonaws.com/Playerscore";
     public static final String REST_Website = "http://ec2-13-59-195-3.us-east-2.compute.amazonaws.com/Playerscore";
     public static final int GameId = 2; // this GameId is for backend game_id in playerscore table
+    public static final int FontSize_Scale_Type = ScreenUtil.FontSize_Pixel_Type;
 
     public static Resources AppResources;
     public static Context AppContext;
