@@ -44,8 +44,8 @@ public class MultiPlayerActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_multi_player);
 
-        TextView multiPlayerSettingTitle = findViewById(R.id.multiPlayerSettingTitle);
-        ScreenUtil.resizeTextSize(multiPlayerSettingTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        TextView twoPlayerSettingTitle = findViewById(R.id.twoPlayerSettingTitle);
+        ScreenUtil.resizeTextSize(twoPlayerSettingTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
 
         final RadioButton bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
         ScreenUtil.resizeTextSize(bluetoothRadioButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);

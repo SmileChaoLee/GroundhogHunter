@@ -49,7 +49,7 @@
                 android:layout_gravity="center"
                 android:textColor="@color/white"
                 android:textStyle="bold"
-                android:text="@string/settingStr">
+                android:text="@string/settingString">
             </TextView>
 
             <LinearLayout
@@ -73,7 +73,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_marginLeft="10dp"
                         android:textColor="#ffffff00"
-                        android:text="@string/soundStr">
+                        android:text="@string/soundString">
                     </TextView>
                     <ToggleButton
                         android:id="@+id/soundSwitch"
@@ -85,8 +85,8 @@
                         android:background="@color/transparent"
                         android:textColor="@color/white"
                         android:textAllCaps="false"
-                        android:textOn="@string/onStr"
-                        android:textOff="@string/offStr">
+                        android:textOn="@string/onString"
+                        android:textOff="@string/offString">
                     </ToggleButton>
                 </RelativeLayout>
 
@@ -113,7 +113,7 @@
                     android:textAllCaps="false"
                     android:textColor="@color/red"
                     android:background="@color/transparent"
-                    android:text="@string/cancelStr" >
+                    android:text="@string/cancelString" >
                 </Button>
                 <Button
                     android:id="@+id/confirmSettingButton"
@@ -124,7 +124,7 @@
                     android:textAllCaps="false"
                     android:textColor="@color/green"
                     android:background="@color/transparent"
-                    android:text="@string/okStr" >
+                    android:text="@string/okString" >
                 </Button>
             </LinearLayout>
         </LinearLayout>

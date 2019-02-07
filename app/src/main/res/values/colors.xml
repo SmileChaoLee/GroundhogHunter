@@ -10,6 +10,8 @@
     <color name="darkRed">#c70e40</color>
     <color name="darkOrange">#a72a19</color>
     <color name="yellow">#ffff00</color>
+    <color name="yellow2">#ffe8e56a</color>
+    <color name="yellow3">#d4d28f</color>
     <color name="green">#00ff00</color>
     <color name="white">#ffffff</color>
     <color name="transparent">#00000000</color>

@@ -12,48 +12,50 @@
         <item>第四關</item>
     </string-array>
 
-    <string name="start_game_string">開始</string>
-    <string name="pause_game_string">暫停</string>
-    <string name="resume_game_string">恢復</string>
-    <string name="new_game_string">新遊戲</string>
-    <string name="quit_game_string">離開</string>
-    <string name="okStr">確定</string>
-    <string name="cancelStr">取消</string>
-    <string name="submitStr">送出</string>
-    <string name="nameStr">輸入你的名字</string>
-    <string name="yesStr">是</string>
-    <string name="noStr">否</string>
-    <string name="highest_string">最高分:</string>
-    <string name="score_string">分數:</string>
-    <string name="timer_string">計時器:</string>
-    <string name="num_hit_string">擊中次數:</string>
-    <string name="local_top10_string">前10名</string>
-    <string name="global_top10_string">全球前10名</string>
+    <string name="startGameString">開始</string>
+    <string name="pauseGameString">暫停</string>
+    <string name="resumeGameString">恢復</string>
+    <string name="newGameString">新遊戲</string>
+    <string name="quitGameString">離開</string>
+    <string name="okString">確定</string>
+    <string name="cancelString">取消</string>
+    <string name="submitString">送出</string>
+    <string name="nameString">輸入你的名字</string>
+    <string name="yesString">是</string>
+    <string name="noString">否</string>
+    <string name="highestString">最高分:</string>
+    <string name="scoreString">分數:</string>
+    <string name="timerString">計時器:</string>
+    <string name="numHitString">擊中次數:</string>
+    <string name="localTop10String">前10名</string>
+    <string name="globalTop10String">全球前10名</string>
 
-    <string name="local_top_10_score_str">前10名最高分</string>        <!-- for menu item -->
-    <string name="activity_top_10_score">前10名最高分</string>   <!-- for activity name -->
-    <string name="local_top_10_score_title">前10名最高分</string>      <!-- for title of list view -->
-    <string name="global_top_10_score_title">全球前10名最高分</string>      <!-- for title of list view -->
+    <string name="localTop10ScoreString">前10名最高分</string>        <!-- for menu item -->
+    <string name="activityTop10ScoreString">前10名最高分</string>   <!-- for activity name -->
+    <string name="localTop10ScoreTitleString">前10名最高分</string>      <!-- for title of list view -->
+    <string name="globalTop10ScoreTitleString">全球前10名最高分</string>      <!-- for title of list view -->
 
-    <string name="settingStr">設定</string>
-    <string name="soundStr">聲音</string>
-    <string name="onStr">開</string>
-    <string name="offStr">關</string>
-    <string name="numPlayersStr">遊戲人數</string>
-    <string name="singleStr">單人</string>
-    <string name="multipleStr">多人</string>
-    <string name="singlePlayerStr">單人</string>
-    <string name="multiPlayerStr">多人</string>
+    <string name="settingString">設定</string>
+    <string name="soundString">聲音</string>
+    <string name="onString">開</string>
+    <string name="offString">關</string>
+    <string name="numPlayersString">遊戲人數</string>
+    <string name="singlePlayerString">單人遊戲</string>
+    <string name="twoPlayerString">雙人遊戲</string>
+    <string name="exitAppString">離開遊戲</string>
 
-    <string name="bluetoothStr">藍芽</string>
-    <string name="lanStr">區域網路</string>
-    <string name="internetStr">網際網路</string>
-    <string name="createGameStr">創立</string>
-    <string name="joinGameStr">加入</string>
+    <string name="bluetoothString">藍芽</string>
+    <string name="lanString">區域網路</string>
+    <string name="internetString">網際網路</string>
+    <string name="createGameString">創立</string>
+    <string name="joinGameString">加入</string>
 
-    <string name="gameStatusStr">狀態:</string>
+    <string name="gameStatusString">狀態:</string>
     <string name="loadingString">下載中 ...</string>
     <string name="showingAdsString">廣告顯示中 ...</string>
+
+    <string name="companyNameString">微笑資訊有限公司</string>
+    <string name="companyContactEmailString">leechao1959@gmail.com</string>
 
     <string name="google_AdMobAppID">ca-app-pub-8354869049759576~9932277958</string>
 </resources>

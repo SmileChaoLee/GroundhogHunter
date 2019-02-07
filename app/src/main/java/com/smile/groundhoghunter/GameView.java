@@ -36,7 +36,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = "GameView";
 
     private final SurfaceHolder surfaceHolder;
-    private final MainActivity mainActivity;
+    private final GroundhogActivity groundhogActivity;
     private final int rowNum;
     private final int colNum;
 
@@ -111,14 +111,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         Log.d(TAG, "GameView.GameView(Context context, int gWidth, int gHeight) is called.");
 
-        mainActivity = (MainActivity)context;
+        groundhogActivity = (GroundhogActivity)context;
 
-        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(mainActivity, GroundhogHunterApp.FontSize_Scale_Type, null);
-        textFontSize = ScreenUtil.suitableFontSize(mainActivity, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
-        fontScale = ScreenUtil.suitableFontScale(mainActivity, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(groundhogActivity, GroundhogHunterApp.FontSize_Scale_Type, null);
+        textFontSize = ScreenUtil.suitableFontSize(groundhogActivity, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        fontScale = ScreenUtil.suitableFontScale(groundhogActivity, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
 
-        rowNum = mainActivity.getRowNum();
-        colNum = mainActivity.getColNum();
+        rowNum = groundhogActivity.getRowNum();
+        colNum = groundhogActivity.getColNum();
 
         gameViewWidth = gWidth;
         gameViewHeight = gHeight;
@@ -134,7 +134,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         // surfaceHolder.setFormat(PixelFormat.TRANSPARENT);    // same effect as the following
         surfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
 
-        highestScore = mainActivity.getHighestScore();
+        highestScore = groundhogActivity.getHighestScore();
         currentScore = 0;
         numOfHits = 0;
         surfaceViewCreated = false; // surfaceView has not been created yet
@@ -207,7 +207,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                 // hit
                                 if (hasSound) {
                                     // needs to play sound for hitting
-                                    SoundUtil.playSound(mainActivity, R.raw.ouh);
+                                    SoundUtil.playSound(groundhogActivity, R.raw.ouh);
                                 }
                                 groundhog.setIsHit(true);
                                 ++numOfHits;
@@ -308,11 +308,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void releaseSynchronizations() {
-        if (MainActivity.GamePause) {
+        if (GroundhogActivity.GamePause) {
             // in pause status
-            synchronized (MainActivity.ActivityHandler) {
-                MainActivity.GamePause = false;
-                MainActivity.ActivityHandler.notifyAll();
+            synchronized (GroundhogActivity.ActivityHandler) {
+                GroundhogActivity.GamePause = false;
+                GroundhogActivity.ActivityHandler.notifyAll();
             }
         }
 
@@ -425,13 +425,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void doDraw(Canvas canvas) {
 
-        mainActivity.runOnUiThread(new Runnable() {
+        groundhogActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mainActivity.setTextForHighScoreTextView(String.valueOf(highestScore));
-                mainActivity.setTextForScoreTextView(String.valueOf(currentScore));
-                mainActivity.setTextForTimerTextView(String.valueOf(timeRemaining));
-                mainActivity.setTextForHitNumTextView(String.valueOf(numOfHits));
+                groundhogActivity.setTextForHighScoreTextView(String.valueOf(highestScore));
+                groundhogActivity.setTextForScoreTextView(String.valueOf(currentScore));
+                groundhogActivity.setTextForTimerTextView(String.valueOf(timeRemaining));
+                groundhogActivity.setTextForHitNumTextView(String.valueOf(numOfHits));
             }
         });
 
@@ -462,29 +462,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void recordScore(final int score) {
         //    record currentScore as a score in database
-        mainActivity.runOnUiThread(new Runnable() {
+        groundhogActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                final EditText et = new EditText(mainActivity);
+                final EditText et = new EditText(groundhogActivity);
                 ScreenUtil.resizeTextSize(et, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
                 // et.setHeight(200);
                 et.setTextColor(Color.BLUE);
                 // et.setBackground(new ColorDrawable(Color.TRANSPARENT));
                 // et.setBackgroundColor(Color.TRANSPARENT);
-                et.setHint(getResources().getString(R.string.nameStr));
+                et.setHint(getResources().getString(R.string.nameString));
                 et.setGravity(Gravity.CENTER);
-                AlertDialog alertD = new AlertDialog.Builder(mainActivity).create();
+                AlertDialog alertD = new AlertDialog.Builder(groundhogActivity).create();
                 alertD.setTitle(null);
                 alertD.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 alertD.setCancelable(false);
                 alertD.setView(et);
-                alertD.setButton(DialogInterface.BUTTON_NEGATIVE, getResources().getString(R.string.cancelStr), new DialogInterface.OnClickListener() {
+                alertD.setButton(DialogInterface.BUTTON_NEGATIVE, getResources().getString(R.string.cancelString), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
-                alertD.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.submitStr), new DialogInterface.OnClickListener() {
+                alertD.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.submitString), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -512,8 +512,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         GroundhogHunterApp.ScoreSQLiteDB.deleteAllAfterTop10();  // only keep the top 10
                         if (currentScore > highestScore) {
                             highestScore = currentScore;
-                            mainActivity.setHighestScore(highestScore);
-                            mainActivity.setTextForHighScoreTextView(String.valueOf(highestScore));
+                            groundhogActivity.setHighestScore(highestScore);
+                            groundhogActivity.setTextForHighScoreTextView(String.valueOf(highestScore));
                         }
                     }
                 });

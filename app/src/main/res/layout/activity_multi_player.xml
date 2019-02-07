@@ -43,14 +43,14 @@
             android:weightSum="10">
 
             <TextView
-                android:id="@+id/multiPlayerSettingTitle"
+                android:id="@+id/twoPlayerSettingTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:textColor="@color/white"
                 android:textStyle="bold"
-                android:text="@string/multiPlayerStr">
+                android:text="@string/twoPlayerString">
             </TextView>
 
             <LinearLayout
@@ -72,7 +72,7 @@
                         android:buttonTint="@color/yellow"
                         android:textColor="@color/yellow"
                         android:textAllCaps="false"
-                        android:text="@string/bluetoothStr">
+                        android:text="@string/bluetoothString">
                     </RadioButton>
                     <RadioButton
                         android:id="@+id/lanRadioButton"
@@ -81,7 +81,7 @@
                         android:buttonTint="@color/yellow"
                         android:textColor="@color/yellow"
                         android:textAllCaps="false"
-                        android:text="@string/lanStr">
+                        android:text="@string/lanString">
                     </RadioButton>
                     <RadioButton
                         android:id="@+id/internetRadioButton"
@@ -90,7 +90,7 @@
                         android:buttonTint="@color/yellow"
                         android:textColor="@color/yellow"
                         android:textAllCaps="false"
-                        android:text="@string/internetStr">
+                        android:text="@string/internetString">
                     </RadioButton>
                 </RadioGroup>
             </LinearLayout>
@@ -118,7 +118,7 @@
                         android:layout_marginRight="10dp"
                         android:layout_marginBottom="5dp"
                         android:background="@drawable/normal_button_image"
-                        android:text="@string/createGameStr">
+                        android:text="@string/createGameString">
                     </Button>
                     <Button
                         android:layout_width="0dp"
@@ -130,7 +130,7 @@
                         android:layout_marginRight="10dp"
                         android:layout_marginBottom="5dp"
                         android:background="@drawable/normal_button_image"
-                        android:text="@string/joinGameStr">
+                        android:text="@string/joinGameString">
                     </Button>
                 </LinearLayout>
                 <LinearLayout
@@ -162,7 +162,7 @@
                     android:layout_marginRight="10dp"
                     android:layout_marginBottom="5dp"
                     android:background="@drawable/normal_button_image"
-                    android:text="@string/cancelStr" >
+                    android:text="@string/cancelString" >
                 </Button>
                 <Button
                     android:id="@+id/confirmMultiPlayerButton"
@@ -177,7 +177,7 @@
                     android:layout_marginRight="10dp"
                     android:layout_marginBottom="5dp"
                     android:background="@drawable/normal_button_image"
-                    android:text="@string/okStr" >
+                    android:text="@string/okString" >
                 </Button>
             </LinearLayout>
 

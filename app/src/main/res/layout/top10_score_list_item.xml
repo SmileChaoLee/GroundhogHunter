@@ -7,7 +7,6 @@
     android:orientation="vertical">
 
     <TextView android:id="@+id/playerTextView"
-        android:textSize="22sp"
         android:textScaleX="1.0"
         android:typeface="monospace"
         android:layout_width="match_parent"
@@ -21,7 +20,6 @@
         android:weightSum="2">
 
         <TextView android:id="@+id/scoreTextView"
-            android:textSize="22sp"
             android:textScaleX="1.0"
             android:typeface="monospace"
             android:layout_width="0dp"

@@ -22,11 +22,11 @@ public class GroundhogRandomThread extends Thread {
 
     public void run() {
         while (keepRunning) {
-            synchronized (MainActivity.ActivityHandler) {
+            synchronized (GroundhogActivity.ActivityHandler) {
                 // for application's (Main activity) synchronizing
-                while (MainActivity.GamePause) {
+                while (GroundhogActivity.GamePause) {
                     try {
-                        MainActivity.ActivityHandler.wait();
+                        GroundhogActivity.ActivityHandler.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

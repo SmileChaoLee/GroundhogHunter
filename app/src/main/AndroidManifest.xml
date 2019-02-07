@@ -15,15 +15,12 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/google_AdMobAppID"/>
+            android:value="@string/google_AdMobAppID" />
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
 
-        <activity
-            android:name=".MainActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,34 +29,35 @@
         </activity>
 
         <activity
-            android:name=".Top10ScoreActivity"
+            android:name=".GroundhogActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeForTop10">
+            android:screenOrientation="portrait">
         </activity>
 
         <activity
-            android:name=".SettingActivity"
-            android:label="@string/settingStr"
-            android:theme="@style/AppThemeTransparent">
-        </activity>
-
-        <activity android:name=".MultiPlayerActivity"
+            android:name=".Top10ScoreActivity"
             android:configChanges="orientation"
-            android:label="@string/multipleStr"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeTransparent">
-        </activity>
+            android:theme="@style/AppThemeForTop10"></activity>
+        <activity
+            android:name=".SettingActivity"
+            android:label="@string/settingString"
+            android:theme="@style/AppThemeTransparent"></activity>
+        <activity
+            android:name=".MultiPlayerActivity"
+            android:configChanges="orientation"
+            android:label="@string/twoPlayerString"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeTransparent"></activity>
 
-        <service android:name=".Service.LocalTop10IntentService"
+        <service
+            android:name=".Service.LocalTop10IntentService"
             android:enabled="true"
-            android:exported="false">
-        </service>
-        <service android:name=".Service.GlobalTop10IntentService"
+            android:exported="false"></service>
+        <service
+            android:name=".Service.GlobalTop10IntentService"
             android:enabled="true"
-            android:exported="false">
-        </service>
-
+            android:exported="false"></service>
     </application>
 
 </manifest>

@@ -10,48 +10,50 @@
         <item>Stage 4</item>
     </string-array>
 
-    <string name="start_game_string">Start</string>
-    <string name="pause_game_string">Pause</string>
-    <string name="resume_game_string">Resume</string>
-    <string name="new_game_string">New</string>
-    <string name="quit_game_string">Quit</string>
-    <string name="okStr">Ok</string>
-    <string name="cancelStr">Cancel</string>
-    <string name="submitStr">Send</string>
-    <string name="nameStr">Input your name</string>
-    <string name="yesStr">YES</string>
-    <string name="noStr">NO</string>
-    <string name="highest_string">High:</string>
-    <string name="score_string">Score:</string>
-    <string name="timer_string">Timer:</string>
-    <string name="num_hit_string">Hits:</string>
-    <string name="local_top10_string">Top 10</string>
-    <string name="global_top10_string">Global Top 10</string>
+    <string name="startGameString">Start</string>
+    <string name="pauseGameString">Pause</string>
+    <string name="resumeGameString">Resume</string>
+    <string name="newGameString">New</string>
+    <string name="quitGameString">Quit</string>
+    <string name="okString">Ok</string>
+    <string name="cancelString">Cancel</string>
+    <string name="submitString">Send</string>
+    <string name="nameString">Input your name</string>
+    <string name="yesString">YES</string>
+    <string name="noString">NO</string>
+    <string name="highestString">High:</string>
+    <string name="scoreString">Score:</string>
+    <string name="timerString">Timer:</string>
+    <string name="numHitString">Hits:</string>
+    <string name="localTop10String">Top 10</string>
+    <string name="globalTop10String">Global Top 10</string>
 
-    <string name="local_top_10_score_str">Top 10 scores</string>              <!-- for menu item -->
-    <string name="activity_top_10_score">Top10ScoreActivity</string>    <!-- for activity name -->
-    <string name="local_top_10_score_title">Top 10 Scores</string>
-    <string name="global_top_10_score_title">Global Top 10 Scores</string>
+    <string name="localTop10ScoreString">Top 10 scores</string>              <!-- for menu item -->
+    <string name="activityTop10ScoreString">Top10ScoreActivity</string>    <!-- for activity name -->
+    <string name="localTop10ScoreTitleString">Top 10 Scores</string>
+    <string name="globalTop10ScoreTitleString">Global Top 10 Scores</string>
 
-    <string name="settingStr">Settings</string>
-    <string name="soundStr">Sound</string>
-    <string name="onStr">On</string>
-    <string name="offStr">Off</string>
-    <string name="numPlayersStr">#Players</string>
-    <string name="singleStr">Single</string>
-    <string name="multipleStr">Multiple</string>
-    <string name="singlePlayerStr">1-Player</string>
-    <string name="multiPlayerStr">N-Players</string>
+    <string name="settingString">Settings</string>
+    <string name="soundString">Sound</string>
+    <string name="onString">On</string>
+    <string name="offString">Off</string>
+    <string name="numPlayersString">#Players</string>
+    <string name="singlePlayerString">Single Player</string>
+    <string name="twoPlayerString">Two Players</string>
+    <string name="exitAppString">Exit Game</string>
 
-    <string name="bluetoothStr">Bluetooth</string>
-    <string name="lanStr">Local Network</string>
-    <string name="internetStr">Internet</string>
-    <string name="createGameStr">Create</string>
-    <string name="joinGameStr">Join</string>
+    <string name="bluetoothString">Bluetooth</string>
+    <string name="lanString">Local Network</string>
+    <string name="internetString">Internet</string>
+    <string name="createGameString">Create</string>
+    <string name="joinGameString">Join</string>
 
-    <string name="gameStatusStr">Status:</string>
+    <string name="gameStatusString">Status:</string>
     <string name="loadingString">Loading ...</string>
     <string name="showingAdsString">Showing Ads ...</string>
+
+    <string name="companyNameString">Smile Information Inc.</string>
+    <string name="companyContactEmailString">leechao1959@gmail.com</string>
 
     <string name="google_AdMobAppID">ca-app-pub-8354869049759576~9932277958</string>
 

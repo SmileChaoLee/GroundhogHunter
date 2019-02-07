@@ -14,7 +14,7 @@
         android:textScaleX="1.0"
         android:textColor="#ff0000ff"
         android:layout_gravity="center_horizontal"
-        android:text="@string/local_top_10_score_title" />
+        android:text="@string/localTop10ScoreTitleString" />
 
     <ListView
         android:id="@+id/top10ListView"
@@ -30,7 +30,7 @@
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/okStr"
+        android:text="@string/okString"
         android:textStyle="bold"
         android:background="@android:drawable/btn_default"
         android:layout_gravity="center"
