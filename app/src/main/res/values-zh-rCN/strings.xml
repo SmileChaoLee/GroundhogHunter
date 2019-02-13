@@ -54,6 +54,10 @@
     <string name="loadingString">下载中 ...</string>
     <string name="showingAdsString">广告显示中 ...</string>
 
+    <string name="bluetoothAlreadyOnString">蓝芽已经开启.</string>
+    <string name="bluetoothNotSupportedString">本机没有支援蓝芽.</string>
+    <string name="playNameCannotBeEmptyString">玩家名称不可以是空白.</string>
+
     <string name="companyNameString">微笑资讯有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>
 

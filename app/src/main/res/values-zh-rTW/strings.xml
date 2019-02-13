@@ -54,6 +54,10 @@
     <string name="loadingString">下載中 ...</string>
     <string name="showingAdsString">廣告顯示中 ...</string>
 
+    <string name="bluetoothAlreadyOnString">藍芽已經開啟.</string>
+    <string name="bluetoothNotSupportedString">本機沒有支援藍芽.</string>
+    <string name="playNameCannotBeEmptyString">玩家名稱不可以是空白.</string>
+
     <string name="companyNameString">微笑資訊有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>
 

@@ -52,6 +52,10 @@
     <string name="loadingString">Loading ...</string>
     <string name="showingAdsString">Showing Ads ...</string>
 
+    <string name="bluetoothAlreadyOnString">Bluetooth has been on already.</string>
+    <string name="bluetoothNotSupportedString">Bluetooth is not supported on device.</string>
+    <string name="playNameCannotBeEmptyString">Player name cannot be empty.</string>
+
     <string name="companyNameString">Smile Information Inc.</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>
 
