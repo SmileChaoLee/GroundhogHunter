@@ -43,7 +43,7 @@
     <string name="exitAppString">Exit Game</string>
 
     <string name="bluetoothString">Bluetooth</string>
-    <string name="lanString">Local Network</string>
+    <string name="wifiString">Local Wifi</string>
     <string name="internetString">Internet</string>
     <string name="createGameString">Create</string>
     <string name="joinGameString">Join</string>

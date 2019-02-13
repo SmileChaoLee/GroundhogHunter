@@ -38,7 +38,7 @@
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="#550000ff"
+            android:background="@color/blue1"
             android:layout_weight="6"
             android:weightSum="5">
             <TextView

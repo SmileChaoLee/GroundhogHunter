@@ -1,8 +1,8 @@
 package com.smile.groundhoghunter;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.multidex.MultiDexApplication;
 
 import com.google.android.gms.ads.MobileAds;
 import com.smile.smilepublicclasseslibrary.facebook_ads_util.*;
@@ -11,7 +11,7 @@ import com.smile.smilepublicclasseslibrary.scoresqlite.*;
 import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
-public class GroundhogHunterApp extends Application {
+public class GroundhogHunterApp extends MultiDexApplication {
 
     // public final String REST_Website = new String("http://192.168.0.11:5000/Playerscore");
     // public static final String REST_Website = "http://ec2-13-59-195-3.us-east-2.compute.amazonaws.com/Playerscore";

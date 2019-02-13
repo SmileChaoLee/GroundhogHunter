@@ -45,7 +45,7 @@
     <string name="exitAppString">離開遊戲</string>
 
     <string name="bluetoothString">藍芽</string>
-    <string name="lanString">區域網路</string>
+    <string name="wifiString">區域無線網路</string>
     <string name="internetString">網際網路</string>
     <string name="createGameString">創立</string>
     <string name="joinGameString">加入</string>

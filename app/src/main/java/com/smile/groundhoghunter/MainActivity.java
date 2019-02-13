@@ -1,18 +1,14 @@
 package com.smile.groundhoghunter;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.smile.groundhoghunter.Model.SmileImageButton;
-import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -63,6 +59,13 @@ public class MainActivity extends AppCompatActivity {
         buttonLp.topMargin = buttonTopMargin;
         buttonLp.rightMargin = buttonRightMargin;
         buttonLp.bottomMargin = buttonBottomMargin;
+        twoPlayerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent multiPlayerIntent = new Intent(MainActivity.this, TwoPlayerActivity.class);
+                startActivity(multiPlayerIntent);
+            }
+        });
 
         Button exitAppButton = findViewById(R.id.exitAppButton);
         ScreenUtil.resizeTextSize(exitAppButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
