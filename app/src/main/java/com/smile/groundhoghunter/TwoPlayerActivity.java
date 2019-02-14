@@ -2,8 +2,11 @@ package com.smile.groundhoghunter;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -33,11 +36,14 @@ import java.util.List;
 public class TwoPlayerActivity extends AppCompatActivity {
 
     private static final String TAG = "TwoPlayerActivity";
-    private static final int REQUEST_ENABLE_BLUETOOTH_FOR_BEING_DISCOVERED = 1; // request to enable bluetooth for being discovered
-    private static final int REQUEST_ENABLE_BLUETOOTH_FOR_DISCOVERING = 2; // request to enable bluetooth for discovering
+    private static final int Request_Enable_Bluetooth_For_Being_Discovered = 1; // request to enable bluetooth for being discovered
+    private static final int Request_Enable_Bluetooth_For_Discovering = 2; // request to enable bluetooth for discovering
+    private static final int Request_Enable_Bluetooth_Discoverability = 3;
+    private static final int durationForBluetoothVisible = 300;   // 300 sec.
     // private properties
     private float textFontSize;
     private float fontScale;
+    private float toastTextSize;
 
     private boolean isDefaultBluetoothEnabled;
     private int mediaType;
@@ -51,6 +57,14 @@ public class TwoPlayerActivity extends AppCompatActivity {
     private String bluetoothAlreadyOnString;
     private String bluetoothNotSupportedString;
     private String playNameCannotBeEmptyString;
+    private String bluetoothVisibilityForPeriodString;
+    private String bluetoothVisibilityIsDisabledString;
+    private String bluetoothRefusedByUserString;
+    private String bluetoothCannotBeTurnedOnString;
+    private String bluetoothCannotBeVisibleString;
+
+    private TwoPlayerListAdapter twoPlayerListAdapter;
+    private TwoPlayerBroadcastReceiver twoPlayerReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,10 +79,18 @@ public class TwoPlayerActivity extends AppCompatActivity {
         float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
         textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
         fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        toastTextSize = textFontSize * 0.8f;
 
         bluetoothAlreadyOnString = getString(R.string.bluetoothAlreadyOnString);
         bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
         playNameCannotBeEmptyString = getString(R.string.playNameCannotBeEmptyString);
+        bluetoothVisibilityForPeriodString = getString(R.string.bluetoothVisibilityForPeriodString)
+                + "(" + durationForBluetoothVisible + " " + getString(R.string.secondString) + ")";
+        bluetoothVisibilityIsDisabledString = getString(R.string.bluetoothVisibilityIsDisabledString);
+        bluetoothRefusedByUserString = getString(R.string.bluetoothRefusedByUserString);
+        bluetoothCannotBeTurnedOnString = getString(R.string.bluetoothCannotBeTurnedOnString);
+        bluetoothCannotBeVisibleString = getString(R.string.bluetoothCannotBeVisibleString);
+
         mediaType = GameView.BluetoothMediaType;
 
         Bundle extras = getIntent().getExtras();
@@ -87,15 +109,20 @@ public class TwoPlayerActivity extends AppCompatActivity {
 
         playerListView = findViewById(R.id.playerListView);
         playerNameList = new ArrayList<>();
-        playerListView.setAdapter(new twoPlayerListAdapter(this, R.layout.player_list_item_layout, R.id.playerNameTextView, playerNameList));
+        twoPlayerListAdapter = new TwoPlayerListAdapter(this, R.layout.player_list_item_layout, R.id.playerNameTextView, playerNameList);
+        twoPlayerListAdapter.setNotifyOnChange(false);  // do not call notifyDataSetChanged() method automatically
+        playerListView.setAdapter(twoPlayerListAdapter);
         playerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long rowId) {
                 if (adapterView != null) {
-                    String temp = adapterView.getItemAtPosition(position).toString();
-                    Log.d(TAG, "adapterView.getItemAtPosition(position) = " + temp);
-                    oppositePlayerName = temp;
-                    view.setSelected(true);
+                    Object item = adapterView.getItemAtPosition(position);
+                    if (item != null) {
+                        String temp = item.toString();
+                        Log.d(TAG, "adapterView.getItemAtPosition(position) = " + temp);
+                        oppositePlayerName = temp;
+                        view.setSelected(true);
+                    }
                 }
             }
         });
@@ -172,19 +199,21 @@ public class TwoPlayerActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Host game. Turn on Bluetooth and make this device visible to others
                 if (playerName.isEmpty()) {
-                    ScreenUtil.showToast(TwoPlayerActivity.this, playNameCannotBeEmptyString, textFontSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                    ScreenUtil.showToast(TwoPlayerActivity.this, playNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
                     return;
                 }
                 if (mBluetoothAdapter == null) {
                     // this device does not support Bluetooth
-                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothNotSupportedString, textFontSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothNotSupportedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
                 } else {
+                    playerNameList.clear();
+                    twoPlayerListAdapter.notifyDataSetChanged();
                     if (!mBluetoothAdapter.isEnabled()) {
                         // has not been enabled yet
                         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH_FOR_BEING_DISCOVERED);
+                        startActivityForResult(enableBtIntent, Request_Enable_Bluetooth_For_Being_Discovered);
                     } else {
-                        onActivityResult(REQUEST_ENABLE_BLUETOOTH_FOR_BEING_DISCOVERED, Activity.RESULT_OK, null);
+                        onActivityResult(Request_Enable_Bluetooth_For_Being_Discovered, Activity.RESULT_OK, null);
                     }
                 }
             }
@@ -196,18 +225,18 @@ public class TwoPlayerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (playerName.isEmpty()) {
-                    ScreenUtil.showToast(TwoPlayerActivity.this, playNameCannotBeEmptyString, textFontSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                    ScreenUtil.showToast(TwoPlayerActivity.this, playNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
                 }
                 if (mBluetoothAdapter == null) {
                     // this device does not support Bluetooth
-                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothNotSupportedString, textFontSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothNotSupportedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
                 } else {
                     if (!mBluetoothAdapter.isEnabled()) {
                         // has not been enabled yet
                         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH_FOR_DISCOVERING);
+                        startActivityForResult(enableBtIntent, Request_Enable_Bluetooth_For_Discovering);
                     } else {
-                        onActivityResult(REQUEST_ENABLE_BLUETOOTH_FOR_DISCOVERING, Activity.RESULT_OK, null);
+                        onActivityResult(Request_Enable_Bluetooth_For_Discovering, Activity.RESULT_OK, null);
                     }
                 }
             }
@@ -230,23 +259,46 @@ public class TwoPlayerActivity extends AppCompatActivity {
                 returnToPrevious(false);
             }
         });
+
+        // BroadcastReceiver
+
+        twoPlayerReceiver = new TwoPlayerBroadcastReceiver();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "Response from bluetooth activity.");
+
         switch(requestCode) {
-            case REQUEST_ENABLE_BLUETOOTH_FOR_BEING_DISCOVERED:
+            case Request_Enable_Bluetooth_For_Being_Discovered:
                 if (resultCode == Activity.RESULT_OK) {
-                    // succeeded to enable bluetooth
-                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothAlreadyOnString, textFontSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                    // succeeded to enable bluetooth. Start enabling discoverability
+                    Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+                    discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, durationForBluetoothVisible);
+                    startActivityForResult(discoverableIntent, Request_Enable_Bluetooth_Discoverability);
+                    // ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothAlreadyOnString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                } else {
+                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothCannotBeTurnedOnString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
                 }
                 break;
-            case REQUEST_ENABLE_BLUETOOTH_FOR_DISCOVERING:
+            case Request_Enable_Bluetooth_For_Discovering:
                 if (resultCode == Activity.RESULT_OK) {
                     // succeeded to enable bluetooth
-                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothAlreadyOnString, textFontSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothAlreadyOnString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                    mBluetoothAdapter.startDiscovery();
+                    ScreenUtil.showToast(TwoPlayerActivity.this, "Start discovering .......", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                }else {
+                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothCannotBeTurnedOnString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                }
+                break;
+            case Request_Enable_Bluetooth_Discoverability:
+                // if (resultCode == durationForBluetoothVisible) {
+                if (resultCode != Activity.RESULT_CANCELED) {
+                    // succeeded
+                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothVisibilityForPeriodString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                } else {
+                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothCannotBeVisibleString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
                 }
                 break;
             default:
@@ -255,8 +307,18 @@ public class TwoPlayerActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        returnToPrevious(false);
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(twoPlayerReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(twoPlayerReceiver);
     }
 
     @Override
@@ -269,11 +331,18 @@ public class TwoPlayerActivity extends AppCompatActivity {
             } else {
                 mBluetoothAdapter.disable();
             }
+            // disable the discoverability 1 second later
+            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 1);
         }
     }
 
-    private void returnToPrevious(boolean confirmed) {
+    @Override
+    public void onBackPressed() {
+        returnToPrevious(false);
+    }
 
+    private void returnToPrevious(boolean confirmed) {
         Intent returnIntent = new Intent();
         Bundle extras = new Bundle();
         extras.putInt("MediaType", mediaType);
@@ -290,13 +359,13 @@ public class TwoPlayerActivity extends AppCompatActivity {
         finish();
     }
 
-    private class twoPlayerListAdapter extends ArrayAdapter {
+    private class TwoPlayerListAdapter extends ArrayAdapter {
 
         private final int mResourceId;
         private final int mTextViewResourceId;
 
         @SuppressWarnings("unchecked")
-        public twoPlayerListAdapter(@NonNull Context context, int resource, int textViewResourceId, @NonNull List objects) {
+        public TwoPlayerListAdapter(@NonNull Context context, int resource, int textViewResourceId, @NonNull List objects) {
             super(context, resource, textViewResourceId, objects);
             mResourceId = resource;
             mTextViewResourceId = textViewResourceId;
@@ -334,6 +403,48 @@ public class TwoPlayerActivity extends AppCompatActivity {
             }
 
             return view;
+        }
+    }
+
+    private class TwoPlayerBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = "";
+            if (intent != null) {
+                action = intent.getAction();
+            }
+
+            ScreenUtil.showToast(TwoPlayerActivity.this, "onReceiver() --> Get messages from bluetooth ", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+
+            switch (action) {
+                case BluetoothAdapter.ACTION_SCAN_MODE_CHANGED:
+                    int extraPreviousScanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_SCAN_MODE, BluetoothAdapter.ERROR);
+                    int extraScanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
+                    if (extraPreviousScanMode != extraScanMode) {
+                        if ((extraScanMode == BluetoothAdapter.SCAN_MODE_CONNECTABLE) || (extraScanMode == BluetoothAdapter.SCAN_MODE_NONE)) {
+                            ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothVisibilityIsDisabledString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                        }
+                    }
+                    break;
+                case BluetoothDevice.ACTION_FOUND:
+                    // Discovery has found a device. Get the BluetoothDevice
+                    // object and its info from the Intent.
+                    mBluetoothAdapter.cancelDiscovery();
+                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    String deviceName = device.getName();
+                    String deviceHardwareAddress = device.getAddress(); // MAC address
+                    if ( (deviceName != null) && (!deviceName.isEmpty()) )
+                    {
+                        ScreenUtil.showToast(TwoPlayerActivity.this, deviceName, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                        if (!playerNameList.contains(deviceName)) {
+                            // not contains
+                            playerNameList.add(deviceName);
+                            twoPlayerListAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    break;
+            }
         }
     }
 }

@@ -12,6 +12,7 @@
         <item>第四关</item>
     </string-array>
 
+    <string name="secondString">秒</string>
     <string name="startGameString">开始</string>
     <string name="pauseGameString">暂停</string>
     <string name="resumeGameString">恢复</string>
@@ -55,8 +56,13 @@
     <string name="showingAdsString">广告显示中 ...</string>
 
     <string name="bluetoothAlreadyOnString">蓝芽已经开启.</string>
+    <string name="bluetoothCannotBeTurnedOnString">蓝芽无法被开启.</string>
     <string name="bluetoothNotSupportedString">本机没有支援蓝芽.</string>
     <string name="playNameCannotBeEmptyString">玩家名称不可以是空白.</string>
+    <string name="bluetoothVisibilityForPeriodString">蓝芽在短时间内可被侦测</string>
+    <string name="bluetoothCannotBeVisibleString">蓝芽被侦测功能无法启动</string>
+    <string name="bluetoothVisibilityIsDisabledString">蓝芽被侦测的功能已关闭.</string>
+    <string name="bluetoothRefusedByUserString">被使用者拒绝.</string>
 
     <string name="companyNameString">微笑资讯有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>
