@@ -8,26 +8,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.smile.smilepublicclasseslibrary.alertdialogfragment.AlertDialogFragment;
+import com.smile.groundhoghunter.Model.SmileImageButton;
+import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
     private int mediaType;
     private BluetoothAdapter mBluetoothAdapter;
 
-    private EditText playerNameEditText;
+    private TextView playerNameTextView;
     private String playerName;
     private String oppositePlayerName;
     private ListView playerListView;
@@ -62,6 +62,10 @@ public class TwoPlayerActivity extends AppCompatActivity {
     private String bluetoothRefusedByUserString;
     private String bluetoothCannotBeTurnedOnString;
     private String bluetoothCannotBeVisibleString;
+    private String scanBluetoothStartedString;
+    private String scanBluetoothFinishedString;
+    private String stopScanningBluetoothString;
+    private String deviceNameString;
 
     private TwoPlayerListAdapter twoPlayerListAdapter;
     private TwoPlayerBroadcastReceiver twoPlayerReceiver;
@@ -69,11 +73,23 @@ public class TwoPlayerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        // BroadcastReceiver and register it
+        twoPlayerReceiver = new TwoPlayerBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        registerReceiver(twoPlayerReceiver, intentFilter);
+
         // device detecting
         // Bluetooth
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter != null) {
             isDefaultBluetoothEnabled = mBluetoothAdapter.isEnabled();
+            if (mBluetoothAdapter.isDiscovering()) {
+                mBluetoothAdapter.cancelDiscovery();
+            }
         }
 
         float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
@@ -90,6 +106,15 @@ public class TwoPlayerActivity extends AppCompatActivity {
         bluetoothRefusedByUserString = getString(R.string.bluetoothRefusedByUserString);
         bluetoothCannotBeTurnedOnString = getString(R.string.bluetoothCannotBeTurnedOnString);
         bluetoothCannotBeVisibleString = getString(R.string.bluetoothCannotBeVisibleString);
+        scanBluetoothStartedString = getString(R.string.scanBluetoothStartedString);
+        stopScanningBluetoothString = getString(R.string.stopScanningBluetoothString);
+        scanBluetoothFinishedString = getString(R.string.scanBluetoothFinishedString);
+        deviceNameString = getString(R.string.deviceNameString);
+
+        int colorDarkOrange = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkOrange);
+        int colorRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.red);
+        int colorDarkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed);
+        int colorDarkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
 
         mediaType = GameView.BluetoothMediaType;
 
@@ -170,30 +195,26 @@ public class TwoPlayerActivity extends AppCompatActivity {
                 break;
         }
 
+        TextView deviceNameStringTextView = findViewById(R.id.deviceNameStringTextView);
+        ScreenUtil.resizeTextSize(deviceNameStringTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+
         playerName = "";
-        playerNameEditText = findViewById(R.id.playerNameEditText);
-        playerNameEditText.setText(playerName);
-        ScreenUtil.resizeTextSize(playerNameEditText, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-        playerNameEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+        if (mBluetoothAdapter != null) {
+            playerName = mBluetoothAdapter.getName();
+            if (playerName == null) {
+                playerName = mBluetoothAdapter.getAddress();
+                if (playerName == null) {
+                   playerName = "";
+                }
             }
+        }
+        playerNameTextView = findViewById(R.id.playerNameTextView);
+        playerNameTextView.setText(playerName);
+        ScreenUtil.resizeTextSize(playerNameTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                playerName = editable.toString();
-                Log.d(TAG, "playerName = " + playerName);
-            }
-        });
-
-        final Button createGameButton = findViewById(R.id.createGameButton);
-        ScreenUtil.resizeTextSize(createGameButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        final SmileImageButton createGameButton = findViewById(R.id.createGameButton);
+        Bitmap createGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.createGameString), colorDarkGreen);
+        createGameButton.setImageBitmap(createGameBitmap);
         createGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -219,8 +240,9 @@ public class TwoPlayerActivity extends AppCompatActivity {
             }
         });
 
-        final Button joinGameButton = findViewById(R.id.joinGameButton);
-        ScreenUtil.resizeTextSize(joinGameButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        final SmileImageButton joinGameButton = findViewById(R.id.joinGameButton);
+        Bitmap joinGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.joinGameString), colorDarkGreen);
+        joinGameButton.setImageBitmap(joinGameBitmap);
         joinGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -242,17 +264,9 @@ public class TwoPlayerActivity extends AppCompatActivity {
             }
         });
 
-        final Button confirmButton = findViewById(R.id.confirmTwoPlayerButton);
-        ScreenUtil.resizeTextSize(confirmButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-        confirmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                returnToPrevious(true);
-            }
-        });
-
-        final Button cancelButton = findViewById(R.id.cancelTwoPlayerButton);
-        ScreenUtil.resizeTextSize(cancelButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        final SmileImageButton cancelButton = findViewById(R.id.cancelTwoPlayerButton);
+        Bitmap cancelGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.cancelString), colorDarkRed);
+        cancelButton.setImageBitmap(cancelGameBitmap);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -260,9 +274,16 @@ public class TwoPlayerActivity extends AppCompatActivity {
             }
         });
 
-        // BroadcastReceiver
+        final SmileImageButton confirmButton = findViewById(R.id.confirmTwoPlayerButton);
+        Bitmap confirmGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.okString), colorDarkGreen);
+        confirmButton.setImageBitmap(confirmGameBitmap);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                returnToPrevious(true);
+            }
+        });
 
-        twoPlayerReceiver = new TwoPlayerBroadcastReceiver();
     }
 
     @Override
@@ -285,9 +306,16 @@ public class TwoPlayerActivity extends AppCompatActivity {
             case Request_Enable_Bluetooth_For_Discovering:
                 if (resultCode == Activity.RESULT_OK) {
                     // succeeded to enable bluetooth
-                    ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothAlreadyOnString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                    // ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothAlreadyOnString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+
+                    playerNameList.clear(); // clear name list
+                    twoPlayerListAdapter.notifyDataSetChanged();
+
+                    if (mBluetoothAdapter.isDiscovering()) {
+                        // if discovering then stop discovering
+                        mBluetoothAdapter.cancelDiscovery();
+                    }
                     mBluetoothAdapter.startDiscovery();
-                    ScreenUtil.showToast(TwoPlayerActivity.this, "Start discovering .......", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
                 }else {
                     ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothCannotBeTurnedOnString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
                 }
@@ -309,16 +337,11 @@ public class TwoPlayerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-        intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(twoPlayerReceiver, intentFilter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(twoPlayerReceiver);
     }
 
     @Override
@@ -326,14 +349,19 @@ public class TwoPlayerActivity extends AppCompatActivity {
         super.onDestroy();
         // recover the status of bluetooth
         if (mBluetoothAdapter != null) {
+            if (mBluetoothAdapter.isDiscovering()) {
+                ScreenUtil.showToast(TwoPlayerActivity.this, stopScanningBluetoothString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                mBluetoothAdapter.cancelDiscovery();
+            }
             if (isDefaultBluetoothEnabled) {
                 mBluetoothAdapter.enable();
             } else {
                 mBluetoothAdapter.disable();
             }
-            // disable the discoverability 1 second later
-            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 1);
+        }
+
+        if (twoPlayerListAdapter != null) {
+            unregisterReceiver(twoPlayerReceiver);
         }
     }
 
@@ -414,9 +442,6 @@ public class TwoPlayerActivity extends AppCompatActivity {
             if (intent != null) {
                 action = intent.getAction();
             }
-
-            ScreenUtil.showToast(TwoPlayerActivity.this, "onReceiver() --> Get messages from bluetooth ", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
-
             switch (action) {
                 case BluetoothAdapter.ACTION_SCAN_MODE_CHANGED:
                     int extraPreviousScanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_SCAN_MODE, BluetoothAdapter.ERROR);
@@ -430,19 +455,31 @@ public class TwoPlayerActivity extends AppCompatActivity {
                 case BluetoothDevice.ACTION_FOUND:
                     // Discovery has found a device. Get the BluetoothDevice
                     // object and its info from the Intent.
-                    mBluetoothAdapter.cancelDiscovery();
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     String deviceName = device.getName();
                     String deviceHardwareAddress = device.getAddress(); // MAC address
-                    if ( (deviceName != null) && (!deviceName.isEmpty()) )
-                    {
-                        ScreenUtil.showToast(TwoPlayerActivity.this, deviceName, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                    // ScreenUtil.showToast(TwoPlayerActivity.this, deviceName, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    String tempPlayerName = "";
+                    if ( (deviceName != null) && (!deviceName.isEmpty()) ) {
                         if (!playerNameList.contains(deviceName)) {
                             // not contains
-                            playerNameList.add(deviceName);
-                            twoPlayerListAdapter.notifyDataSetChanged();
+                            tempPlayerName = deviceName;
+                        }
+                    } else {
+                        if ( (deviceHardwareAddress != null) && (!deviceHardwareAddress.isEmpty()) ) {
+                            tempPlayerName = deviceHardwareAddress;
                         }
                     }
+                    if (!tempPlayerName.isEmpty()) {
+                        playerNameList.add(tempPlayerName);
+                        twoPlayerListAdapter.notifyDataSetChanged();
+                    }
+                    break;
+                case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
+                    ScreenUtil.showToast(TwoPlayerActivity.this, scanBluetoothStartedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                    break;
+                case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
+                    ScreenUtil.showToast(TwoPlayerActivity.this, scanBluetoothFinishedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
                     break;
             }
         }

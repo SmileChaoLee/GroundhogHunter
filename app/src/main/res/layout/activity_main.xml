@@ -34,39 +34,38 @@
         app:layout_constraintTop_toBottomOf="@id/dummy1TextView"
         android:weightSum="3">
 
-        <Button
+        <com.smile.groundhoghunter.Model.SmileImageButton
             android:id="@+id/singlePlayerButton"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:text="@string/singlePlayerString"
             android:textAllCaps="false"
-            android:textColor="@color/blue"
-            android:gravity="center"
-            android:background="@drawable/normal_button_image"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"
+            android:background="@android:color/transparent"
             android:layout_weight="1">
-        </Button>
+        </com.smile.groundhoghunter.Model.SmileImageButton>
 
-        <Button
+        <com.smile.groundhoghunter.Model.SmileImageButton
             android:id="@+id/twoPlayerButton"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:text="@string/twoPlayerString"
             android:textAllCaps="false"
-            android:textColor="@color/blue"
-            android:background="@drawable/normal_button_image"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"
+            android:background="@android:color/transparent"
             android:layout_weight="1">
-        </Button>
+        </com.smile.groundhoghunter.Model.SmileImageButton>
 
-        <Button
+        <com.smile.groundhoghunter.Model.SmileImageButton
             android:id="@+id/exitAppButton"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:text="@string/exitAppString"
             android:textAllCaps="false"
-            android:textColor="@color/darkRed"
-            android:background="@drawable/normal_button_image"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"
+            android:background="@android:color/transparent"
             android:layout_weight="1">
-        </Button>
+        </com.smile.groundhoghunter.Model.SmileImageButton>
     </LinearLayout>
 
     <TextView

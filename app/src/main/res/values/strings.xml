@@ -61,6 +61,10 @@
     <string name="bluetoothCannotBeVisibleString">Bluetooth visibility cannot be enabled.</string>
     <string name="bluetoothVisibilityIsDisabledString">Bluetooth visibility was disabled.</string>
     <string name="bluetoothRefusedByUserString">Refused by user.</string>
+    <string name="scanBluetoothStartedString">Scanning Bluetooth devices started.</string>
+    <string name="scanBluetoothFinishedString">Scanning Bluetooth devices finished.</string>
+    <string name="stopScanningBluetoothString">Stop scaning Bluetooth devices.</string>
+    <string name="deviceNameString">Device name:</string>
 
     <string name="companyNameString">Smile Information Inc.</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

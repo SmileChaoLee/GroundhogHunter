@@ -63,6 +63,10 @@
     <string name="bluetoothCannotBeVisibleString">蓝芽被侦测功能无法启动</string>
     <string name="bluetoothVisibilityIsDisabledString">蓝芽被侦测的功能已关闭.</string>
     <string name="bluetoothRefusedByUserString">被使用者拒绝.</string>
+    <string name="scanBluetoothStartedString">开始侦测蓝芽裝置.</string>
+    <string name="scanBluetoothFinishedString">完成侦测蓝芽裝置.</string>
+    <string name="stopScanningBluetoothString">停止侦测蓝牙装置.</string>
+    <string name="deviceNameString">设备名称:</string>
 
     <string name="companyNameString">微笑资讯有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

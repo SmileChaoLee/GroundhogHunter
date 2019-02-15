@@ -29,7 +29,7 @@ public class FontAndBitmapUtil {
         // draw start button
         TextPaint paint = new TextPaint();
         paint.setColor(textColor);
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setAntiAlias(true);
 
