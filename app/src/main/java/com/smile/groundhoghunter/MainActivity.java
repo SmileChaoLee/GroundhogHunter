@@ -7,16 +7,17 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.smile.groundhoghunter.Model.SmileImageButton;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
+import com.smile.smilepublicclasseslibrary.privacy_policy.PrivacyPolicyUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final int PrivacyPolicyActivityRequestCode = 10;
     private float textFontSize;
     private float fontScale;
 
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
         String singlePlayerString = getString(R.string.singlePlayerString);
         String twoPlayerString = getString(R.string.twoPlayerString);
+        String privacyPolicyString = getString(com.smile.smilepublicclasseslibrary.R.string.privacyPolicyString);
         String exitAppString = getString(R.string.exitAppString);
 
         int colorDarkOrange = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkOrange);
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        int buttonLeftMargin = ScreenUtil.dpToPixel(this, 50);
+        int buttonLeftMargin = ScreenUtil.dpToPixel(this, 60);
         int buttonTopMargin = ScreenUtil.dpToPixel(this, 10);
         int buttonRightMargin = buttonLeftMargin;
         int buttonBottomMargin = buttonTopMargin;
@@ -63,6 +65,10 @@ public class MainActivity extends AppCompatActivity {
 
         final SmileImageButton twoPlayerButton = findViewById(R.id.twoPlayerButton);
         Bitmap twoPlayerBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, twoPlayerString, Color.BLUE);
+        if (!BuildConfig.DEBUG) {
+            twoPlayerButton.setEnabled(false);
+            twoPlayerButton.setVisibility(View.GONE);
+        }
         twoPlayerButton.setImageBitmap(twoPlayerBitmap);
         buttonLp = (LinearLayout.LayoutParams) twoPlayerButton.getLayoutParams();
         buttonLp.leftMargin = buttonLeftMargin;
@@ -74,6 +80,21 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent multiPlayerIntent = new Intent(MainActivity.this, TwoPlayerActivity.class);
                 startActivity(multiPlayerIntent);
+            }
+        });
+
+        final SmileImageButton privacyPolicyButton = findViewById(R.id.privacyPolicyButton);
+        Bitmap privacyPolicyBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, privacyPolicyString, Color.BLUE);
+        privacyPolicyButton.setImageBitmap(privacyPolicyBitmap);
+        buttonLp = (LinearLayout.LayoutParams) privacyPolicyButton.getLayoutParams();
+        buttonLp.leftMargin = buttonLeftMargin;
+        buttonLp.topMargin = buttonTopMargin;
+        buttonLp.rightMargin = buttonRightMargin;
+        buttonLp.bottomMargin = buttonBottomMargin;
+        privacyPolicyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PrivacyPolicyUtil.startPrivacyPolicyActivity(MainActivity.this, GroundhogHunterApp.PrivacyPolicyUrl, PrivacyPolicyActivityRequestCode);
             }
         });
 

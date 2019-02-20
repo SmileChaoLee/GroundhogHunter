@@ -448,7 +448,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
                     int extraScanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
                     if (extraPreviousScanMode != extraScanMode) {
                         if ((extraScanMode == BluetoothAdapter.SCAN_MODE_CONNECTABLE) || (extraScanMode == BluetoothAdapter.SCAN_MODE_NONE)) {
-                            ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothVisibilityIsDisabledString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+                            ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothVisibilityIsDisabledString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                         }
                     }
                     break;

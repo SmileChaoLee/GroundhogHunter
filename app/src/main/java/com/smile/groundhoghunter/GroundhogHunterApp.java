@@ -25,6 +25,7 @@ public class GroundhogHunterApp extends MultiDexApplication {
 
     public static ShowingInterstitialAdsUtil InterstitialAd;
     public static String googleAdMobBannerID = "";
+    public static final String PrivacyPolicyUrl = "http://ec2-13-59-195-3.us-east-2.compute.amazonaws.com/PrivacyPolicy";
 
     private static FacebookInterstitialAds facebookAds;
     private static GoogleAdMobInterstitial googleInterstitialAd;
