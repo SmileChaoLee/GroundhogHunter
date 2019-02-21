@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter.Service;
+package com.smile.groundhoghunter.Services;
 
 import android.app.IntentService;
 import android.content.Intent;

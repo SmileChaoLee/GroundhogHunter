@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.smile.groundhoghunter.Model.SmileImageButton;
+import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.privacy_policy.PrivacyPolicyUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
@@ -65,10 +65,12 @@ public class MainActivity extends AppCompatActivity {
 
         final SmileImageButton twoPlayerButton = findViewById(R.id.twoPlayerButton);
         Bitmap twoPlayerBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, twoPlayerString, Color.BLUE);
+        /*
         if (!BuildConfig.DEBUG) {
             twoPlayerButton.setEnabled(false);
             twoPlayerButton.setVisibility(View.GONE);
         }
+        */
         twoPlayerButton.setImageBitmap(twoPlayerBitmap);
         buttonLp = (LinearLayout.LayoutParams) twoPlayerButton.getLayoutParams();
         buttonLp.leftMargin = buttonLeftMargin;

@@ -1,6 +1,6 @@
 package com.smile.groundhoghunter;
 
-import com.smile.groundhoghunter.Model.Groundhog;
+import com.smile.groundhoghunter.Models.Groundhog;
 
 import java.util.Random;
 

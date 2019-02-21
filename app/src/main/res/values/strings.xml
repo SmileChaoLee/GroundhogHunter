@@ -65,6 +65,10 @@
     <string name="scanBluetoothFinishedString">Scanning Bluetooth devices finished.</string>
     <string name="stopScanningBluetoothString">Stop scaning Bluetooth devices.</string>
     <string name="deviceNameString">Device name:</string>
+    <string name="waitingForConnectionString">Waiting for connection.</string>
+    <string name="waitingIsStoppedOrTimeoutString">Waiting for connection stopped or timeout.</string>
+    <string name="connectToHostSucceededString">Succeeded to connect to Host.</string>
+    <string name="connectToHostFailedString">Failed to connect to Host.</string>
 
     <string name="companyNameString">Smile Information Inc.</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

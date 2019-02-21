@@ -67,6 +67,10 @@
     <string name="scanBluetoothFinishedString">完成偵測藍芽裝置.</string>
     <string name="stopScanningBluetoothString">停止偵測藍牙裝置.</string>
     <string name="deviceNameString">設備名稱:</string>
+    <string name="waitingForConnectionString">等待連線.</string>
+    <string name="waitingIsStoppedOrTimeoutString">等待連線已停止或逾時.</string>
+    <string name="connectToHostSucceededString">成功地連到主遊戲.</string>
+    <string name="connectToHostFailedString">連線到主遊戲失敗.</string>
 
     <string name="companyNameString">微笑資訊有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

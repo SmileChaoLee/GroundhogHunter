@@ -24,7 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.smile.groundhoghunter.Model.Groundhog;
+import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.groundhoghunter.Utilities.SoundUtil;
 import com.smile.smilepublicclasseslibrary.player_record_rest.PlayerRecordRest;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
@@ -64,8 +64,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     // public static final properties
     public static final Handler GameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
     public static final int BluetoothMediaType = 0;
-    public static final int LanMediaType = 1;
+    public static final int wifiMediaType = 1;
     public static final int InternetMediaType = 2;
+    public static final int NoneMediaType = -1;
     public static final int TimerInterval = 60; // 60 seconds
     public static final int DrawingInterval;
     public static final int NumberOfGroundhogTypes;

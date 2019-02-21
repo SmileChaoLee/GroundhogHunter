@@ -1,11 +1,10 @@
-package com.smile.groundhoghunter.Model;
+package com.smile.groundhoghunter.Models;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
 
 public class SmileImageButton extends android.support.v7.widget.AppCompatImageButton implements View.OnTouchListener {
 

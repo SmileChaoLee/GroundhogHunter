@@ -35,38 +35,39 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp">
-            <RadioButton
+            <android.support.v7.widget.AppCompatRadioButton
                 android:id="@+id/bluetoothRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:buttonTint="@color/blue"
+                app:buttonTint="@color/darkRed"
                 android:textColor="@color/blue"
                 android:textAllCaps="false"
                 android:textStyle="normal"
-                android:text="@string/bluetoothString">
-            </RadioButton>
-            <RadioButton
+                android:text="@string/bluetoothString"
+                android:enabled="true">
+            </android.support.v7.widget.AppCompatRadioButton>
+            <android.support.v7.widget.AppCompatRadioButton
                 android:id="@+id/lanRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:buttonTint="@color/blue"
+                app:buttonTint="@color/darkRed"
                 android:textColor="@color/blue"
                 android:textAllCaps="false"
                 android:textStyle="normal"
                 android:text="@string/wifiString"
                 android:enabled="false" >
-            </RadioButton>
-            <RadioButton
+            </android.support.v7.widget.AppCompatRadioButton>
+            <android.support.v7.widget.AppCompatRadioButton
                 android:id="@+id/internetRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:buttonTint="@color/blue"
+                app:buttonTint="@color/darkRed"
                 android:textColor="@color/blue"
                 android:textAllCaps="false"
                 android:textStyle="normal"
                 android:text="@string/internetString"
                 android:enabled="false" >
-            </RadioButton>
+            </android.support.v7.widget.AppCompatRadioButton>
         </RadioGroup>
     </LinearLayout>
 
@@ -120,7 +121,7 @@
         app:layout_constraintHeight_percent="0.1"
         app:layout_constraintTop_toBottomOf="@id/dummyLayout1"
         android:weightSum="2">
-        <com.smile.groundhoghunter.Model.SmileImageButton
+        <com.smile.groundhoghunter.Models.SmileImageButton
             android:id="@+id/createGameButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -133,8 +134,8 @@
             android:scaleType="fitXY"
             android:background="@android:color/transparent"
             android:layout_weight="1" >
-        </com.smile.groundhoghunter.Model.SmileImageButton>
-        <com.smile.groundhoghunter.Model.SmileImageButton
+        </com.smile.groundhoghunter.Models.SmileImageButton>
+        <com.smile.groundhoghunter.Models.SmileImageButton
             android:id="@+id/joinGameButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -147,7 +148,7 @@
             android:scaleType="fitXY"
             android:background="@android:color/transparent"
             android:layout_weight="1" >
-        </com.smile.groundhoghunter.Model.SmileImageButton>
+        </com.smile.groundhoghunter.Models.SmileImageButton>
     </LinearLayout>
 
     <LinearLayout
@@ -179,7 +180,7 @@
         app:layout_constraintHeight_percent="0.1"
         app:layout_constraintBottom_toBottomOf="parent"
         android:weightSum="2">
-        <com.smile.groundhoghunter.Model.SmileImageButton
+        <com.smile.groundhoghunter.Models.SmileImageButton
             android:id="@+id/cancelTwoPlayerButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -193,8 +194,8 @@
             android:scaleType="fitXY"
             android:background="@android:color/transparent"
             android:layout_weight="1" >
-        </com.smile.groundhoghunter.Model.SmileImageButton>
-        <com.smile.groundhoghunter.Model.SmileImageButton
+        </com.smile.groundhoghunter.Models.SmileImageButton>
+        <com.smile.groundhoghunter.Models.SmileImageButton
             android:id="@+id/confirmTwoPlayerButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -208,7 +209,7 @@
             android:scaleType="fitXY"
             android:background="@android:color/transparent"
             android:layout_weight="1" >
-        </com.smile.groundhoghunter.Model.SmileImageButton>
+        </com.smile.groundhoghunter.Models.SmileImageButton>
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
