@@ -71,6 +71,9 @@
     <string name="waitingIsStoppedOrTimeoutString">等待連線已停止或逾時.</string>
     <string name="connectToHostSucceededString">成功地連到主遊戲.</string>
     <string name="connectToHostFailedString">連線到主遊戲失敗.</string>
+    <string name="explainProblemForBluetoothString">如果連線有問題, 請重新開啟藍芽.</string>
+    <string name="explainProblemForWifiString">如果連線有問題, 請重新連線到無線網路.</string>
+    <string name="explainProblemForInternetString">如果連線有問題, 請重新連線到網際網路.</string>
 
     <string name="companyNameString">微笑資訊有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

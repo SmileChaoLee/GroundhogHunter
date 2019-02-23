@@ -47,10 +47,11 @@ public class BluetoothConnectToThread extends Thread {
 
         Intent broadcastIntent;
 
-        // Cancel discovery because it otherwise slows down the connection.
-        mBluetoothAdapter.cancelDiscovery();
-
         if (mBluetoothSocket != null) {
+            // Cancel discovery because it otherwise slows down the connection.
+            if (mBluetoothAdapter.isDiscovering()) {
+                mBluetoothAdapter.cancelDiscovery();
+            }
             try {
                 // Connect to the remote device through the socket. This call blocks
                 // until it succeeds or throws an exception.
@@ -58,8 +59,17 @@ public class BluetoothConnectToThread extends Thread {
                 mBluetoothSocket.connect();
                 Log.e(TAG, "Finished to connect to server socket ..........");
 
+                String deviceName = mBluetoothDevice.getName();
+                String deviceHardwareAddress = mBluetoothDevice.getAddress(); // MAC address
+                if ( (deviceName == null) && (deviceName.isEmpty()) ) {
+                    if ( (deviceHardwareAddress != null) && (!deviceHardwareAddress.isEmpty()) ) {
+                        deviceName = deviceHardwareAddress;
+                    }
+                }
+
                 broadcastIntent = new Intent();
                 broadcastIntent.setAction(BluetoothConnectToThreadConnected);
+                broadcastIntent.putExtra("BluetoothDeviceName", deviceName);
                 mContext.sendBroadcast(broadcastIntent);
 
             } catch (IOException ex) {

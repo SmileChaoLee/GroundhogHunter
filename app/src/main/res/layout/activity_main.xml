@@ -22,7 +22,7 @@
         android:id="@+id/dummy1TextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.05"
+        app:layout_constraintHeight_percent="0.00"
         app:layout_constraintTop_toBottomOf="@id/appIconImageView" />
 
     <LinearLayout
@@ -30,7 +30,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.45"
+        app:layout_constraintHeight_percent="0.55"
         app:layout_constraintTop_toBottomOf="@id/dummy1TextView"
         android:weightSum="4">
 
@@ -40,7 +40,8 @@
             android:layout_height="0dp"
             android:textAllCaps="false"
             android:layout_gravity="center"
-            android:scaleType="fitXY"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:layout_weight="1">
         </com.smile.groundhoghunter.Models.SmileImageButton>
@@ -51,7 +52,8 @@
             android:layout_height="0dp"
             android:textAllCaps="false"
             android:layout_gravity="center"
-            android:scaleType="fitXY"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:layout_weight="1">
         </com.smile.groundhoghunter.Models.SmileImageButton>
@@ -62,7 +64,8 @@
             android:layout_height="0dp"
             android:textAllCaps="false"
             android:layout_gravity="center"
-            android:scaleType="fitXY"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:layout_weight="1">
         </com.smile.groundhoghunter.Models.SmileImageButton>
@@ -73,7 +76,8 @@
             android:layout_height="0dp"
             android:textAllCaps="false"
             android:layout_gravity="center"
-            android:scaleType="fitXY"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:layout_weight="1">
         </com.smile.groundhoghunter.Models.SmileImageButton>
@@ -83,14 +87,14 @@
         android:id="@+id/dummy2TextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.05"
+        app:layout_constraintHeight_percent="0.00"
         app:layout_constraintTop_toBottomOf="@id/buttonLinearLayout" />
 
     <TextView
         android:id="@+id/companyNameTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:textColor="@color/blue"
+        android:textColor="@android:color/black"
         android:gravity="center"
         android:text="@string/companyNameString"
         app:layout_constraintHeight_percent="0.05"
@@ -100,7 +104,7 @@
         android:id="@+id/companyContactEmailTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:textColor="@color/blue"
+        android:textColor="@android:color/black"
         android:gravity="center"
         android:text="@string/companyContactEmailString"
         app:layout_constraintHeight_percent="0.05"

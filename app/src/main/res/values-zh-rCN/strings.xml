@@ -71,6 +71,9 @@
     <string name="waitingIsStoppedOrTimeoutString">等待连线已停止或逾时.</string>
     <string name="connectToHostSucceededString">成功地连到主遊戏.</string>
     <string name="connectToHostFailedString">连线到主遊戏失败.</string>
+    <string name="explainProblemForBluetoothString">如果连线有问题, 请重新开启蓝芽.</string>
+    <string name="explainProblemForWifiString">如果连线有问题, 请重新连线到无线网络.</string>
+    <string name="explainProblemForInternetString">如果连线有问题, 请重新连线到网际网络.</string>
 
     <string name="companyNameString">微笑资讯有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

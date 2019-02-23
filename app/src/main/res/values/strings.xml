@@ -69,6 +69,9 @@
     <string name="waitingIsStoppedOrTimeoutString">Waiting for connection stopped or timeout.</string>
     <string name="connectToHostSucceededString">Succeeded to connect to Host.</string>
     <string name="connectToHostFailedString">Failed to connect to Host.</string>
+    <string name="explainProblemForBluetoothString">If you have any problem with connecting, please reboot Bluetooth.</string>
+    <string name="explainProblemForWifiString">If you have any problem with connecting, please reconnect to Wifi.</string>
+    <string name="explainProblemForInternetString">If you have any problem with connecting, please reconnect to internet.</string>
 
     <string name="companyNameString">Smile Information Inc.</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

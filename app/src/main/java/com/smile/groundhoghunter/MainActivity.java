@@ -42,14 +42,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         int buttonLeftMargin = ScreenUtil.dpToPixel(this, 60);
-        int buttonTopMargin = ScreenUtil.dpToPixel(this, 10);
+        int buttonTopMargin = ScreenUtil.dpToPixel(this, 5);
         int buttonRightMargin = buttonLeftMargin;
         int buttonBottomMargin = buttonTopMargin;
+        LinearLayout.LayoutParams buttonLp;
 
         final SmileImageButton singlePlayerButton = findViewById(R.id.singlePlayerButton);
         Bitmap singlePlayerBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, singlePlayerString, Color.BLUE);
         singlePlayerButton.setImageBitmap(singlePlayerBitmap);
-        LinearLayout.LayoutParams buttonLp = (LinearLayout.LayoutParams) singlePlayerButton.getLayoutParams();
+        buttonLp = (LinearLayout.LayoutParams) singlePlayerButton.getLayoutParams();
         buttonLp.leftMargin = buttonLeftMargin;
         buttonLp.topMargin = buttonTopMargin;
         buttonLp.rightMargin = buttonRightMargin;
