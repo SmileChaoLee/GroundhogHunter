@@ -11,11 +11,11 @@
     </string-array>
 
     <string name="secondString">Sec.</string>
-    <string name="startGameString">Start</string>
-    <string name="pauseGameString">Pause</string>
-    <string name="resumeGameString">Resume</string>
-    <string name="newGameString">New</string>
-    <string name="quitGameString">Quit</string>
+    <string name="startString">Start</string>
+    <string name="pauseString">Pause</string>
+    <string name="resumeString">Resume</string>
+    <string name="newString">New</string>
+    <string name="quitString">Quit</string>
     <string name="okString">Ok</string>
     <string name="cancelString">Cancel</string>
     <string name="submitString">Send</string>
@@ -34,6 +34,7 @@
     <string name="localTop10ScoreTitleString">Top 10 Scores</string>
     <string name="globalTop10ScoreTitleString">Global Top 10 Scores</string>
 
+    <string name="exitString">Exit</string>
     <string name="settingString">Settings</string>
     <string name="soundString">Sound</string>
     <string name="onString">On</string>
@@ -46,8 +47,9 @@
     <string name="bluetoothString">Bluetooth</string>
     <string name="wifiString">Local Wifi</string>
     <string name="internetString">Internet</string>
-    <string name="createGameString">Create</string>
-    <string name="joinGameString">Join</string>
+    <string name="createString">Create</string>
+    <string name="joinString">Join</string>
+    <string name="refreshString">Fresh</string>
 
     <string name="gameStatusString">Status:</string>
     <string name="loadingString">Loading ...</string>
@@ -56,7 +58,8 @@
     <string name="bluetoothAlreadyOnString">Bluetooth has been on already.</string>
     <string name="bluetoothCannotBeTurnedOnString">Bluetooth cannot be turned on.</string>
     <string name="bluetoothNotSupportedString">Bluetooth is not supported on device.</string>
-    <string name="playNameCannotBeEmptyString">Player name cannot be empty.</string>
+    <string name="deviceNameCannotBeEmptyString">Device name cannot be empty.</string>
+    <string name="playerNameCannotBeEmptyString">Player name cannot be empty.</string>
     <string name="bluetoothVisibilityForPeriodString">Bluetooth will is visible for</string>
     <string name="bluetoothCannotBeVisibleString">Bluetooth visibility cannot be enabled.</string>
     <string name="bluetoothVisibilityIsDisabledString">Bluetooth visibility was disabled.</string>
@@ -65,6 +68,7 @@
     <string name="scanBluetoothFinishedString">Scanning Bluetooth devices finished.</string>
     <string name="stopScanningBluetoothString">Stop scaning Bluetooth devices.</string>
     <string name="deviceNameString">Device name:</string>
+    <string name="playerNameString">Player name:</string>
     <string name="waitingForConnectionString">Waiting for connection.</string>
     <string name="waitingIsStoppedOrTimeoutString">Waiting for connection stopped or timeout.</string>
     <string name="connectToHostSucceededString">Succeeded to connect to Host.</string>
@@ -72,6 +76,9 @@
     <string name="explainProblemForBluetoothString">If you have any problem with connecting, please reboot Bluetooth.</string>
     <string name="explainProblemForWifiString">If you have any problem with connecting, please reconnect to Wifi.</string>
     <string name="explainProblemForInternetString">If you have any problem with connecting, please reconnect to internet.</string>
+    <string name="createBluetoothGameString">Create Bluetooth Game</string>
+    <string name="joinBluetoothGameString">Join Bluetooth Game</string>
+    <string name="startGameString">Start Game</string>
 
     <string name="companyNameString">Smile Information Inc.</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".GroundhogActivity">
     <item android:id="@+id/newGame"
-        android:title="@string/newGameString"
+        android:title="@string/newString"
         android:orderInCategory="1"
         app:showAsAction="never"/>
     <item android:id="@+id/top_10_score"
@@ -10,7 +10,7 @@
         android:orderInCategory="2"
         app:showAsAction="never"/>
     <item android:id="@+id/quitGame"
-        android:title="@string/quitGameString"
+        android:title="@string/quitString"
         android:orderInCategory="3"
         app:showAsAction="never"/>
 </menu>

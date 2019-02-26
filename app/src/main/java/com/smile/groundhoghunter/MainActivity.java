@@ -3,6 +3,7 @@ package com.smile.groundhoghunter;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.privacy_policy.PrivacyPolicyUtil;
+import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,15 +36,15 @@ public class MainActivity extends AppCompatActivity {
         String privacyPolicyString = getString(com.smile.smilepublicclasseslibrary.R.string.privacyPolicyString);
         String exitAppString = getString(R.string.exitAppString);
 
-        int colorDarkOrange = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkOrange);
-        int colorRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.red);
+        // int colorDarkOrange = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkOrange);
+        // int colorRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.red);
         int colorDarkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed);
-        int colorDarkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
+        // int colorDarkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
 
         setContentView(R.layout.activity_main);
 
         int buttonLeftMargin = ScreenUtil.dpToPixel(this, 60);
-        int buttonTopMargin = ScreenUtil.dpToPixel(this, 5);
+        int buttonTopMargin = ScreenUtil.dpToPixel(this, 10);
         int buttonRightMargin = buttonLeftMargin;
         int buttonBottomMargin = buttonTopMargin;
         LinearLayout.LayoutParams buttonLp;
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent gameIntent = new Intent(MainActivity.this, GroundhogActivity.class);
+                gameIntent.putExtra("GameType", GameView.SinglePlayerGame);
                 startActivity(gameIntent);
             }
         });
@@ -112,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         exitAppButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                exitApp();;
+                exitGame();;
             }
         });
 
@@ -124,10 +127,38 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        exitApp();
+        exitGame();
     }
 
-    private void exitApp() {
-        finish();
+    private void exitGame() {
+        if (GroundhogHunterApp.InterstitialAd != null) {
+            // free version
+            int entryPoint = 0; //  no used
+            ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdAsyncTask =
+                    GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(MainActivity.this
+                            , entryPoint
+                            , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
+                        @Override
+                        public void executeAfterDismissAds(int endPoint) {
+                            exitApplication();
+                        }
+                    });
+            showAdAsyncTask.execute();
+        } else {
+            exitApplication();
+        }
+    }
+    private void exitApplication() {
+        final Handler handlerClose = new Handler();
+        final int timeDelay = 200;
+        handlerClose.postDelayed(new Runnable() {
+            public void run() {
+                // quit game
+                finish();
+                int pid = android.os.Process.myPid();
+                android.os.Process.killProcess(pid);
+                System.exit(0);
+            }
+        },timeDelay);
     }
 }

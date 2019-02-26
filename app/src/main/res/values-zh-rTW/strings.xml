@@ -13,11 +13,11 @@
     </string-array>
 
     <string name="secondString">秒</string>
-    <string name="startGameString">開始</string>
-    <string name="pauseGameString">暫停</string>
-    <string name="resumeGameString">恢復</string>
-    <string name="newGameString">新遊戲</string>
-    <string name="quitGameString">離開</string>
+    <string name="startString">開始</string>
+    <string name="pauseString">暫停</string>
+    <string name="resumeString">恢復</string>
+    <string name="newString">新遊戲</string>
+    <string name="quitString">離開</string>
     <string name="okString">確定</string>
     <string name="cancelString">取消</string>
     <string name="submitString">送出</string>
@@ -36,6 +36,7 @@
     <string name="localTop10ScoreTitleString">前10名最高分</string>      <!-- for title of list view -->
     <string name="globalTop10ScoreTitleString">全球前10名最高分</string>      <!-- for title of list view -->
 
+    <string name="exitString">離開</string>
     <string name="settingString">設定</string>
     <string name="soundString">聲音</string>
     <string name="onString">開</string>
@@ -48,8 +49,9 @@
     <string name="bluetoothString">藍芽</string>
     <string name="wifiString">區域無線網路</string>
     <string name="internetString">網際網路</string>
-    <string name="createGameString">創立</string>
-    <string name="joinGameString">加入</string>
+    <string name="createString">創立</string>
+    <string name="joinString">加入</string>
+    <string name="refreshString">刷新</string>
 
     <string name="gameStatusString">狀態:</string>
     <string name="loadingString">下載中 ...</string>
@@ -58,7 +60,8 @@
     <string name="bluetoothAlreadyOnString">藍芽已經開啟.</string>
     <string name="bluetoothCannotBeTurnedOnString">藍芽無法被開啟.</string>
     <string name="bluetoothNotSupportedString">本機沒有支援藍芽.</string>
-    <string name="playNameCannotBeEmptyString">玩家名稱不可以是空白.</string>
+    <string name="deviceNameCannotBeEmptyString">設備名稱不可以是空白.</string>
+    <string name="playerNameCannotBeEmptyString">玩家名稱不可以是空白.</string>
     <string name="bluetoothVisibilityForPeriodString">藍芽在短時間內可被偵測</string>
     <string name="bluetoothCannotBeVisibleString">藍芽被偵測功能無法啟動</string>
     <string name="bluetoothVisibilityIsDisabledString">藍芽被偵測的功能已關閉.</string>
@@ -67,6 +70,7 @@
     <string name="scanBluetoothFinishedString">完成偵測藍芽裝置.</string>
     <string name="stopScanningBluetoothString">停止偵測藍牙裝置.</string>
     <string name="deviceNameString">設備名稱:</string>
+    <string name="playerNameString">玩家名稱:</string>
     <string name="waitingForConnectionString">等待連線.</string>
     <string name="waitingIsStoppedOrTimeoutString">等待連線已停止或逾時.</string>
     <string name="connectToHostSucceededString">成功地連到主遊戲.</string>
@@ -74,6 +78,9 @@
     <string name="explainProblemForBluetoothString">如果連線有問題, 請重新開啟藍芽.</string>
     <string name="explainProblemForWifiString">如果連線有問題, 請重新連線到無線網路.</string>
     <string name="explainProblemForInternetString">如果連線有問題, 請重新連線到網際網路.</string>
+    <string name="createBluetoothGameString">創立藍芽遊戲</string>
+    <string name="joinBluetoothGameString">加入藍芽游戲</string>
+    <string name="startGameString">啟動遊戲</string>
 
     <string name="companyNameString">微笑資訊有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

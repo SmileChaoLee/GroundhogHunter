@@ -23,6 +23,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.groundhoghunter.Utilities.SoundUtil;
@@ -63,6 +64,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     // public static final properties
     public static final Handler GameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
+    public static final int SinglePlayerGame = 1;
+    public static final int TwoPlayerGame = 2;
     public static final int BluetoothMediaType = 0;
     public static final int wifiMediaType = 1;
     public static final int InternetMediaType = 2;
@@ -107,7 +110,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         score_board = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.score_board);
     }
 
-    public GameView(Context context, int gWidth, int gHeight) {
+    public GameView(Context context, int gameType, int gWidth, int gHeight) {
         super(context);
 
         Log.d(TAG, "GameView.GameView(Context context, int gWidth, int gHeight) is called.");

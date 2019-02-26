@@ -1,6 +1,7 @@
 package com.smile.groundhoghunter;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.os.Build;
@@ -8,7 +9,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatRadioButton;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,15 +28,13 @@ public class TwoPlayerActivity extends AppCompatActivity {
 
     private int mediaType;
     private TextView explainProblemTextView;
-    private TextView playerNameTextView;
-    private String playerName;
+    private TextView deviceNameTextView;
+    private String deviceName;
     private String bluetoothNotSupportedString;
-    private String playNameCannotBeEmptyString;
+    private String deviceNameCannotBeEmptyString;
     private String explainProblemForBluetoothString;
     private String explainProblemForWifiString;
     private String explainProblemForInternetString;
-
-    private BluetoothAdapter mBluetoothAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +45,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
         toastTextSize = textFontSize * 0.8f;
 
         bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
-        playNameCannotBeEmptyString = getString(R.string.playNameCannotBeEmptyString);
+        deviceNameCannotBeEmptyString = getString(R.string.deviceNameCannotBeEmptyString);
         explainProblemForBluetoothString = getString(R.string.explainProblemForBluetoothString);
         explainProblemForWifiString = getString(R.string.explainProblemForWifiString);
         explainProblemForInternetString = getString(R.string.explainProblemForInternetString);
@@ -61,15 +59,10 @@ public class TwoPlayerActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.O) {
-            // not Oreo
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-
         setContentView(R.layout.activity_two_players);
 
-        TextView twoPlayerSettingTitle = findViewById(R.id.twoPlayerSettingTitle);
-        ScreenUtil.resizeTextSize(twoPlayerSettingTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        TextView twoPlayerSettingTitleTextView = findViewById(R.id.twoPlayerSettingTitleTextView);
+        ScreenUtil.resizeTextSize(twoPlayerSettingTitleTextView, textFontSize * 1.2f, GroundhogHunterApp.FontSize_Scale_Type);
 
         explainProblemTextView = findViewById(R.id.explainProblemTextView);
         ScreenUtil.resizeTextSize(explainProblemTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
@@ -105,7 +98,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
 
         // device detecting
         // Bluetooth
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             // this device does not support Bluetooth
             ScreenUtil.showToast(TwoPlayerActivity.this, bluetoothNotSupportedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
@@ -152,19 +145,19 @@ public class TwoPlayerActivity extends AppCompatActivity {
         TextView deviceNameStringTextView = findViewById(R.id.deviceNameStringTextView);
         ScreenUtil.resizeTextSize(deviceNameStringTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
 
-        playerName = "";
+        deviceName = "";
         if (mBluetoothAdapter != null) {
-            playerName = mBluetoothAdapter.getName();
-            if (playerName == null) {
-                playerName = mBluetoothAdapter.getAddress();
-                if (playerName == null) {
-                   playerName = "";
+            deviceName = mBluetoothAdapter.getName();
+            if (deviceName == null) {
+                deviceName = mBluetoothAdapter.getAddress();
+                if (deviceName == null) {
+                   deviceName = "";
                 }
             }
         }
-        playerNameTextView = findViewById(R.id.playerNameTextView);
-        playerNameTextView.setText(playerName);
-        ScreenUtil.resizeTextSize(playerNameTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        deviceNameTextView = findViewById(R.id.deviceNameTextView);
+        deviceNameTextView.setText(deviceName);
+        ScreenUtil.resizeTextSize(deviceNameTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
 
         int buttonLeftMargin = ScreenUtil.dpToPixel(this, 100);
         int buttonTopMargin = ScreenUtil.dpToPixel(this, 10);
@@ -172,8 +165,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
         int buttonBottomMargin = buttonTopMargin;
         LinearLayout.LayoutParams buttonLp;
 
-        final SmileImageButton createGameButton = findViewById(R.id.createGameButton);
-        Bitmap createGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.createGameString), colorDarkGreen);
+        final SmileImageButton createGameButton = findViewById(R.id.createTwoPlayerGameButton);
+        Bitmap createGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.createString), colorDarkGreen);
         createGameButton.setImageBitmap(createGameBitmap);
         buttonLp = (LinearLayout.LayoutParams) createGameButton.getLayoutParams();
         buttonLp.leftMargin = buttonLeftMargin;
@@ -184,15 +177,22 @@ public class TwoPlayerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Host game. Turn on Bluetooth and make this device visible to others
-                if (playerName.isEmpty()) {
-                    ScreenUtil.showToast(TwoPlayerActivity.this, playNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                if (deviceName.isEmpty()) {
+                    ScreenUtil.showToast(TwoPlayerActivity.this, deviceNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     return;
+                }
+                Intent gameIntent;
+                switch (mediaType) {
+                    case GameView.BluetoothMediaType:
+                        gameIntent = new Intent(TwoPlayerActivity.this, BluetoothCreateGameActivity.class);
+                        startActivity(gameIntent);
+                        break;
                 }
             }
         });
 
-        final SmileImageButton joinGameButton = findViewById(R.id.joinGameButton);
-        Bitmap joinGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.joinGameString), colorDarkGreen);
+        final SmileImageButton joinGameButton = findViewById(R.id.joinTwoPlayerGameButton);
+        Bitmap joinGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.joinString), colorDarkGreen);
         joinGameButton.setImageBitmap(joinGameBitmap);
         buttonLp = (LinearLayout.LayoutParams) joinGameButton.getLayoutParams();
         buttonLp.leftMargin = buttonLeftMargin;
@@ -202,14 +202,22 @@ public class TwoPlayerActivity extends AppCompatActivity {
         joinGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (playerName.isEmpty()) {
-                    ScreenUtil.showToast(TwoPlayerActivity.this, playNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                if (deviceName.isEmpty()) {
+                    ScreenUtil.showToast(TwoPlayerActivity.this, deviceNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    return;
+                }
+                Intent gameIntent;
+                switch (mediaType) {
+                    case GameView.BluetoothMediaType:
+                        gameIntent = new Intent(TwoPlayerActivity.this, BluetoothJoinGameActivity.class);
+                        startActivity(gameIntent);
+                        break;
                 }
             }
         });
 
-        final SmileImageButton cancelButton = findViewById(R.id.cancelTwoPlayerButton);
-        Bitmap cancelGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.cancelString), colorDarkRed);
+        final SmileImageButton cancelButton = findViewById(R.id.exitTwoPlayerActivityButton);
+        Bitmap cancelGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.exitString), colorDarkRed);
         cancelButton.setImageBitmap(cancelGameBitmap);
         buttonLp = (LinearLayout.LayoutParams) cancelButton.getLayoutParams();
         buttonLp.leftMargin = buttonLeftMargin;
