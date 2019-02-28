@@ -265,26 +265,26 @@ public class GroundhogActivity extends AppCompatActivity {
         messageImageView.setVisibility(View.GONE);
 
         // buttons for start game, new game, quit game
-        String startGameString = getString(R.string.startGameString);
-        String pauseGameString = getString(R.string.pauseString);
-        String resumeGameString = getString(R.string.resumeString);
+        String startString = getString(R.string.startString);
+        String pauseString = getString(R.string.pauseString);
+        String resumeString = getString(R.string.resumeString);
 
         startGameButton = findViewById(R.id.startGameButton);
-        final Bitmap startGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.start_game_button, startGameString, Color.BLUE);
+        final Bitmap startGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.start_game_button, startString, Color.BLUE);
         startGameButton.setImageBitmap(startGameBitmap);
         startGameButton.setClickable(true);
         startGameButton.setEnabled(true);
         startGameButton.setVisibility(View.VISIBLE);
 
         pauseGameButton = findViewById(R.id.pauseGameButton);
-        Bitmap pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseGameString, Color.BLUE);
+        Bitmap pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseString, Color.BLUE);
         pauseGameButton.setImageBitmap(pauseGameBitmap);
         pauseGameButton.setClickable(false);
         pauseGameButton.setEnabled(false);
         pauseGameButton.setVisibility(View.GONE);
 
         resumeGameButton = findViewById(R.id.resumeGameButton);
-        Bitmap resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeGameString, Color.BLUE);
+        Bitmap resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeString, Color.BLUE);
         resumeGameButton.setImageBitmap(resumeGameBitmap);
         resumeGameButton.setClickable(false);
         resumeGameButton.setEnabled(false);
