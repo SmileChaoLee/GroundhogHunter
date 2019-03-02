@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.smile.groundhoghunter.Models.SmileImageButton;
-import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
+import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.privacy_policy.PrivacyPolicyUtil;
 import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;

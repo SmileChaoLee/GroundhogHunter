@@ -70,12 +70,14 @@
     <string name="deviceNameString">Device name:</string>
     <string name="playerNameString">Player name:</string>
     <string name="waitingForConnectionString">Waiting for connection.</string>
-    <string name="waitingIsStoppedOrTimeoutString">Waiting for connection stopped or timeout.</string>
+    <string name="waitingStoppedCancelledString">Waiting for connection stopped or cancelled.</string>
     <string name="cannotCreateServerSocketString">Cannot create server socket.</string>
     <string name="serverAcceptedConnectionString">Server accepted connection.</string>
-    <string name="serverSocketCancelledString">Server socket was cancelled.</string>
+    <string name="cannotCreateClientSocketString">Cannot create client socket.</string>
+    <string name="startedConnectingToHostString">Started to connect to host.</string>
     <string name="connectToHostSucceededString">Succeeded to connect to Host.</string>
     <string name="connectToHostFailedString">Failed to connect to Host.</string>
+    <string name="cancelledConnectingToHostString">Cancelled connecting to Host.</string>
     <string name="explainProblemForBluetoothString">If you have any problem with connecting, please reboot Bluetooth.</string>
     <string name="explainProblemForWifiString">If you have any problem with connecting, please reconnect to Wifi.</string>
     <string name="explainProblemForInternetString">If you have any problem with connecting, please reconnect to internet.</string>

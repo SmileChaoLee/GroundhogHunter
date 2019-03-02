@@ -16,17 +16,14 @@ public class BluetoothAcceptThread extends Thread {
     public static final String BluetoothAcceptThreadStarted = ".Threads.BluetoothAcceptThread.Started";
     public static final String BluetoothAcceptThreadStopped = ".Threads.BluetoothAcceptThread.Stopped";
     public static final String BluetoothAcceptThreadConnected =  ".Threads.BluetoothAcceptThread.Connected";
-    public static final String BluetoothAcceptThreadCancelled = ".Threads.BluetoothAcceptThread.Cancelled";
 
-    private static final String TAG = new String("com.smile.groundhoghunter.Threads.BluetoothAcceptThread");
+    private static final String TAG = new String(".Threads.BluetoothAcceptThread");
     private final Context mContext;
     private final String mDeviceName;
     private final java.util.UUID mAppUUID;
     private final BluetoothAdapter mBluetoothAdapter;
     private final BluetoothServerSocket mServerSocket;
-    private boolean isKeepRunning;
     private boolean isListening;
-    private boolean isCancelled;
 
     public BluetoothAcceptThread(Context context, BluetoothAdapter bluetoothAdapter, String deviceName, java.util.UUID appUUID) {
 
@@ -34,9 +31,7 @@ public class BluetoothAcceptThread extends Thread {
         mBluetoothAdapter = bluetoothAdapter;
         mDeviceName = deviceName;
         mAppUUID = appUUID;
-        isKeepRunning = true;
         isListening = false;
-        isCancelled = false;
 
         // Use a temporary object that is later assigned to mmServerSocket
         // because mmServerSocket is final.
@@ -65,52 +60,40 @@ public class BluetoothAcceptThread extends Thread {
         }
         if (mServerSocket != null) {
             BluetoothSocket mBluetoothSocket = null;
-            isCancelled = false;
-            while (isKeepRunning) {
-                // Keep listening until exception occurs or a socket is returned.
-                try {
-                    isListening = true; // listening
+            // Keep listening until exception occurs or a socket is returned.
+            try {
+                isListening = true; // listening
 
+                broadcastIntent = new Intent();
+                broadcastIntent.setAction(BluetoothAcceptThreadStarted);
+                mContext.sendBroadcast(broadcastIntent);
+
+                mBluetoothSocket = mServerSocket.accept();
+                Log.e(TAG, "BluetoothSocket's accept() method finished.");
+
+                if (mBluetoothSocket != null) {
+                    // A connection was accepted. Perform work associated with
+                    // the connection in a separate thread.
                     broadcastIntent = new Intent();
-                    broadcastIntent.setAction(BluetoothAcceptThreadStarted);
+                    broadcastIntent.setAction(BluetoothAcceptThreadConnected);
                     mContext.sendBroadcast(broadcastIntent);
 
-                    mBluetoothSocket = mServerSocket.accept();
-                    Log.e(TAG, "BluetoothSocket's accept() method finished.");
+                    // manageMyConnectedSocket(mBluetoothSocket);   // has not been implemented yet.
 
-                    if (mBluetoothSocket != null) {
-                        // A connection was accepted. Perform work associated with
-                        // the connection in a separate thread.
-                        broadcastIntent = new Intent();
-                        broadcastIntent.setAction(BluetoothAcceptThreadConnected);
-                        mContext.sendBroadcast(broadcastIntent);
-
-                        // manageMyConnectedSocket(mBluetoothSocket);   // has not been implemented yet.
-                        mServerSocket.close();
-                        break;
-                    }
-                } catch (IOException ex) {
-                    Log.e(TAG, "BluetoothSocket's accept() method failed", ex);
-
-                    // listening is stopped (means BluetoothServerSocket closed or exception occurred)
-                    isListening = false;
-                    if (!isCancelled) {
-                        broadcastIntent = new Intent();
-                        broadcastIntent.setAction(BluetoothAcceptThreadStopped);
-                        mContext.sendBroadcast(broadcastIntent);
-                    }
-                    break;
+                    mServerSocket.close();
                 }
+            } catch (IOException ex) {
+                Log.e(TAG, "BluetoothSocket's accept() method failed", ex);
+
+                // listening is stopped (means BluetoothServerSocket closed or exception occurred)
+                isListening = false;
+                broadcastIntent = new Intent();
+                broadcastIntent.setAction(BluetoothAcceptThreadStopped);
+                mContext.sendBroadcast(broadcastIntent);
             }
         }
     }
 
-    public void setKeepRunning(boolean isKeepRunning) {
-        this.isKeepRunning = isKeepRunning;
-    }
-    public boolean isKeepRunning() {
-        return this.isKeepRunning;
-    }
     public boolean isListening() {
         return isListening;
     }
@@ -118,19 +101,10 @@ public class BluetoothAcceptThread extends Thread {
     // Closes the connect socket and causes the thread to finish.
     public void cancel() {
 
-        if (isCancelled) {
-            return;
-        }
-
-        isCancelled = true;
-        Intent broadcastIntent;
         if (mServerSocket != null) {
             try {
                 Log.e(TAG, "Closing the connect socket");
                 mServerSocket.close();
-                broadcastIntent = new Intent();
-                broadcastIntent.setAction(BluetoothAcceptThreadCancelled);
-                mContext.sendBroadcast(broadcastIntent);
                 Log.e(TAG, "Connect socket closed.");
             } catch (IOException ex) {
                 Log.e(TAG, "Could not close the connect socket", ex);

@@ -1,30 +1,31 @@
 package com.smile.groundhoghunter.Threads;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.smile.groundhoghunter.Utilities.BluetoothUtil;
+
 import java.io.IOException;
 
 public class BluetoothConnectToThread extends Thread {
 
-    public static final String BluetoothConnectToThreadConnected =  "com.smile.groundhoghunter.Threads.BluetoothConnectToThread.Connected";
-    public static final String BluetoothConnectToThreadFailedToConnect =  "com.smile.groundhoghunter.Threads.BluetoothConnectToThread.FailedToConnect";
+    public static final String BluetoothConnectToThreadNoClientSocket = ".Threads.BluetoothConnectToThread.NoClientSocket";
+    public static final String BluetoothConnectToThreadStarted = ".Threads.BluetoothConnectToThread.Started";
+    public static final String BluetoothConnectToThreadConnected =  ".Threads.BluetoothConnectToThread.Connected";
+    public static final String BluetoothConnectToThreadFailedToConnect =  ".Threads.BluetoothConnectToThread.FailedToConnect";
 
-    private static final String TAG = new String("com.smile.groundhoghunter.Threads.BluetoothConnectToThread");
-    private final BluetoothAdapter mBluetoothAdapter;
+    private static final String TAG = new String(".Threads.BluetoothConnectToThread");
     private final BluetoothDevice mBluetoothDevice;
     private final Context mContext;
     private final java.util.UUID mAppUUID;
 
     private final BluetoothSocket mBluetoothSocket;
 
-    public BluetoothConnectToThread(Context context, BluetoothAdapter bluetoothAdapter, BluetoothDevice bluetoothDevice, java.util.UUID appUUID) {
+    public BluetoothConnectToThread(Context context, BluetoothDevice bluetoothDevice, java.util.UUID appUUID) {
         mContext = context;
-        mBluetoothAdapter = bluetoothAdapter;
         mBluetoothDevice = bluetoothDevice;
         mAppUUID = appUUID;
 
@@ -44,60 +45,65 @@ public class BluetoothConnectToThread extends Thread {
     }
 
     public void run() {
-
         Intent broadcastIntent;
+        if (mBluetoothSocket == null) {
+            // cannot create Server Socket
+            broadcastIntent = new Intent();
+            broadcastIntent.setAction(BluetoothConnectToThreadNoClientSocket);
+            mContext.sendBroadcast(broadcastIntent);
+            return;
+        }
 
         if (mBluetoothSocket != null) {
-            // Cancel discovery because it otherwise slows down the connection.
-            if (mBluetoothAdapter.isDiscovering()) {
-                mBluetoothAdapter.cancelDiscovery();
-            }
+
+            String deviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothDevice);
             try {
                 // Connect to the remote device through the socket. This call blocks
                 // until it succeeds or throws an exception.
                 Log.e(TAG, "Started to connect to server socket ..........");
+
+                broadcastIntent = new Intent();
+                broadcastIntent.setAction(BluetoothConnectToThreadStarted);
+                broadcastIntent.putExtra("BluetoothDeviceName", deviceName);
+                mContext.sendBroadcast(broadcastIntent);
+
                 mBluetoothSocket.connect();
                 Log.e(TAG, "Finished to connect to server socket ..........");
-
-                String deviceName = mBluetoothDevice.getName();
-                String deviceHardwareAddress = mBluetoothDevice.getAddress(); // MAC address
-                if ( (deviceName == null) && (deviceName.isEmpty()) ) {
-                    if ( (deviceHardwareAddress != null) && (!deviceHardwareAddress.isEmpty()) ) {
-                        deviceName = deviceHardwareAddress;
-                    }
-                }
 
                 broadcastIntent = new Intent();
                 broadcastIntent.setAction(BluetoothConnectToThreadConnected);
                 broadcastIntent.putExtra("BluetoothDeviceName", deviceName);
                 mContext.sendBroadcast(broadcastIntent);
 
+                // The connection attempt succeeded. Perform work associated with
+                // the connection in a separate thread.
+                // manageMyConnectedSocket(mmSocket); // has not been implemented yet
+
             } catch (IOException ex) {
                 // Unable to connect; close the socket and return.
                 Log.e(TAG, "Could not connect to server socket", ex);
                 broadcastIntent = new Intent();
                 broadcastIntent.setAction(BluetoothConnectToThreadFailedToConnect);
+                broadcastIntent.putExtra("BluetoothDeviceName", deviceName);
                 mContext.sendBroadcast(broadcastIntent);
                 try {
                     mBluetoothSocket.close();
                 } catch (IOException closeException) {
                     Log.e(TAG, "Could not close the client socket", closeException);
                 }
-                return;
             }
-
-            // The connection attempt succeeded. Perform work associated with
-            // the connection in a separate thread.
-            // manageMyConnectedSocket(mmSocket); // has not been implemented yet
         }
     }
 
     // Closes the client socket and causes the thread to finish.
     public void cancel() {
-        try {
-            mBluetoothSocket.close();
-        } catch (IOException e) {
-            Log.e(TAG, "Could not close the client socket", e);
+
+        if (mBluetoothSocket != null) {
+            try {
+                mBluetoothSocket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Could not close the client socket", e);
+            }
         }
     }
 }

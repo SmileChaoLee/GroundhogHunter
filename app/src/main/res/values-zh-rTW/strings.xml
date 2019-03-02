@@ -72,12 +72,14 @@
     <string name="deviceNameString">設備名稱:</string>
     <string name="playerNameString">玩家名稱:</string>
     <string name="waitingForConnectionString">等待連線.</string>
-    <string name="waitingIsStoppedOrTimeoutString">等待連線已停止或逾時.</string>
+    <string name="waitingStoppedCancelledString">等待連線已停止或取消.</string>
     <string name="cannotCreateServerSocketString">無法建立伺服端接口.</string>
     <string name="serverAcceptedConnectionString">主遊戲成功連到客戶端.</string>
-    <string name="serverSocketCancelledString">伺服端接口已取消.</string>
+    <string name="cannotCreateClientSocketString">無法建立客戶端接口.</string>
+    <string name="startedConnectingToHostString">開始嘗試連線到主遊戲.</string>
     <string name="connectToHostSucceededString">成功地連到主遊戲.</string>
     <string name="connectToHostFailedString">連線到主遊戲失敗.</string>
+    <string name="cancelledConnectingToHostString">取消連線到主遊戲.</string>
     <string name="explainProblemForBluetoothString">如果連線有問題, 請重新開啟藍芽.</string>
     <string name="explainProblemForWifiString">如果連線有問題, 請重新連線到無線網路.</string>
     <string name="explainProblemForInternetString">如果連線有問題, 請重新連線到網際網路.</string>

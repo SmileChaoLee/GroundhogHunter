@@ -15,7 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.smile.groundhoghunter.Models.SmileImageButton;
-import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
+import com.smile.groundhoghunter.Utilities.BluetoothUtil;
+import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class TwoPlayerActivity extends AppCompatActivity {
@@ -145,16 +146,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
         TextView deviceNameStringTextView = findViewById(R.id.deviceNameStringTextView);
         ScreenUtil.resizeTextSize(deviceNameStringTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
 
-        deviceName = "";
-        if (mBluetoothAdapter != null) {
-            deviceName = mBluetoothAdapter.getName();
-            if (deviceName == null) {
-                deviceName = mBluetoothAdapter.getAddress();
-                if (deviceName == null) {
-                   deviceName = "";
-                }
-            }
-        }
+        deviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothAdapter);
+
         deviceNameTextView = findViewById(R.id.deviceNameTextView);
         deviceNameTextView.setText(deviceName);
         ScreenUtil.resizeTextSize(deviceNameTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);

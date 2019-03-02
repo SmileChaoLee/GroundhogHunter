@@ -29,7 +29,7 @@ import com.google.android.gms.ads.AdView;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Services.LocalTop10IntentService;
-import com.smile.groundhoghunter.Utilities.FontAndBitmapUtil;
+import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.alertdialogfragment.AlertDialogFragment;
 import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
