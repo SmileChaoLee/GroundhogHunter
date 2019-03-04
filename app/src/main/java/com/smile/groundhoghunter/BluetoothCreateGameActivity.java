@@ -35,7 +35,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
     private static final String TAG = new String(".BluetoothCreateGameActivity");
     private static final int Request_Enable_Bluetooth_For_Being_Discovered = 1; // request to enable bluetooth for being discovered
     private static final int Request_Enable_Bluetooth_Discoverability = 3;
-    private static final int durationForBluetoothVisible = 60;   // 300 sec.
+    private static final int durationForBluetoothVisible = GroundhogHunterApp.durationForBluetoothVisible;
 
     private float textFontSize;
     private float fontScale;
@@ -153,6 +153,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                         Log.d(TAG, "adapterView.getItemAtPosition(position) = " + temp);
                         oppositePlayerName = temp;
                         view.setSelected(true);
+                        // send oppositePlayerName to the host
                     }
                 }
             }
@@ -305,7 +306,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     ScreenUtil.showToast(context, waitingForConnectionString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
                 case BluetoothAcceptThread.BluetoothAcceptThreadConnected:
-                    ScreenUtil.showToast(context, serverAcceptedConnectionString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    ScreenUtil.showToast(context, serverAcceptedConnectionString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
                     stopBluetoothAcceptThread();
                     break;
                 case BluetoothAcceptThread.BluetoothAcceptThreadStopped:

@@ -23,6 +23,7 @@ public class GroundhogHunterApp extends MultiDexApplication {
     public static final String PrivacyPolicyUrl = "http://ec2-13-59-195-3.us-east-2.compute.amazonaws.com/PrivacyPolicy";
     public static final String UUID_String = "b5af9bad-42e0-4d0d-8546-ebeb97e1abfa";
     public static final UUID ApplicationUUID = UUID.fromString(UUID_String);
+    public static final int durationForBluetoothVisible = 60;   // 60 seconds
 
     public static Resources AppResources;
     public static Context AppContext;

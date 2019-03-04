@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -25,6 +24,7 @@ import android.widget.Toast;
 import com.smile.groundhoghunter.ArrayAdatpers.TwoPlayerListAdapter;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Threads.BluetoothConnectToThread;
+import com.smile.groundhoghunter.Threads.BluetoothDiscoveryTimerThread;
 import com.smile.groundhoghunter.Utilities.BluetoothUtil;
 import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
@@ -37,6 +37,8 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     // private properties
     private static final String TAG = new String(".BluetoothJoinGameActivity");
     private static final int Request_Enable_Bluetooth_For_Discovering = 2; // request to enable bluetooth for discovering
+    private static final int durationForBluetoothVisible = GroundhogHunterApp.durationForBluetoothVisible;
+
     private float textFontSize;
     private float fontScale;
     private float toastTextSize;
@@ -60,6 +62,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
 
     private TwoPlayerListAdapter twoPlayerListAdapter;
     private BluetoothJoinGameBroadcastReceiver btJoinGameReceiver;
+    private BluetoothDiscoveryTimerThread mBluetoothDiscoveryTimerThread;
     private BluetoothConnectToThread mBluetoothConnectToThread;
 
     private boolean isDefaultBluetoothEnabled;
@@ -78,6 +81,8 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
         intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        intentFilter.addAction(BluetoothDiscoveryTimerThread.TimerHasReached);
+        intentFilter.addAction(BluetoothDiscoveryTimerThread.TimerHasBeenDismissed);
         intentFilter.addAction(BluetoothConnectToThread.BluetoothConnectToThreadNoClientSocket);
         intentFilter.addAction(BluetoothConnectToThread.BluetoothConnectToThreadStarted);
         intentFilter.addAction(BluetoothConnectToThread.BluetoothConnectToThreadConnected);
@@ -188,11 +193,13 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "Response from bluetooth activity.");
-
+        String megString;
         switch(requestCode) {
             case Request_Enable_Bluetooth_For_Discovering:
                 if (resultCode == Activity.RESULT_OK) {
                     // succeeded to enable bluetooth
+                    megString = "Bluetooth has been turn on.";
+                    Log.d(TAG, megString);
                     bluetoothDeviceHashSet.clear(); // clear HashSet because of starting discovering
                     playerNameList.clear(); // clear name list
                     twoPlayerListAdapter.notifyDataSetChanged();
@@ -200,8 +207,14 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         // if discovering then stop discovering
                         mBluetoothAdapter.cancelDiscovery();
                     }
+                    // stop BluetoothDiscoveryTimerThread
+                    stopBluetoothDiscoveryTimerThread();
+                    // start discovery
                     mBluetoothAdapter.startDiscovery();
+                    startBluetoothDiscoveryTimerThread();
                 }else {
+                    megString = bluetoothCannotBeTurnedOnString;
+                    Log.d(TAG, megString);
                     ScreenUtil.showToast(this, bluetoothCannotBeTurnedOnString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                 }
                 break;
@@ -214,6 +227,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         super.onDestroy();
         // recover the status of bluetooth
 
+        stopBluetoothDiscoveryTimerThread();
         stopBluetoothConnectToThread();
 
         if (mBluetoothAdapter != null) {
@@ -237,11 +251,33 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     }
 
     private void startBluetoothDiscovery() {
-
         playerNameList.clear();
         twoPlayerListAdapter.notifyDataSetChanged();
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBtIntent, Request_Enable_Bluetooth_For_Discovering);
+    }
+
+    private void startBluetoothDiscoveryTimerThread() {
+        int timerPeriod = durationForBluetoothVisible * 1000;   // transfer to mini seconds
+        mBluetoothDiscoveryTimerThread = new BluetoothDiscoveryTimerThread(this, timerPeriod);
+        mBluetoothDiscoveryTimerThread.start();
+    }
+
+    private void stopBluetoothDiscoveryTimerThread() {
+        if (mBluetoothDiscoveryTimerThread != null) {
+            mBluetoothDiscoveryTimerThread.dismissTimerThread();
+            boolean retry = true;
+            while (retry) {
+                try {
+                    mBluetoothDiscoveryTimerThread.join();
+                    Log.d(TAG, "mBluetoothDiscoveryTimerThread.Join()........\n");
+                    retry = false;
+                    mBluetoothDiscoveryTimerThread = null;
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }// continue processing until the thread ends
+            }
+        }
     }
 
     private void stopBluetoothConnectToThread() {
@@ -265,6 +301,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            String megString;
             String deviceName = "";
             String action = "";
             if (intent != null) {
@@ -278,6 +315,8 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     // start to connect to host game
                     if (mBluetoothDevice != null) {
                         if (!bluetoothDeviceHashSet.contains(mBluetoothDevice)) {
+                            megString = BluetoothUtil.getBluetoothDeviceName(mBluetoothDevice);
+                            Log.d(TAG, megString);
                             // ScreenUtil.showToast(context, BluetoothUtil.getBluetoothDeviceName(mBluetoothDevice), toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                             bluetoothDeviceHashSet.add(mBluetoothDevice);
                             mBluetoothAdapter.cancelDiscovery();    // stop discovering to speed up connection
@@ -288,22 +327,33 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     }
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
+                    megString = scanBluetoothStartedString;
+                    Log.d(TAG, megString);
                     // ScreenUtil.showToast(context, scanBluetoothStartedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
+                    megString = scanBluetoothFinishedString;
+                    Log.d(TAG, megString);
                     // ScreenUtil.showToast(context, scanBluetoothFinishedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    stopBluetoothConnectToThread();
+                    // stopBluetoothConnectToThread();
                     break;
                 case BluetoothConnectToThread.BluetoothConnectToThreadNoClientSocket:
+                    megString = cannotCreateClientSocketString;
+                    Log.d(TAG, megString);
                     ScreenUtil.showToast(context, cannotCreateClientSocketString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    stopBluetoothDiscoveryTimerThread();
                     stopBluetoothConnectToThread();
                     break;
                 case BluetoothConnectToThread.BluetoothConnectToThreadStarted:
                     deviceName = intent.getStringExtra("BluetoothDeviceName");
-                    ScreenUtil.showToast(context, startedConnectingToHostString + "("+deviceName+")", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    megString = startedConnectingToHostString + "("+deviceName+")";
+                    Log.d(TAG, megString);
+                    // ScreenUtil.showToast(context, startedConnectingToHostString + "("+deviceName+")", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
                 case BluetoothConnectToThread.BluetoothConnectToThreadConnected:
                     deviceName = intent.getStringExtra("BluetoothDeviceName");
+                    megString = connectToHostSucceededString + "("+deviceName+")";
+                    Log.d(TAG, megString);
                     ScreenUtil.showToast(context, connectToHostSucceededString +"("+deviceName+")", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     if ((deviceName != null) && (!deviceName.isEmpty())) {
                         if (!playerNameList.contains(deviceName)) {
@@ -311,13 +361,30 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                             twoPlayerListAdapter.notifyDataSetChanged();
                         }
                     }
+                    stopBluetoothDiscoveryTimerThread();
                     stopBluetoothConnectToThread();
                     break;
                 case BluetoothConnectToThread.BluetoothConnectToThreadFailedToConnect:
                     deviceName = intent.getStringExtra("BluetoothDeviceName");
-                    ScreenUtil.showToast(context, connectToHostFailedString + "("+deviceName+")", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    megString = connectToHostFailedString + "("+deviceName+")";
+                    Log.d(TAG, megString);
+                    // ScreenUtil.showToast(context, connectToHostFailedString + "("+deviceName+")", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     mBluetoothAdapter.startDiscovery(); // start discovering again
                     stopBluetoothConnectToThread();
+                    break;
+                case BluetoothDiscoveryTimerThread.TimerHasReached:
+                    megString = "Discovery time has reached.";
+                    Log.d(TAG, megString);
+                    ScreenUtil.showToast(context, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    if (mBluetoothAdapter.isDiscovering()) {
+                        mBluetoothAdapter.cancelDiscovery();
+                    }
+                    stopBluetoothConnectToThread();
+                    break;
+                case BluetoothDiscoveryTimerThread.TimerHasBeenDismissed:
+                    megString = "Discovery timer has been dismissed.";
+                    Log.d(TAG, megString);
+                    ScreenUtil.showToast(context, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
             }
         }
