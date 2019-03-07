@@ -2,34 +2,26 @@ package com.smile.groundhoghunter.Threads;
 
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.smile.groundhoghunter.Interfaces.MessageConstants;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
-import java.util.Arrays;
 
 public class BluetoothFunctionThread extends Thread {
     private final String TAG = new String(".Threads.BluetoothFunctionThread");
-    private final Context mContext;
     private final Handler mHandler;
     private final BluetoothSocket mBluetoothSocket;
     private final InputStream inputStream;
     private final OutputStream outputStream;
     private String mBuffer;
-    private int numBytesRead;
     private boolean keepRunning;
 
-    public BluetoothFunctionThread(Context context, Handler handler, BluetoothSocket bluetoothSocket) {
-        mContext = context;
+    public BluetoothFunctionThread(Handler handler, BluetoothSocket bluetoothSocket) {
         mHandler = handler;
         mBluetoothSocket = bluetoothSocket;
         InputStream inpStream = null;
@@ -49,7 +41,6 @@ public class BluetoothFunctionThread extends Thread {
 
         inputStream = inpStream;
         outputStream = outStream;
-        numBytesRead = 0;
         keepRunning = true;
     }
 

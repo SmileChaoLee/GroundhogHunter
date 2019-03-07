@@ -396,7 +396,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     Log.d(TAG, "Started to read player name.");
                     // start reading data from the other device and writing data to the other device
                     // start communicating
-                    BluetoothFunctionThread mBluetoothFunctionThread = new BluetoothFunctionThread(mContext, createGameHandler, mBluetoothSocket);
+                    BluetoothFunctionThread mBluetoothFunctionThread = new BluetoothFunctionThread(createGameHandler, mBluetoothSocket);
                     mBluetoothFunctionThread.start();
                     bluetoothFunctionThreadList.add(mBluetoothFunctionThread);
 

@@ -448,7 +448,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         stopBluetoothConnectToThread(false);    // do not close the BluetoothSocket
                         // start reading data from the other device and writing data to the other device
                         // start communicating
-                        BluetoothFunctionThread mBluetoothFunctionThread = new BluetoothFunctionThread(mContext, joinGameHandler, mBluetoothSocket);
+                        BluetoothFunctionThread mBluetoothFunctionThread = new BluetoothFunctionThread(joinGameHandler, mBluetoothSocket);
                         mBluetoothFunctionThread.start();
                         bluetoothFunctionThreadList.add(mBluetoothFunctionThread);
                     } else {
