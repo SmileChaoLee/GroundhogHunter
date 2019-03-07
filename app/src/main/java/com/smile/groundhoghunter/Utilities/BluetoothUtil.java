@@ -2,6 +2,9 @@ package com.smile.groundhoghunter.Utilities;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+
+import java.io.IOException;
 
 public class BluetoothUtil {
     public static String getBluetoothDeviceName(BluetoothDevice mBluetoothDevice) {
@@ -32,5 +35,17 @@ public class BluetoothUtil {
         }
 
         return deviceName;
+    }
+
+    public static void closeBluetoothSocket(BluetoothSocket mBluetoothSocket ) {
+
+        if (mBluetoothSocket != null) {
+            // close connection
+            try {
+                mBluetoothSocket.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }

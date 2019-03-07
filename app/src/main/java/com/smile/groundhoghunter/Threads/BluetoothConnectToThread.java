@@ -37,11 +37,14 @@ public class BluetoothConnectToThread extends Thread {
         // MY_UUID is the app's UUID string, also used in the server code.
         try {
             temp = mBluetoothDevice.createRfcommSocketToServiceRecord(mAppUUID);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Log.e(TAG, "BluetoothSocket's create() method failed", ex);
         }
 
         mBluetoothSocket = temp;
+        if (mBluetoothSocket.isConnected()) {
+            BluetoothUtil.closeBluetoothSocket(mBluetoothSocket);
+        }
     }
 
     public void run() {
@@ -65,8 +68,8 @@ public class BluetoothConnectToThread extends Thread {
                 broadcastIntent = new Intent();
                 broadcastIntent.setAction(BluetoothConnectToThreadStarted);
                 broadcastIntent.putExtra("BluetoothDeviceName", deviceName);
-                mContext.sendBroadcast(broadcastIntent);
 
+                mContext.sendBroadcast(broadcastIntent);
                 mBluetoothSocket.connect();
                 Log.e(TAG, "Finished to connect to server socket ..........");
 
@@ -79,7 +82,7 @@ public class BluetoothConnectToThread extends Thread {
                 // the connection in a separate thread.
                 // manageMyConnectedSocket(mmSocket); // has not been implemented yet
 
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 // Unable to connect; close the socket and return.
                 Log.e(TAG, "Could not connect to server socket", ex);
                 broadcastIntent = new Intent();
@@ -88,7 +91,7 @@ public class BluetoothConnectToThread extends Thread {
                 mContext.sendBroadcast(broadcastIntent);
                 try {
                     mBluetoothSocket.close();
-                } catch (IOException closeException) {
+                } catch (Exception closeException) {
                     Log.e(TAG, "Could not close the client socket", closeException);
                 }
             }
@@ -96,14 +99,18 @@ public class BluetoothConnectToThread extends Thread {
     }
 
     // Closes the client socket and causes the thread to finish.
-    public void cancel() {
+    public void closeBluetoothSocket() {
 
         if (mBluetoothSocket != null) {
             try {
                 mBluetoothSocket.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "Could not close the client socket", e);
             }
         }
+    }
+
+    public BluetoothSocket getBluetoothSocket() {
+        return mBluetoothSocket;
     }
 }

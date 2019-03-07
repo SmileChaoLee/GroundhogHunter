@@ -50,6 +50,7 @@
     <string name="createString">Create</string>
     <string name="joinString">Join</string>
     <string name="refreshString">Fresh</string>
+    <string name="startGameString">Start Game</string>
 
     <string name="gameStatusString">Status:</string>
     <string name="loadingString">Loading ...</string>
@@ -83,7 +84,8 @@
     <string name="explainProblemForInternetString">If you have any problem with connecting, please reconnect to internet.</string>
     <string name="createBluetoothGameString">Create Bluetooth Game</string>
     <string name="joinBluetoothGameString">Join Bluetooth Game</string>
-    <string name="startGameString">Start Game</string>
+    <string name="clientLeftGameString">Client left game.</string>
+    <string name="hostLeftGameString">Host left game.</string>
 
     <string name="companyNameString">Smile Information Inc.</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

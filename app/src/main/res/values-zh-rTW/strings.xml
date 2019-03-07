@@ -52,6 +52,7 @@
     <string name="createString">創立</string>
     <string name="joinString">加入</string>
     <string name="refreshString">刷新</string>
+    <string name="startGameString">啟動遊戲</string>
 
     <string name="gameStatusString">狀態:</string>
     <string name="loadingString">下載中 ...</string>
@@ -85,7 +86,8 @@
     <string name="explainProblemForInternetString">如果連線有問題, 請重新連線到網際網路.</string>
     <string name="createBluetoothGameString">創立藍芽遊戲</string>
     <string name="joinBluetoothGameString">加入藍芽游戲</string>
-    <string name="startGameString">啟動遊戲</string>
+    <string name="clientLeftGameString">客戶端已經離開遊戲.</string>
+    <string name="hostLeftGameString">主遊戲端已經離開遊戲.</string>
 
     <string name="companyNameString">微笑資訊有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

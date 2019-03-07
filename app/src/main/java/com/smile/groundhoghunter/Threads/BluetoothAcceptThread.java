@@ -23,12 +23,15 @@ public class BluetoothAcceptThread extends Thread {
     private final java.util.UUID mAppUUID;
     private final BluetoothAdapter mBluetoothAdapter;
     private final BluetoothServerSocket mServerSocket;
+
+    private BluetoothSocket mBluetoothSocket;
     private boolean isListening;
 
     public BluetoothAcceptThread(Context context, BluetoothAdapter bluetoothAdapter, String deviceName, java.util.UUID appUUID) {
 
         mContext = context;
         mBluetoothAdapter = bluetoothAdapter;
+        mBluetoothSocket = null;
         mDeviceName = deviceName;
         mAppUUID = appUUID;
         isListening = false;
@@ -41,7 +44,7 @@ public class BluetoothAcceptThread extends Thread {
             try {
                 // app_UUID is the app's UUID string, also used by the client code.
                 temp = mBluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(mDeviceName, mAppUUID);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 Log.e(TAG, "Socket's listen() method failed", ex);
             }
         }
@@ -59,7 +62,6 @@ public class BluetoothAcceptThread extends Thread {
             return;
         }
         if (mServerSocket != null) {
-            BluetoothSocket mBluetoothSocket = null;
             // Keep listening until exception occurs or a socket is returned.
             try {
                 isListening = true; // listening
@@ -79,10 +81,9 @@ public class BluetoothAcceptThread extends Thread {
                     mContext.sendBroadcast(broadcastIntent);
 
                     // manageMyConnectedSocket(mBluetoothSocket);   // has not been implemented yet.
-
                     mServerSocket.close();
                 }
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 Log.e(TAG, "BluetoothSocket's accept() method failed", ex);
 
                 // listening is stopped (means BluetoothServerSocket closed or exception occurred)
@@ -99,16 +100,20 @@ public class BluetoothAcceptThread extends Thread {
     }
 
     // Closes the connect socket and causes the thread to finish.
-    public void cancel() {
+    public void closeServerSocket() {
 
         if (mServerSocket != null) {
             try {
-                Log.e(TAG, "Closing the connect socket");
+                Log.e(TAG, "Closing the server socket");
                 mServerSocket.close();
-                Log.e(TAG, "Connect socket closed.");
-            } catch (IOException ex) {
+                Log.e(TAG, "server socket closed.");
+            } catch (Exception ex) {
                 Log.e(TAG, "Could not close the connect socket", ex);
             }
         }
+    }
+
+    public BluetoothSocket getBluetoothSocket() {
+        return mBluetoothSocket;
     }
 }

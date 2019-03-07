@@ -52,6 +52,7 @@
     <string name="createString">创立</string>
     <string name="joinString">加入</string>
     <string name="refreshString">刷新</string>
+    <string name="startGameString">启动游戏</string>
 
     <string name="gameStatusString">状态:</string>
     <string name="loadingString">下载中 ...</string>
@@ -85,7 +86,8 @@
     <string name="explainProblemForInternetString">如果连线有问题, 请重新连线到网际网络.</string>
     <string name="createBluetoothGameString">创立蓝芽遊戏</string>
     <string name="joinBluetoothGameString">加入蓝芽遊戏</string>
-    <string name="startGameString">启动游戏</string>
+    <string name="clientLeftGameString">客户端已经离开游戏.</string>
+    <string name="hostLeftGameString">主游戏端已经离开游戏.</string>
 
     <string name="companyNameString">微笑资讯有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>
