@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.smile.groundhoghunter.ArrayAdatpers.TwoPlayerListAdapter;
+import com.smile.groundhoghunter.Interfaces.MessageConstants;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Threads.BluetoothAcceptThread;
 import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
@@ -77,7 +79,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        createGameHandler = new Handler(Looper.getMainLooper());
+        createGameHandler = new CreateGameHandler(Looper.getMainLooper());
 
         playerNameList = new ArrayList<>();
         bluetoothFunctionThreadList = new ArrayList<>();
@@ -86,11 +88,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
         btCreateGameReceiver = new BluetoothCreateGameBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-        intentFilter.addAction(BluetoothAcceptThread.BluetoothAcceptThreadNoServerSocket);
-        intentFilter.addAction(BluetoothAcceptThread.BluetoothAcceptThreadStarted);
-        intentFilter.addAction(BluetoothAcceptThread.BluetoothAcceptThreadConnected);
-        intentFilter.addAction(BluetoothAcceptThread.BluetoothAcceptThreadStopped);
-        intentFilter.addAction(BluetoothFunctionThread.PlayerNameHasBeenRead);
         registerReceiver(btCreateGameReceiver, intentFilter);
 
         float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
@@ -233,7 +230,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     // succeeded
                     ScreenUtil.showToast(this, bluetoothVisibilityForPeriodString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     // create a BluetoothSocket for listening for connection using a thread
-                    mBluetoothAcceptThread = new BluetoothAcceptThread(this, mBluetoothAdapter, playerName, GroundhogHunterApp.ApplicationUUID);
+                    mBluetoothAcceptThread = new BluetoothAcceptThread(createGameHandler, mBluetoothAdapter, playerName, GroundhogHunterApp.ApplicationUUID);
                     mBluetoothAcceptThread.start();
                     // ScreenUtil.showToast(this, "Listening for connection.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                 } else {
@@ -261,8 +258,13 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
             }
         }
 
-        if (twoPlayerListAdapter != null) {
+        if (btCreateGameReceiver != null) {
             unregisterReceiver(btCreateGameReceiver);
+        }
+
+        if (createGameHandler != null) {
+            createGameHandler.removeCallbacksAndMessages(null);
+            createGameHandler = null;
         }
     }
 
@@ -343,35 +345,32 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                         }
                     }
                     break;
-                case BluetoothAcceptThread.BluetoothAcceptThreadNoServerSocket:
-                    ScreenUtil.showToast(context, cannotCreateServerSocketString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    stopBluetoothAcceptThread();
-                    break;
-                case BluetoothAcceptThread.BluetoothAcceptThreadStarted:
-                    ScreenUtil.showToast(context, waitingForConnectionString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    break;
-                case BluetoothAcceptThread.BluetoothAcceptThreadConnected:
-                    ScreenUtil.showToast(context, serverAcceptedConnectionString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+            }
+        }
+    }
 
-                    mBluetoothSocket = mBluetoothAcceptThread.getBluetoothSocket();
-                    stopBluetoothAcceptThread();
+    private class CreateGameHandler extends Handler {
 
-                    Log.d(TAG, "Started to read player name.");
-                    // start reading data from the other device and writing data to the other device
-                    // start communicating
-                    BluetoothFunctionThread mBluetoothFunctionThread = new BluetoothFunctionThread(context, createGameHandler, mBluetoothSocket);
-                    mBluetoothFunctionThread.start();
-                    bluetoothFunctionThreadList.add(mBluetoothFunctionThread);
+        private final Looper mLooper;
+        private final Context mContext;
 
-                    break;
-                case BluetoothAcceptThread.BluetoothAcceptThreadStopped:
-                    ScreenUtil.showToast(context, waitingStoppedCancelledString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    stopBluetoothAcceptThread();
-                    break;
-                case BluetoothFunctionThread.PlayerNameHasBeenRead:
+        public CreateGameHandler(Looper looper) {
+            super(looper);
+            mLooper = looper;
+            mContext = getApplicationContext();
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            // super.handleMessage(msg);
+
+            Bundle data = msg.getData();
+
+            switch (msg.what) {
+                case MessageConstants.PlayerNameHasBeenRead:
                     Log.d(TAG, "Player name hsa been read.");
-                    ScreenUtil.showToast(context, "Player name has been read.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    pName = intent.getStringExtra("PlayerName");
+                    ScreenUtil.showToast(mContext, "Player name has been read.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    String pName = data.getString("PlayerName");
                     if (pName != null) {
                         if (!pName.isEmpty()) {
                             if (!playerNameList.contains(pName)) {
@@ -380,6 +379,31 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                             }
                         }
                     }
+                    break;
+                case MessageConstants.BluetoothAcceptThreadNoServerSocket:
+                    ScreenUtil.showToast(mContext, cannotCreateServerSocketString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    stopBluetoothAcceptThread();
+                    break;
+                case MessageConstants.BluetoothAcceptThreadStarted:
+                    ScreenUtil.showToast(mContext, waitingForConnectionString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    break;
+                case MessageConstants.BluetoothAcceptThreadConnected:
+                    ScreenUtil.showToast(mContext, serverAcceptedConnectionString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
+
+                    mBluetoothSocket = mBluetoothAcceptThread.getBluetoothSocket();
+                    stopBluetoothAcceptThread();
+
+                    Log.d(TAG, "Started to read player name.");
+                    // start reading data from the other device and writing data to the other device
+                    // start communicating
+                    BluetoothFunctionThread mBluetoothFunctionThread = new BluetoothFunctionThread(mContext, createGameHandler, mBluetoothSocket);
+                    mBluetoothFunctionThread.start();
+                    bluetoothFunctionThreadList.add(mBluetoothFunctionThread);
+
+                    break;
+                case MessageConstants.BluetoothAcceptThreadStopped:
+                    ScreenUtil.showToast(mContext, waitingStoppedCancelledString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    stopBluetoothAcceptThread();
                     break;
             }
         }

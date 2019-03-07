@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.smile.groundhoghunter.ArrayAdatpers.TwoPlayerListAdapter;
+import com.smile.groundhoghunter.Interfaces.MessageConstants;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Threads.BluetoothConnectToThread;
 import com.smile.groundhoghunter.Threads.BluetoothDiscoveryTimerThread;
@@ -80,7 +82,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        joinGameHandler = new Handler(Looper.getMainLooper());
+        joinGameHandler = new JoinGameHandler(Looper.getMainLooper());
 
         bluetoothDeviceHashSet = new HashSet<BluetoothDevice>();
         playerNameList = new ArrayList<>();
@@ -92,12 +94,6 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
         intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        intentFilter.addAction(BluetoothDiscoveryTimerThread.TimerHasReached);
-        intentFilter.addAction(BluetoothDiscoveryTimerThread.TimerHasBeenDismissed);
-        intentFilter.addAction(BluetoothConnectToThread.BluetoothConnectToThreadNoClientSocket);
-        intentFilter.addAction(BluetoothConnectToThread.BluetoothConnectToThreadStarted);
-        intentFilter.addAction(BluetoothConnectToThread.BluetoothConnectToThreadConnected);
-        intentFilter.addAction(BluetoothConnectToThread.BluetoothConnectToThreadFailedToConnect);
         registerReceiver(btJoinGameReceiver, intentFilter);
 
         float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
@@ -259,8 +255,12 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
             }
         }
 
-        if (twoPlayerListAdapter != null) {
+        if (btJoinGameReceiver != null) {
             unregisterReceiver(btJoinGameReceiver);
+        }
+
+        if (joinGameHandler != null) {
+            joinGameHandler.removeCallbacksAndMessages(null);
         }
     }
 
@@ -287,7 +287,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
 
     private void startBluetoothDiscoveryTimerThread() {
         int timerPeriod = durationForBluetoothVisible * 1000;   // transfer to mini seconds
-        mBluetoothDiscoveryTimerThread = new BluetoothDiscoveryTimerThread(this, timerPeriod);
+        mBluetoothDiscoveryTimerThread = new BluetoothDiscoveryTimerThread(joinGameHandler, timerPeriod);
         mBluetoothDiscoveryTimerThread.start();
     }
 
@@ -353,7 +353,6 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String megString;
-            String deviceName = "";
             String action = "";
             if (intent != null) {
                 action = intent.getAction();
@@ -372,7 +371,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                             bluetoothDeviceHashSet.add(mBluetoothDevice);
                             mBluetoothAdapter.cancelDiscovery();    // stop discovering to speed up connection
                             stopBluetoothConnectToThread(true);
-                            mBluetoothConnectToThread = new BluetoothConnectToThread(context, mBluetoothDevice, GroundhogHunterApp.ApplicationUUID);
+                            mBluetoothConnectToThread = new BluetoothConnectToThread(joinGameHandler, mBluetoothDevice, GroundhogHunterApp.ApplicationUUID);
                             mBluetoothConnectToThread.start();
                         }
                     }
@@ -380,31 +379,61 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                 case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
                     megString = scanBluetoothStartedString;
                     Log.d(TAG, megString);
-                    // ScreenUtil.showToast(context, scanBluetoothStartedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    ScreenUtil.showToast(context, scanBluetoothStartedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
                     megString = scanBluetoothFinishedString;
                     Log.d(TAG, megString);
                     // ScreenUtil.showToast(context, scanBluetoothFinishedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
-                case BluetoothConnectToThread.BluetoothConnectToThreadNoClientSocket:
+            }
+        }
+    }
+
+    private class JoinGameHandler extends Handler {
+
+        private final Looper mLooper;
+        private final Context mContext;
+
+        public JoinGameHandler(Looper looper) {
+            super(looper);
+            mLooper = looper;
+            mContext = getApplicationContext();
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            // super.handleMessage(msg);
+
+            String megString;
+            String deviceName = "";
+            Bundle data = msg.getData();
+
+            switch (msg.what) {
+                case MessageConstants.BluetoothConnectToThreadNoClientSocket:
                     megString = cannotCreateClientSocketString;
                     Log.d(TAG, megString);
-                    ScreenUtil.showToast(context, cannotCreateClientSocketString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    ScreenUtil.showToast(mContext, cannotCreateClientSocketString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     stopBluetoothDiscoveryTimerThread();
                     stopBluetoothConnectToThread(true);
                     break;
-                case BluetoothConnectToThread.BluetoothConnectToThreadStarted:
-                    deviceName = intent.getStringExtra("BluetoothDeviceName");
+                case MessageConstants.BluetoothConnectToThreadStarted:
+                    deviceName = "";
+                    if (data != null) {
+                        deviceName = data.getString("BluetoothDeviceName");
+                    }
                     megString = startedConnectingToHostString + "("+deviceName+")";
                     Log.d(TAG, megString);
                     // ScreenUtil.showToast(context, startedConnectingToHostString + "("+deviceName+")", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
-                case BluetoothConnectToThread.BluetoothConnectToThreadConnected:
-                    deviceName = intent.getStringExtra("BluetoothDeviceName");
+                case MessageConstants.BluetoothConnectToThreadConnected:
+                    deviceName = "";
+                    if (data != null) {
+                        deviceName = data.getString("BluetoothDeviceName");
+                    }
                     megString = connectToHostSucceededString + "("+deviceName+")";
                     Log.d(TAG, megString);
-                    ScreenUtil.showToast(context, connectToHostSucceededString +"("+deviceName+")", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    // ScreenUtil.showToast(mContext, connectToHostSucceededString +"("+deviceName+")", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     boolean isAddedName = false;
                     if ((deviceName != null) && (!deviceName.isEmpty())) {
                         if (!playerNameList.contains(deviceName)) {
@@ -419,34 +448,37 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         stopBluetoothConnectToThread(false);    // do not close the BluetoothSocket
                         // start reading data from the other device and writing data to the other device
                         // start communicating
-                        BluetoothFunctionThread mBluetoothFunctionThread = new BluetoothFunctionThread(context, joinGameHandler, mBluetoothSocket);
+                        BluetoothFunctionThread mBluetoothFunctionThread = new BluetoothFunctionThread(mContext, joinGameHandler, mBluetoothSocket);
                         mBluetoothFunctionThread.start();
                         bluetoothFunctionThreadList.add(mBluetoothFunctionThread);
                     } else {
                         stopBluetoothConnectToThread(true);    // close the BluetoothSocket
                     }
                     break;
-                case BluetoothConnectToThread.BluetoothConnectToThreadFailedToConnect:
-                    deviceName = intent.getStringExtra("BluetoothDeviceName");
+                case MessageConstants.BluetoothConnectToThreadFailedToConnect:
+                    deviceName = "";
+                    if (data != null) {
+                        deviceName = data.getString("BluetoothDeviceName");
+                    }
                     megString = connectToHostFailedString + "("+deviceName+")";
                     Log.d(TAG, megString);
                     // ScreenUtil.showToast(context, connectToHostFailedString + "("+deviceName+")", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     mBluetoothAdapter.startDiscovery(); // start discovering again
                     stopBluetoothConnectToThread(true);
                     break;
-                case BluetoothDiscoveryTimerThread.TimerHasReached:
+                case MessageConstants.DiscoveryTimerHasReached:
                     megString = "Discovery time has reached.";
                     Log.d(TAG, megString);
-                    ScreenUtil.showToast(context, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    ScreenUtil.showToast(mContext, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     if (mBluetoothAdapter.isDiscovering()) {
                         mBluetoothAdapter.cancelDiscovery();
                     }
                     stopBluetoothConnectToThread(true);
                     break;
-                case BluetoothDiscoveryTimerThread.TimerHasBeenDismissed:
+                case MessageConstants.DiscoveryTimerHasBeenDismissed:
                     megString = "Discovery timer has been dismissed.";
                     Log.d(TAG, megString);
-                    ScreenUtil.showToast(context, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    ScreenUtil.showToast(mContext, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
             }
         }

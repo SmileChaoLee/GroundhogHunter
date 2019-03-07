@@ -1,26 +1,29 @@
 package com.smile.groundhoghunter.Threads;
 
-import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+
+import com.smile.groundhoghunter.Interfaces.MessageConstants;
 
 public class BluetoothDiscoveryTimerThread extends Thread {
 
-    public static final String TimerHasReached = ".Threads.BluetoothDiscoveryTimerThread.TimerHasReached";
-    public static final String TimerHasBeenDismissed = ".Threads.BluetoothDiscoveryTimerThread.TimerHasBeenDismissed";
-    private final Context mContext;
+    private final Handler mHandler;
     private final int mTimerPeriod;
     private final int mTimeEachLopp = 300;   // 300 ms
     private boolean keepRunning;
 
-    public BluetoothDiscoveryTimerThread(Context context, int timerPeriod) {
-        mContext = context;
+    public BluetoothDiscoveryTimerThread(Handler handler, int timerPeriod) {
+        mHandler = handler;
         mTimerPeriod = timerPeriod;
         keepRunning = true;
     }
 
     public void run() {
 
+        Message msg;
         int elapsedTime= 0;
+
         while ( (elapsedTime < mTimerPeriod) && keepRunning) {
             try {
                 Thread.sleep(mTimeEachLopp);
@@ -33,11 +36,11 @@ public class BluetoothDiscoveryTimerThread extends Thread {
         Intent broadcastIntent = new Intent();
         if (keepRunning) {
             // send message to activity to cancel discovery
-            broadcastIntent.setAction(TimerHasReached);
-            mContext.sendBroadcast(broadcastIntent);
+            msg = mHandler.obtainMessage(MessageConstants.DiscoveryTimerHasReached);
+            msg.sendToTarget();
         } else {
-            broadcastIntent.setAction(TimerHasBeenDismissed);
-            mContext.sendBroadcast(broadcastIntent);
+            msg = mHandler.obtainMessage(MessageConstants.DiscoveryTimerHasBeenDismissed);
+            msg.sendToTarget();
         }
     }
 

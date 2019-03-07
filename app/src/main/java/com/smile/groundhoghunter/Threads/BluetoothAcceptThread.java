@@ -3,22 +3,17 @@ package com.smile.groundhoghunter.Threads;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
-import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
-import java.io.IOException;
+import com.smile.groundhoghunter.Interfaces.MessageConstants;
 
 public class BluetoothAcceptThread extends Thread {
 
-    public static final String BluetoothAcceptThreadNoServerSocket = ".Threads.BluetoothAcceptThread.NoServerSocket";
-    public static final String BluetoothAcceptThreadStarted = ".Threads.BluetoothAcceptThread.Started";
-    public static final String BluetoothAcceptThreadStopped = ".Threads.BluetoothAcceptThread.Stopped";
-    public static final String BluetoothAcceptThreadConnected =  ".Threads.BluetoothAcceptThread.Connected";
-
     private static final String TAG = new String(".Threads.BluetoothAcceptThread");
-    private final Context mContext;
+    private final Handler mHandler;
     private final String mDeviceName;
     private final java.util.UUID mAppUUID;
     private final BluetoothAdapter mBluetoothAdapter;
@@ -27,9 +22,9 @@ public class BluetoothAcceptThread extends Thread {
     private BluetoothSocket mBluetoothSocket;
     private boolean isListening;
 
-    public BluetoothAcceptThread(Context context, BluetoothAdapter bluetoothAdapter, String deviceName, java.util.UUID appUUID) {
+    public BluetoothAcceptThread(Handler handler, BluetoothAdapter bluetoothAdapter, String deviceName, java.util.UUID appUUID) {
 
-        mContext = context;
+        mHandler = handler;
         mBluetoothAdapter = bluetoothAdapter;
         mBluetoothSocket = null;
         mDeviceName = deviceName;
@@ -53,12 +48,12 @@ public class BluetoothAcceptThread extends Thread {
 
     public void run() {
 
-        Intent broadcastIntent;
+        Message msg;
+
         if (mServerSocket == null) {
             // cannot create Server Socket
-            broadcastIntent = new Intent();
-            broadcastIntent.setAction(BluetoothAcceptThreadNoServerSocket);
-            mContext.sendBroadcast(broadcastIntent);
+            msg = mHandler.obtainMessage(MessageConstants.BluetoothAcceptThreadNoServerSocket);
+            msg.sendToTarget();
             return;
         }
         if (mServerSocket != null) {
@@ -66,9 +61,8 @@ public class BluetoothAcceptThread extends Thread {
             try {
                 isListening = true; // listening
 
-                broadcastIntent = new Intent();
-                broadcastIntent.setAction(BluetoothAcceptThreadStarted);
-                mContext.sendBroadcast(broadcastIntent);
+                msg = mHandler.obtainMessage(MessageConstants.BluetoothAcceptThreadStarted);
+                msg.sendToTarget();
 
                 mBluetoothSocket = mServerSocket.accept();
                 Log.e(TAG, "BluetoothSocket's accept() method finished.");
@@ -76,11 +70,10 @@ public class BluetoothAcceptThread extends Thread {
                 if (mBluetoothSocket != null) {
                     // A connection was accepted. Perform work associated with
                     // the connection in a separate thread.
-                    broadcastIntent = new Intent();
-                    broadcastIntent.setAction(BluetoothAcceptThreadConnected);
-                    mContext.sendBroadcast(broadcastIntent);
 
-                    // manageMyConnectedSocket(mBluetoothSocket);   // has not been implemented yet.
+                    msg = mHandler.obtainMessage(MessageConstants.BluetoothAcceptThreadConnected);
+                    msg.sendToTarget();
+
                     mServerSocket.close();
                 }
             } catch (Exception ex) {
@@ -88,9 +81,8 @@ public class BluetoothAcceptThread extends Thread {
 
                 // listening is stopped (means BluetoothServerSocket closed or exception occurred)
                 isListening = false;
-                broadcastIntent = new Intent();
-                broadcastIntent.setAction(BluetoothAcceptThreadStopped);
-                mContext.sendBroadcast(broadcastIntent);
+                msg = mHandler.obtainMessage(MessageConstants.BluetoothAcceptThreadStopped);
+                msg.sendToTarget();
             }
         }
     }

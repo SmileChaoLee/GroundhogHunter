@@ -3,18 +3,20 @@ package com.smile.groundhoghunter.Threads;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import com.smile.groundhoghunter.Interfaces.MessageConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 public class BluetoothFunctionThread extends Thread {
-    public static final String PlayerNameHasBeenRead = ".Threads.BluetoothFunctionThread.PlayerNameHasBeenRead";
-
     private final String TAG = new String(".Threads.BluetoothFunctionThread");
-
     private final Context mContext;
     private final Handler mHandler;
     private final BluetoothSocket mBluetoothSocket;
@@ -55,6 +57,8 @@ public class BluetoothFunctionThread extends Thread {
             return;
         }
 
+        Message readMsg;
+        Bundle data;
         while (keepRunning) {
             try {
                 // numBytesRead = inputStream.read(mBuffer);
@@ -67,10 +71,17 @@ public class BluetoothFunctionThread extends Thread {
                 Log.d(TAG, "BluetoothReadFromThread: " + playerName);
 
                 if (!playerName.isEmpty()) {
+                    /*
                     Intent broadcastIntent = new Intent();
                     broadcastIntent.setAction(PlayerNameHasBeenRead);
                     broadcastIntent.putExtra("PlayerName", playerName);
                     mContext.sendBroadcast(broadcastIntent);
+                    */
+                    readMsg = mHandler.obtainMessage(MessageConstants.PlayerNameHasBeenRead);
+                    data = new Bundle();
+                    data.putString("PlayerName", playerName);
+                    readMsg.setData(data);
+                    readMsg.sendToTarget();
                     Log.d(TAG, "Player name is not empty.");
                 } else {
                     Log.d(TAG, "Player name is empty.");
