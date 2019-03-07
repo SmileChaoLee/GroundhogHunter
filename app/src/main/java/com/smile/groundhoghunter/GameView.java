@@ -23,9 +23,11 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.smile.groundhoghunter.Models.Groundhog;
+import com.smile.groundhoghunter.Threads.GameTimerThread;
+import com.smile.groundhoghunter.Threads.GameViewDrawThread;
+import com.smile.groundhoghunter.Threads.GroundhogRandomThread;
 import com.smile.groundhoghunter.Utilities.SoundUtil;
 import com.smile.smilepublicclasseslibrary.player_record_rest.PlayerRecordRest;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
@@ -36,6 +38,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = "GameView";
 
+    private float textFontSize;
+    private float fontScale;
     private final SurfaceHolder surfaceHolder;
     private final GroundhogActivity groundhogActivity;
     private final int rowNum;
@@ -51,14 +55,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private int timeRemaining;
     private GameViewDrawThread gameViewDrawThread;
     private GroundhogRandomThread groundhogRandomThread;
-    private TimerThread timerThread;
+    private GameTimerThread gameTimerThread;
     private boolean surfaceViewCreated;
     private int runningStatus;
     private boolean hasSound;
 
     // default properties (package modifier)
-    Groundhog[] groundhogArray;
-
+    public Groundhog[] groundhogArray;
     // public static properties
     public static boolean GameViewPause = false;    // for synchronizing
 
@@ -79,9 +82,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public static final Bitmap[] GroundhogHitBitmaps;
     public static final int[] hitScores;
     public static final Bitmap score_board;
-
-    private float textFontSize;
-    private float fontScale;
 
     static {
         DrawingInterval = 80;
@@ -248,13 +248,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
             runningStatus = 1;  // game is set to be running
 
-            timerThread = new TimerThread(this);
+            gameTimerThread = new GameTimerThread(this);
             groundhogRandomThread = new GroundhogRandomThread(this);
             gameViewDrawThread = new GameViewDrawThread(this);
 
             groundhogRandomThread.start();
             gameViewDrawThread.start();
-            timerThread.start();
+            gameTimerThread.start();
         }
     }
 
@@ -303,7 +303,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void drawGameScreen() {
         Canvas canvas = null;
-        timeRemaining = timerThread.getTimeRemaining();
+        timeRemaining = gameTimerThread.getTimeRemaining();
         startDrawingScreen();
         if ( (timeRemaining <=0 ) && (runningStatus == 1) ) {
             // if game is running and timer is finished, then it is game over
@@ -360,13 +360,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
 
-        if (timerThread != null) {
-            timerThread.setKeepRunning(false);    // stop the timerThread
+        if (gameTimerThread != null) {
+            gameTimerThread.setKeepRunning(false);    // stop the gameTimerThread
             retry = true;
             while (retry) {
                 try {
-                    timerThread.join();
-                    Log.d(TAG, "timerThread.Join()........\n");
+                    gameTimerThread.join();
+                    Log.d(TAG, "gameTimerThread.Join()........\n");
                     retry = false;
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
@@ -454,7 +454,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         // but do not use Thread.join() to stop stop thread
         gameViewDrawThread.setKeepRunning(false);
         groundhogRandomThread.setKeepRunning(false);
-        timerThread.setKeepRunning(false);
+        gameTimerThread.setKeepRunning(false);
 
         runningStatus = 2;
         boolean isInTop10 = GroundhogHunterApp.ScoreSQLiteDB.isInTop10(currentScore);

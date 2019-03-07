@@ -1,20 +1,21 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.Threads;
 
-public class TimerThread extends Thread {
+import com.smile.groundhoghunter.GameView;
+import com.smile.groundhoghunter.GroundhogActivity;
+
+public class GameViewDrawThread extends Thread {
 
     private GameView gameView;
     private boolean keepRunning;
-    private int synchronizeTime = 1000; // one second
-    private int timeRemaining;
+    private int synchronizeTime = GameView.DrawingInterval;
 
-    public TimerThread(GameView gView) {
+    public GameViewDrawThread(GameView gView) {
         this.gameView = gView;
-        keepRunning = true;
-        timeRemaining = GameView.TimerInterval;
+        keepRunning = true; // keepRunning = true -> loop in run() still going
     }
 
     public void run() {
-        while ( (timeRemaining>0) && (keepRunning) ) {
+        while (keepRunning) {
             synchronized (GroundhogActivity.ActivityHandler) {
                 // for application's (Main activity) synchronizing
                 while (GroundhogActivity.GamePause) {
@@ -37,16 +38,14 @@ public class TimerThread extends Thread {
                 }
             }
 
+            // start drawing
+            gameView.drawGameScreen();
+
             try{Thread.sleep(synchronizeTime);}
             catch(Exception e){e.printStackTrace();}
-
-            --timeRemaining;
         }
     }
 
-    public int getTimeRemaining() {
-        return this.timeRemaining;
-    }
     public void setKeepRunning(boolean keepRunning) {
         this.keepRunning = keepRunning;
     }

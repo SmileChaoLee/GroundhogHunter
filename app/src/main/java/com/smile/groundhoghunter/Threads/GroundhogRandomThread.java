@@ -1,5 +1,7 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.Threads;
 
+import com.smile.groundhoghunter.GameView;
+import com.smile.groundhoghunter.GroundhogActivity;
 import com.smile.groundhoghunter.Models.Groundhog;
 
 import java.util.Random;

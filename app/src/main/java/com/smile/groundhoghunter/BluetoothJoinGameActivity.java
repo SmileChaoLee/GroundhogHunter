@@ -187,8 +187,6 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         refreshJoinGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // stopBluetoothConnectToThread(true);
-                // Log.d(TAG, "Refresh --> stopBluetoothConnectToThread(true)");
                 startBluetoothDiscovery();
                 Log.d(TAG, "Refresh --> startBluetoothDiscovery()");
             }
@@ -246,6 +244,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         // recover the status of bluetooth
 
         stopBluetoothWritePlayerNameThread();
+
         stopBluetoothDiscoveryTimerThread();
         stopBluetoothConnectToThread(true);
         BluetoothUtil.closeBluetoothSocket(mBluetoothSocket);
@@ -281,8 +280,8 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         twoPlayerListAdapter.notifyDataSetChanged();
 
         stopBluetoothWritePlayerNameThread();
+
         stopBluetoothConnectToThread(true);
-        // close BluetoothSocket if already connected
         BluetoothUtil.closeBluetoothSocket(mBluetoothSocket);
 
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
