@@ -14,6 +14,8 @@ import com.smile.groundhoghunter.Interfaces.MessageConstants;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 
 public class BluetoothFunctionThread extends Thread {
     private final String TAG = new String(".Threads.BluetoothFunctionThread");
@@ -22,7 +24,7 @@ public class BluetoothFunctionThread extends Thread {
     private final BluetoothSocket mBluetoothSocket;
     private final InputStream inputStream;
     private final OutputStream outputStream;
-    private byte[] mBuffer = new byte[1024];
+    private String mBuffer;
     private int numBytesRead;
     private boolean keepRunning;
 
@@ -59,33 +61,35 @@ public class BluetoothFunctionThread extends Thread {
 
         Message readMsg;
         Bundle data;
+
         while (keepRunning) {
             try {
-                // numBytesRead = inputStream.read(mBuffer);
-                // int head = inputStream.read();
-                Log.d(TAG, "BluetoothReadFromThread start reading");
-                byte[] stringRead = new byte[100];
-                int byteNum = inputStream.read(stringRead);
-                String playerName = new String(stringRead);
-                playerName = playerName.substring(0, byteNum);
-                Log.d(TAG, "BluetoothReadFromThread: " + playerName);
-
-                if (!playerName.isEmpty()) {
-                    /*
-                    Intent broadcastIntent = new Intent();
-                    broadcastIntent.setAction(PlayerNameHasBeenRead);
-                    broadcastIntent.putExtra("PlayerName", playerName);
-                    mContext.sendBroadcast(broadcastIntent);
-                    */
-                    readMsg = mHandler.obtainMessage(MessageConstants.PlayerNameHasBeenRead);
-                    data = new Bundle();
-                    data.putString("PlayerName", playerName);
-                    readMsg.setData(data);
-                    readMsg.sendToTarget();
-                    Log.d(TAG, "Player name is not empty.");
-                } else {
-                    Log.d(TAG, "Player name is empty.");
+                Log.d(TAG, "BluetoothFunctionThread start reading");
+                int byteHead = inputStream.read();
+                int dataLength = inputStream.read();
+                StringBuilder sb = new StringBuilder();
+                int readBuff = -1;
+                int byteRead = 0;
+                while ( (byteRead<=dataLength) && ((readBuff=inputStream.read()) != -1) && (readBuff != '\n')) {
+                    sb.append((char)readBuff);
+                    byteRead++;
                 }
+                mBuffer = sb.toString();
+                switch (byteHead) {
+                    case MessageConstants.PlayerNameHasBeenRead:
+                        if (!mBuffer.isEmpty()) {
+                            readMsg = mHandler.obtainMessage(MessageConstants.PlayerNameHasBeenRead);
+                            data = new Bundle();
+                            data.putString("PlayerName", mBuffer);
+                            readMsg.setData(data);
+                            readMsg.sendToTarget();
+                            Log.d(TAG, "Player name is not empty.");
+                        } else {
+                            Log.d(TAG, "Player name is empty.");
+                        }
+                        break;
+                }
+                Log.d(TAG, "BluetoothFunctionThread: " + mBuffer);
             } catch (Exception ex) {
                 Log.d(TAG, "Failed to read data.", ex);
                 break;
@@ -94,15 +98,23 @@ public class BluetoothFunctionThread extends Thread {
     }
 
     public String getDataRead() {
-        String data = new String(mBuffer);
-        data = data.substring(0, numBytesRead);
-        return data;
+        return mBuffer;
     }
 
-    public void write(String data) {
+    public void write(int headByte, String data) {
         try {
-            Log.d(TAG, "Write data to the other.");
-            outputStream.write(data.getBytes());
+            Log.d(TAG, "Started to write data to the other.");
+
+            int dataLength = data.length();
+            byte[] byteWrite = new byte[dataLength + 3];
+            byteWrite[0] = (byte)headByte;
+            byteWrite[1] = (byte)dataLength;
+            System.arraycopy(data.getBytes(), 0, byteWrite, 2, dataLength);
+            byteWrite[byteWrite.length - 1] = '\n';
+            Log.d(TAG, "byteWrite = " + new String(byteWrite));
+
+            outputStream.write(byteWrite);
+
             Log.d(TAG, "Succeeded to write data to the other.");
         } catch (Exception ex) {
             Log.d(TAG, "Failed to write data.", ex);

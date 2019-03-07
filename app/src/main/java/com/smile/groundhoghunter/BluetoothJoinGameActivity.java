@@ -169,7 +169,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         // write player name to the other device
                         BluetoothFunctionThread mBluetoothConnectToThread = bluetoothFunctionThreadList.get(position);
                         if (mBluetoothConnectToThread != null) {
-                            mBluetoothConnectToThread.write(playerName);
+                            mBluetoothConnectToThread.write(MessageConstants.PlayerNameHasBeenRead, playerName);
                         }
                     }
                 }
