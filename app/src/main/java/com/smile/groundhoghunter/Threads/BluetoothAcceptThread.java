@@ -3,12 +3,11 @@ package com.smile.groundhoghunter.Threads;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.smile.groundhoghunter.Interfaces.MessageConstants;
+import com.smile.groundhoghunter.Constants.BluetoothConstants;
 
 public class BluetoothAcceptThread extends Thread {
 
@@ -52,7 +51,7 @@ public class BluetoothAcceptThread extends Thread {
 
         if (mServerSocket == null) {
             // cannot create Server Socket
-            msg = mHandler.obtainMessage(MessageConstants.BluetoothAcceptThreadNoServerSocket);
+            msg = mHandler.obtainMessage(BluetoothConstants.BluetoothAcceptThreadNoServerSocket);
             msg.sendToTarget();
             return;
         }
@@ -61,7 +60,7 @@ public class BluetoothAcceptThread extends Thread {
             try {
                 isListening = true; // listening
 
-                msg = mHandler.obtainMessage(MessageConstants.BluetoothAcceptThreadStarted);
+                msg = mHandler.obtainMessage(BluetoothConstants.BluetoothAcceptThreadStarted);
                 msg.sendToTarget();
 
                 mBluetoothSocket = mServerSocket.accept();
@@ -71,7 +70,7 @@ public class BluetoothAcceptThread extends Thread {
                     // A connection was accepted. Perform work associated with
                     // the connection in a separate thread.
 
-                    msg = mHandler.obtainMessage(MessageConstants.BluetoothAcceptThreadConnected);
+                    msg = mHandler.obtainMessage(BluetoothConstants.BluetoothAcceptThreadConnected);
                     msg.sendToTarget();
 
                     mServerSocket.close();
@@ -81,7 +80,7 @@ public class BluetoothAcceptThread extends Thread {
 
                 // listening is stopped (means BluetoothServerSocket closed or exception occurred)
                 isListening = false;
-                msg = mHandler.obtainMessage(MessageConstants.BluetoothAcceptThreadStopped);
+                msg = mHandler.obtainMessage(BluetoothConstants.BluetoothAcceptThreadStopped);
                 msg.sendToTarget();
             }
         }

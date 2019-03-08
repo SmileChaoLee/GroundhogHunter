@@ -1,13 +1,12 @@
 package com.smile.groundhoghunter.Threads;
 
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.smile.groundhoghunter.Interfaces.MessageConstants;
+import com.smile.groundhoghunter.Constants.BluetoothConstants;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -56,6 +55,7 @@ public class BluetoothFunctionThread extends Thread {
         while (keepRunning) {
             try {
                 Log.d(TAG, "BluetoothFunctionThread start reading");
+
                 int byteHead = inputStream.read();
                 int dataLength = inputStream.read();
                 StringBuilder sb = new StringBuilder();
@@ -66,20 +66,29 @@ public class BluetoothFunctionThread extends Thread {
                     byteRead++;
                 }
                 mBuffer = sb.toString();
+
                 switch (byteHead) {
-                    case MessageConstants.PlayerNameHasBeenRead:
+                    case BluetoothConstants.PlayerNameHasBeenRead:
                         if (!mBuffer.isEmpty()) {
-                            readMsg = mHandler.obtainMessage(MessageConstants.PlayerNameHasBeenRead);
+                            readMsg = mHandler.obtainMessage(BluetoothConstants.PlayerNameHasBeenRead);
                             data = new Bundle();
                             data.putString("PlayerName", mBuffer);
                             readMsg.setData(data);
                             readMsg.sendToTarget();
-                            Log.d(TAG, "Player name is not empty.");
                         } else {
                             Log.d(TAG, "Player name is empty.");
                         }
                         break;
+                    case BluetoothConstants.HostExitCode:
+                        readMsg = mHandler.obtainMessage(BluetoothConstants.HostExitCode);
+                        readMsg.sendToTarget();
+                        break;
+                    case BluetoothConstants.ClientExitCode:
+                        readMsg = mHandler.obtainMessage(BluetoothConstants.ClientExitCode);
+                        readMsg.sendToTarget();
+                        break;
                 }
+
                 Log.d(TAG, "BluetoothFunctionThread: " + mBuffer);
             } catch (Exception ex) {
                 Log.d(TAG, "Failed to read data.", ex);

@@ -7,7 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.smile.groundhoghunter.Interfaces.MessageConstants;
+import com.smile.groundhoghunter.Constants.BluetoothConstants;
 import com.smile.groundhoghunter.Utilities.BluetoothUtil;
 
 public class BluetoothConnectToThread extends Thread {
@@ -49,7 +49,7 @@ public class BluetoothConnectToThread extends Thread {
 
         if (mBluetoothSocket == null) {
             // cannot create Server Socket
-            msg = mHandler.obtainMessage(MessageConstants.BluetoothConnectToThreadNoClientSocket);
+            msg = mHandler.obtainMessage(BluetoothConstants.BluetoothConnectToThreadNoClientSocket);
             msg.sendToTarget();
             return;
         }
@@ -62,7 +62,7 @@ public class BluetoothConnectToThread extends Thread {
                 // until it succeeds or throws an exception.
                 Log.e(TAG, "Started to connect to server socket ..........");
 
-                msg = mHandler.obtainMessage(MessageConstants.BluetoothConnectToThreadStarted);
+                msg = mHandler.obtainMessage(BluetoothConstants.BluetoothConnectToThreadStarted);
                 data = new Bundle();
                 data.putString("BluetoothDeviceName", deviceName);
                 msg.setData(data);
@@ -71,7 +71,7 @@ public class BluetoothConnectToThread extends Thread {
                 mBluetoothSocket.connect();
                 Log.e(TAG, "Finished to connect to server socket ..........");
 
-                msg = mHandler.obtainMessage(MessageConstants.BluetoothConnectToThreadConnected);
+                msg = mHandler.obtainMessage(BluetoothConstants.BluetoothConnectToThreadConnected);
                 data = new Bundle();
                 data.putString("BluetoothDeviceName", deviceName);
                 msg.setData(data);
@@ -85,7 +85,7 @@ public class BluetoothConnectToThread extends Thread {
                 // Unable to connect; close the socket and return.
                 Log.e(TAG, "Could not connect to server socket", ex);
 
-                msg = mHandler.obtainMessage(MessageConstants.BluetoothConnectToThreadFailedToConnect);
+                msg = mHandler.obtainMessage(BluetoothConstants.BluetoothConnectToThreadFailedToConnect);
                 data = new Bundle();
                 data.putString("BluetoothDeviceName", deviceName);
                 msg.setData(data);
