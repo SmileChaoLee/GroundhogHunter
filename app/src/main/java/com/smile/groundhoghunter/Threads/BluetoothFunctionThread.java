@@ -20,6 +20,8 @@ public class BluetoothFunctionThread extends Thread {
     private String mBuffer;
     private boolean keepRunning;
 
+    private BluetoothFunctionThread thisThread;
+
     public BluetoothFunctionThread(Handler handler, BluetoothSocket bluetoothSocket) {
         mHandler = handler;
         mBluetoothSocket = bluetoothSocket;
@@ -41,6 +43,8 @@ public class BluetoothFunctionThread extends Thread {
         inputStream = inpStream;
         outputStream = outStream;
         keepRunning = true;
+
+        thisThread = this;
     }
 
     public void run() {
@@ -53,46 +57,50 @@ public class BluetoothFunctionThread extends Thread {
         Bundle data;
 
         while (keepRunning) {
-            try {
-                Log.d(TAG, "BluetoothFunctionThread start reading");
+            synchronized (thisThread) {
+                try {
+                    Log.d(TAG, "BluetoothFunctionThread start reading");
 
-                int byteHead = inputStream.read();
-                int dataLength = inputStream.read();
-                StringBuilder sb = new StringBuilder();
-                int readBuff = -1;
-                int byteRead = 0;
-                while ( (byteRead<=dataLength) && ((readBuff=inputStream.read()) != -1) && (readBuff != '\n')) {
-                    sb.append((char)readBuff);
-                    byteRead++;
-                }
-                mBuffer = sb.toString();
+                    int byteHead = inputStream.read();
+                    int dataLength = inputStream.read();
+                    StringBuilder sb = new StringBuilder();
+                    int readBuff = -1;
+                    int byteRead = 0;
+                    while ((byteRead <= dataLength) && ((readBuff = inputStream.read()) != -1) && (readBuff != '\n')) {
+                        sb.append((char) readBuff);
+                        byteRead++;
+                    }
+                    mBuffer = sb.toString();
 
-                switch (byteHead) {
-                    case BluetoothConstants.PlayerNameHasBeenRead:
-                        if (!mBuffer.isEmpty()) {
-                            readMsg = mHandler.obtainMessage(BluetoothConstants.PlayerNameHasBeenRead);
-                            data = new Bundle();
-                            data.putString("PlayerName", mBuffer);
-                            readMsg.setData(data);
+                    switch (byteHead) {
+                        case BluetoothConstants.OppositePlayerNameHasBeenRead:
+                            if (!mBuffer.isEmpty()) {
+                                readMsg = mHandler.obtainMessage(BluetoothConstants.OppositePlayerNameHasBeenRead);
+                                data = new Bundle();
+                                data.putString("OppositePlayerName", mBuffer);
+                                readMsg.setData(data);
+                                readMsg.sendToTarget();
+                            } else {
+                                Log.d(TAG, "Opposite player name is empty.");
+                            }
+                            break;
+                        case BluetoothConstants.HostExitCode:
+                            readMsg = mHandler.obtainMessage(BluetoothConstants.HostExitCode);
                             readMsg.sendToTarget();
-                        } else {
-                            Log.d(TAG, "Player name is empty.");
-                        }
-                        break;
-                    case BluetoothConstants.HostExitCode:
-                        readMsg = mHandler.obtainMessage(BluetoothConstants.HostExitCode);
-                        readMsg.sendToTarget();
-                        break;
-                    case BluetoothConstants.ClientExitCode:
-                        readMsg = mHandler.obtainMessage(BluetoothConstants.ClientExitCode);
-                        readMsg.sendToTarget();
-                        break;
-                }
+                            break;
+                        case BluetoothConstants.ClientExitCode:
+                            readMsg = mHandler.obtainMessage(BluetoothConstants.ClientExitCode);
+                            readMsg.sendToTarget();
+                            break;
+                    }
 
-                Log.d(TAG, "BluetoothFunctionThread: " + mBuffer);
-            } catch (Exception ex) {
-                Log.d(TAG, "Failed to read data.", ex);
-                break;
+                    Log.d(TAG, "BluetoothFunctionThread: " + mBuffer);
+                } catch (Exception ex) {
+                    Log.d(TAG, "Failed to read data.", ex);
+                    break;
+                }
+                Log.d(TAG, "NotifyAll().");
+                thisThread.notifyAll();
             }
         }
     }
@@ -123,6 +131,10 @@ public class BluetoothFunctionThread extends Thread {
 
     public void setKeepRunning(boolean keepRunning) {
         this.keepRunning = keepRunning;
+    }
+
+    public BluetoothSocket getBluetoothSocket() {
+        return mBluetoothSocket;
     }
 
     public void closeBluetoothSocket() {

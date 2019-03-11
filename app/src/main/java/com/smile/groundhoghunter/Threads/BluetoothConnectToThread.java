@@ -18,6 +18,7 @@ public class BluetoothConnectToThread extends Thread {
     private final java.util.UUID mAppUUID;
 
     private final BluetoothSocket mBluetoothSocket;
+    private BluetoothFunctionThread btFunctionThread;
 
     public BluetoothConnectToThread(Handler handler, BluetoothDevice bluetoothDevice, java.util.UUID appUUID) {
         mHandler = handler;
@@ -69,11 +70,25 @@ public class BluetoothConnectToThread extends Thread {
                 msg.sendToTarget();
 
                 mBluetoothSocket.connect();
-                Log.e(TAG, "Finished to connect to server socket ..........");
+                Log.e(TAG, "Connected to server socket.");
 
+                // start reading the opposite player's name
+                btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
+                // waiting for notification (notify)
+                synchronized (btFunctionThread) {
+                    btFunctionThread.start();
+                    Log.d(TAG, "Waiting for opposite player name.");
+                    try {
+                        btFunctionThread.wait();
+                        Log.d(TAG, "btFunctionThread got notified.");
+                    } catch (InterruptedException ex) {
+                        Log.d(TAG, "Failed to synchronize.");
+                        ex.printStackTrace();
+                    }
+                }
                 msg = mHandler.obtainMessage(BluetoothConstants.BluetoothConnectToThreadConnected);
                 data = new Bundle();
-                data.putString("BluetoothDeviceName", deviceName);
+                data.putString("OppositePlayerName", btFunctionThread.getDataRead());
                 msg.setData(data);
                 msg.sendToTarget();
 
@@ -106,6 +121,12 @@ public class BluetoothConnectToThread extends Thread {
         if (mBluetoothSocket != null) {
             try {
                 mBluetoothSocket.close();
+                if (btFunctionThread != null) {
+                    Log.e(TAG, "Notify beFunctionThread.");
+                    synchronized (btFunctionThread) {
+                        btFunctionThread.notifyAll();
+                    }
+                }
             } catch (Exception e) {
                 Log.e(TAG, "Could not close the client socket", e);
             }
@@ -114,5 +135,8 @@ public class BluetoothConnectToThread extends Thread {
 
     public BluetoothSocket getBluetoothSocket() {
         return mBluetoothSocket;
+    }
+    public BluetoothFunctionThread getBtFunctionThread() {
+        return btFunctionThread;
     }
 }

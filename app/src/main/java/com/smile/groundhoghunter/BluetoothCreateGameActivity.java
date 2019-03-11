@@ -16,6 +16,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -148,6 +150,22 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
         playerNameEditText.setText("");
         playerNameEditText.append(playerName);
         ScreenUtil.resizeTextSize(playerNameEditText, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        playerNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                playerName = editable.toString();
+            }
+        });
 
         playerListView = findViewById(R.id.playerListView);
         twoPlayerListAdapter = new TwoPlayerListAdapter(this, R.layout.player_list_item_layout, R.id.playerNameTextView, oppositePlayerNameList, textFontSize);
@@ -372,14 +390,14 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
             Bundle data = msg.getData();
 
             switch (msg.what) {
-                case BluetoothConstants.PlayerNameHasBeenRead:
-                    Log.d(TAG, "Player name hsa been read.");
-                    ScreenUtil.showToast(mContext, "Player name has been read.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    String pName = data.getString("PlayerName");
-                    if (pName != null) {
-                        if (!pName.isEmpty()) {
-                            if (!oppositePlayerNameList.contains(pName)) {
-                                oppositePlayerNameList.add(pName);
+                case BluetoothConstants.OppositePlayerNameHasBeenRead:
+                    Log.d(TAG, "Opposite player name hsa been read.");
+                    ScreenUtil.showToast(mContext, "Opposite player name hsa been read.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    String oppName = data.getString("OppositePlayerName");
+                    if (oppName != null) {
+                        if (!oppName.isEmpty()) {
+                            if (!oppositePlayerNameList.contains(oppName)) {
+                                oppositePlayerNameList.add(oppName);
                                 twoPlayerListAdapter.notifyDataSetChanged();
                             }
                         }

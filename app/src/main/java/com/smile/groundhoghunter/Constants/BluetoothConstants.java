@@ -11,7 +11,7 @@ public final class BluetoothConstants {
     public static final int BluetoothConnectToThreadStarted = 12;
     public static final int BluetoothConnectToThreadConnected = 13;
     public static final int BluetoothConnectToThreadFailedToConnect = 14;
-    public static final int PlayerNameHasBeenRead = 21;
+    public static final int OppositePlayerNameHasBeenRead = 21;
     public static final int DiscoveryTimerHasReached = 31;
     public static final int DiscoveryTimerHasBeenDismissed = 32;
     public static final int HostExitCode = 35;
