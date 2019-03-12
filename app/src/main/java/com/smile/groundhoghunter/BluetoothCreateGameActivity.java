@@ -53,7 +53,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
     private String playerName;
     private String oppositePlayerName;
     private ListView playerListView;
-    private ArrayList<Pair<String, String>> oppositePlayerNameList;
+    private HashMap<String, String> oppositePlayerNameMap;
 
     private String bluetoothNotSupportedString;
     private String playerNameCannotBeEmptyString;
@@ -82,7 +82,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
 
         createGameHandler = new CreateGameHandler(Looper.getMainLooper());
 
-        oppositePlayerNameList = new ArrayList<>();
+        oppositePlayerNameMap = new HashMap<>();
         btMacAddressThreadMap = new HashMap<>();
 
         // BroadcastReceiver and register it
@@ -254,8 +254,8 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
         btMacAddressThreadMap.clear();
         btMacAddressThreadMap = null;
 
-        oppositePlayerNameList.clear();
-        oppositePlayerNameList = null;
+        oppositePlayerNameMap.clear();
+        oppositePlayerNameMap = null;
         twoPlayerListAdapter.clear();
         twoPlayerListAdapter = null;
 
@@ -301,7 +301,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
 
         BluetoothUtil.stopBluetoothFunctionThreads(btMacAddressThreadMap);
         btMacAddressThreadMap.clear();
-        oppositePlayerNameList.clear();
+        oppositePlayerNameMap.clear();
         twoPlayerListAdapter.clear();
         twoPlayerListAdapter.notifyDataSetChanged();
 
@@ -389,12 +389,11 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                             btDevice = mBluetoothSocket.getRemoteDevice();
                             deviceName = BluetoothUtil.getBluetoothDeviceName(btDevice);
                             remoteMacAddress = btDevice.getAddress();
-                            Pair<String, String> mPair = new Pair<>(oppositeName, remoteMacAddress);
-                            if (!oppositePlayerNameList.contains(mPair)) {
-                                oppositePlayerNameList.add(mPair);
+                            if (!oppositePlayerNameMap.containsKey(remoteMacAddress)) {
+                                oppositePlayerNameMap.put(remoteMacAddress, oppositeName);
                                 ArrayList<String> oppNameList = new ArrayList<>();
-                                for (Pair<String, String> oppName : oppositePlayerNameList) {
-                                    oppNameList.add(oppName.first);
+                                for (String macAddress : oppositePlayerNameMap.keySet()) {
+                                    oppNameList.add(oppositePlayerNameMap.get(macAddress));
                                 }
                                 twoPlayerListAdapter.updateData(oppNameList);
                             }
@@ -438,19 +437,20 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     remoteMacAddress = data.getString("BluetoothMacAddress");
                     btFunctionThread = btMacAddressThreadMap.get(remoteMacAddress);
                     btMacAddressThreadMap.remove(remoteMacAddress);
+
                     // release btFunctionThread (stop communicating)
                     BluetoothUtil.stopBluetoothFunctionThread(btFunctionThread);
+
                     // remove the remote connected device from oppositePlayerNameList
-                    for (Pair<String, String> oppArr : oppositePlayerNameList) {
-                        if (oppArr.second.equals(remoteMacAddress)) {
-                            oppositePlayerNameList.remove(oppArr);
-                        }
-                    }
+                    oppositePlayerNameMap.remove(remoteMacAddress);
+
+                    // update list view
                     ArrayList<String> oppNameList = new ArrayList<>();
-                    for (Pair<String, String> oppName : oppositePlayerNameList) {
-                        oppNameList.add(oppName.first);
+                    for (String macAddress : oppositePlayerNameMap.keySet()) {
+                        oppNameList.add(oppositePlayerNameMap.get(macAddress));
                     }
                     twoPlayerListAdapter.updateData(oppNameList);
+
                     break;
             }
         }
