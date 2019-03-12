@@ -287,8 +287,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
 
         if (mBluetoothAdapter != null) {
             String macAddress = mBluetoothAdapter.getAddress();
-            Set<String> btSocketThreadSet = btMacAddressThreadMap.keySet();
-            for (String remoteMacAddress : btSocketThreadSet) {
+            for (String remoteMacAddress : btMacAddressThreadMap.keySet()) {
                 BluetoothFunctionThread btFunctionThread = btMacAddressThreadMap.get(remoteMacAddress);
                 btFunctionThread.write(BluetoothConstants.HostExitCode, macAddress);
             }
@@ -383,12 +382,12 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     megString = oppositeName + " " + megString;
                     Log.d(TAG, megString);
                     ScreenUtil.showToast(mContext, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    mBluetoothSocket = mBluetoothAcceptThread.getBluetoothSocket();
+                    btDevice = mBluetoothSocket.getRemoteDevice();
+                    deviceName = BluetoothUtil.getBluetoothDeviceName(btDevice);
+                    remoteMacAddress = btDevice.getAddress();
                     if (oppositeName != null) {
                         if (!oppositeName.isEmpty()) {
-                            mBluetoothSocket = mBluetoothAcceptThread.getBluetoothSocket();
-                            btDevice = mBluetoothSocket.getRemoteDevice();
-                            deviceName = BluetoothUtil.getBluetoothDeviceName(btDevice);
-                            remoteMacAddress = btDevice.getAddress();
                             if (!oppositePlayerNameMap.containsKey(remoteMacAddress)) {
                                 oppositePlayerNameMap.put(remoteMacAddress, oppositeName);
                                 ArrayList<String> oppNameList = new ArrayList<>();

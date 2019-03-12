@@ -54,7 +54,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     private String playerName;
     private String oppositePlayerName;
     private ListView oppositePlayerListView;
-    private ArrayList<Pair<String, String>> oppositePlayerNameList;
+    private HashMap<String, String> oppositePlayerNameMap;
 
     private String bluetoothNotSupportedString;
     private String playerNameCannotBeEmptyString;
@@ -85,7 +85,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         joinGameHandler = new JoinGameHandler(Looper.getMainLooper());
 
         btDeviceDiscoveredHashSet = new HashSet<BluetoothDevice>();
-        oppositePlayerNameList = new ArrayList<>();
+        oppositePlayerNameMap = new HashMap<>();
         btMacAddressThreadMap = new HashMap<>();
 
         // BroadcastReceiver and register it
@@ -164,14 +164,21 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long rowId) {
                 if (adapterView != null) {
-                    oppositePlayerName = oppositePlayerNameList.get(position).first;
-                    String remoteMacAddress = oppositePlayerNameList.get(position).second;
-                    if (remoteMacAddress != null) {
-                        Log.d(TAG, "oppositePlayerName = " + oppositePlayerName);
+                    Object item = adapterView.getItemAtPosition(position);
+                    if (item != null) {
                         view.setSelected(true);
-                        BluetoothFunctionThread btFunctionThread = btMacAddressThreadMap.get(remoteMacAddress);
-                        if (btFunctionThread != null) {
-                            btFunctionThread.write(BluetoothConstants.OppositePlayerNameHasBeenRead, playerName);
+                        String temp = item.toString();
+                        oppositePlayerName = temp;
+                        String oppName;
+                        // get remote mac address of remote device
+                        for (String remoteMacAddress : oppositePlayerNameMap.keySet()) {
+                            oppName = oppositePlayerNameMap.get(remoteMacAddress);
+                            if (oppName.equals(oppositePlayerName)) {
+                                BluetoothFunctionThread btFunctionThread = btMacAddressThreadMap.get(remoteMacAddress);
+                                if (btFunctionThread != null) {
+                                    btFunctionThread.write(BluetoothConstants.OppositePlayerNameHasBeenRead, playerName);
+                                }
+                            }
                         }
                     }
                 }
@@ -242,8 +249,8 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
 
         btDeviceDiscoveredHashSet.clear(); // clear HashSet because of starting discovering
         btDeviceDiscoveredHashSet = null;
-        oppositePlayerNameList.clear();
-        oppositePlayerNameList = null;
+        oppositePlayerNameMap.clear();
+        oppositePlayerNameMap = null;
         twoPlayerListAdapter.clear();
         twoPlayerListAdapter = null;
 
@@ -278,8 +285,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
 
         if (mBluetoothAdapter != null) {
             String macAddress = mBluetoothAdapter.getAddress();
-            Set<String> btSocketThreadSet = btMacAddressThreadMap.keySet();
-            for (String remoteMacAddress : btSocketThreadSet) {
+            for (String remoteMacAddress : btMacAddressThreadMap.keySet()) {
                 BluetoothFunctionThread btFunctionThread = btMacAddressThreadMap.get(remoteMacAddress);
                 btFunctionThread.write(BluetoothConstants.ClientExitCode, macAddress);
             }
@@ -292,7 +298,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         btDeviceDiscoveredHashSet.clear(); // clear HashSet because of starting discovering
         BluetoothUtil.stopBluetoothFunctionThreads(btMacAddressThreadMap);
         btMacAddressThreadMap.clear();
-        oppositePlayerNameList.clear();
+        oppositePlayerNameMap.clear();
         twoPlayerListAdapter.clear();
         twoPlayerListAdapter.notifyDataSetChanged();
 
@@ -450,19 +456,19 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     megString = data.getString("OppositePlayerName");
                     ScreenUtil.showToast(mContext, megString + " hsa been read.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     Log.d(TAG, "OppositePlayerNameHasBeenRead: " + megString);
-
                     mBluetoothSocket = mBluetoothConnectToThread.getBluetoothSocket();
-                    remoteMacAddress = mBluetoothSocket.getRemoteDevice().getAddress();
+                    btDevice = mBluetoothSocket.getRemoteDevice();
+                    deviceName = BluetoothUtil.getBluetoothDeviceName(btDevice);
+                    remoteMacAddress = btDevice.getAddress();
                     boolean isAddedName = false;
                     String oppositeName = data.getString("OppositePlayerName");
                     if (oppositeName != null) {
                         if (!oppositeName.isEmpty()) {
-                            Pair<String, String> mPair = new Pair<>(oppositeName, remoteMacAddress);
-                            if (!oppositePlayerNameList.contains(mPair)) {
-                                oppositePlayerNameList.add(mPair);
+                            if (!oppositePlayerNameMap.containsKey(remoteMacAddress)) {
+                                oppositePlayerNameMap.put(remoteMacAddress, oppositeName);
                                 ArrayList<String> oppNameList = new ArrayList<>();
-                                for (Pair<String, String> nameBt : oppositePlayerNameList) {
-                                    oppNameList.add(nameBt.first);
+                                for (String macAddress : oppositePlayerNameMap.keySet()) {
+                                    oppNameList.add(oppositePlayerNameMap.get(macAddress));
                                 }
                                 twoPlayerListAdapter.updateData(oppNameList);
                                 isAddedName = true;
@@ -507,19 +513,20 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     remoteMacAddress = data.getString("BluetoothMacAddress");
                     btFunctionThread = btMacAddressThreadMap.get(remoteMacAddress);
                     btMacAddressThreadMap.remove(remoteMacAddress);
+
                     // release btFunctionThread (stop communicating)
                     BluetoothUtil.stopBluetoothFunctionThread(btFunctionThread);
+
                     // remove the remote connected device from oppositePlayerNameList
-                    for (Pair<String, String> oppArr : oppositePlayerNameList) {
-                        if (oppArr.second.equals(remoteMacAddress)) {
-                            oppositePlayerNameList.remove(oppArr);
-                        }
-                    }
+                    oppositePlayerNameMap.remove(remoteMacAddress);
+
+                    // update list view
                     ArrayList<String> oppNameList = new ArrayList<>();
-                    for (Pair<String, String> oppName : oppositePlayerNameList) {
-                        oppNameList.add(oppName.first);
+                    for (String macAddress : oppositePlayerNameMap.keySet()) {
+                        oppNameList.add(oppositePlayerNameMap.get(macAddress));
                     }
                     twoPlayerListAdapter.updateData(oppNameList);
+
                     break;
             }
         }
