@@ -14,8 +14,10 @@ public class BluetoothUtil {
             deviceName = "";
         }
         if (deviceName.isEmpty()) {
-            if ((deviceHardwareAddress != null) && (!deviceHardwareAddress.isEmpty())) {
-                deviceName = deviceHardwareAddress;
+            if (deviceHardwareAddress != null) {
+                if (!deviceHardwareAddress.isEmpty()) {
+                    deviceName = deviceHardwareAddress;
+                }
             }
         }
 

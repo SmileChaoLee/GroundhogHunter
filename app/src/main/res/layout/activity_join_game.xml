@@ -46,21 +46,20 @@
             android:text="@string/playerNameString"
             android:layout_weight="40">
         </TextView>
-        <EditText
-            android:id="@+id/playerNameEditText"
+        <TextView
+            android:id="@+id/playerNameTextView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:textAllCaps="false"
             android:textColor="@android:color/black"
             android:textStyle="normal"
-            android:cursorVisible="true"
             android:background="@drawable/edittext_bar"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="0dp"
             android:layout_marginRight="20dp"
-            android:gravity="left|center_vertical"
+            android:gravity="center"
             android:layout_weight="60">
-        </EditText>
+        </TextView>
     </LinearLayout>
 
     <LinearLayout

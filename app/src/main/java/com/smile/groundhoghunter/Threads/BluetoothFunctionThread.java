@@ -19,6 +19,7 @@ public class BluetoothFunctionThread extends Thread {
     private final OutputStream outputStream;
     private String mBuffer;
     private boolean keepRunning;
+    private boolean startRead;
 
     private BluetoothFunctionThread thisThread;
 
@@ -43,6 +44,7 @@ public class BluetoothFunctionThread extends Thread {
         inputStream = inpStream;
         outputStream = outStream;
         keepRunning = true;
+        startRead = false;  // default is not reading the input stream
 
         thisThread = this;
     }
@@ -57,50 +59,58 @@ public class BluetoothFunctionThread extends Thread {
         Bundle data;
 
         while (keepRunning) {
+
             synchronized (thisThread) {
-                try {
-                    Log.d(TAG, "BluetoothFunctionThread start reading");
-
-                    int byteHead = inputStream.read();
-                    int dataLength = inputStream.read();
-                    StringBuilder sb = new StringBuilder();
-                    int readBuff = -1;
-                    int byteRead = 0;
-                    while ((byteRead <= dataLength) && ((readBuff = inputStream.read()) != -1) && (readBuff != '\n')) {
-                        sb.append((char) readBuff);
-                        byteRead++;
+                // wait until start reading data
+                while (!startRead) {
+                    try {
+                        thisThread.wait();
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
                     }
-                    mBuffer = sb.toString();
-
-                    switch (byteHead) {
-                        case BluetoothConstants.OppositePlayerNameHasBeenRead:
-                            if (!mBuffer.isEmpty()) {
-                                readMsg = mHandler.obtainMessage(BluetoothConstants.OppositePlayerNameHasBeenRead);
-                                data = new Bundle();
-                                data.putString("OppositePlayerName", mBuffer);
-                                readMsg.setData(data);
-                                readMsg.sendToTarget();
-                            } else {
-                                Log.d(TAG, "Opposite player name is empty.");
-                            }
-                            break;
-                        case BluetoothConstants.HostExitCode:
-                            readMsg = mHandler.obtainMessage(BluetoothConstants.HostExitCode);
-                            readMsg.sendToTarget();
-                            break;
-                        case BluetoothConstants.ClientExitCode:
-                            readMsg = mHandler.obtainMessage(BluetoothConstants.ClientExitCode);
-                            readMsg.sendToTarget();
-                            break;
-                    }
-
-                    Log.d(TAG, "BluetoothFunctionThread: " + mBuffer);
-                } catch (Exception ex) {
-                    Log.d(TAG, "Failed to read data.", ex);
-                    break;
                 }
-                Log.d(TAG, "NotifyAll().");
-                thisThread.notifyAll();
+            }
+
+            try {
+                Log.d(TAG, "BluetoothFunctionThread start reading");
+
+                int byteHead = inputStream.read();
+                int dataLength = inputStream.read();
+                StringBuilder sb = new StringBuilder();
+                int readBuff = -1;
+                int byteRead = 0;
+                while ((byteRead <= dataLength) && ((readBuff = inputStream.read()) != -1) && (readBuff != '\n')) {
+                    sb.append((char) readBuff);
+                    byteRead++;
+                }
+                mBuffer = sb.toString();
+
+                switch (byteHead) {
+                    case BluetoothConstants.OppositePlayerNameHasBeenRead:
+                        if (!mBuffer.isEmpty()) {
+                            readMsg = mHandler.obtainMessage(BluetoothConstants.OppositePlayerNameHasBeenRead);
+                            data = new Bundle();
+                            data.putString("OppositePlayerName", mBuffer);
+                            readMsg.setData(data);
+                            readMsg.sendToTarget();
+                        } else {
+                            Log.d(TAG, "Opposite player name is empty.");
+                        }
+                        break;
+                    case BluetoothConstants.HostExitCode:
+                        readMsg = mHandler.obtainMessage(BluetoothConstants.HostExitCode);
+                        readMsg.sendToTarget();
+                        break;
+                    case BluetoothConstants.ClientExitCode:
+                        readMsg = mHandler.obtainMessage(BluetoothConstants.ClientExitCode);
+                        readMsg.sendToTarget();
+                        break;
+                }
+
+                Log.d(TAG, "BluetoothFunctionThread: " + mBuffer);
+            } catch (Exception ex) {
+                Log.d(TAG, "Failed to read data.", ex);
+                break;
             }
         }
     }
@@ -131,6 +141,10 @@ public class BluetoothFunctionThread extends Thread {
 
     public void setKeepRunning(boolean keepRunning) {
         this.keepRunning = keepRunning;
+    }
+
+    public void setStartRead(boolean startRead) {
+        this.startRead = startRead;
     }
 
     public BluetoothSocket getBluetoothSocket() {

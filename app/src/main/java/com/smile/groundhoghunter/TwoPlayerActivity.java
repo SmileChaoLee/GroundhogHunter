@@ -2,14 +2,15 @@ package com.smile.groundhoghunter;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatRadioButton;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,10 +30,10 @@ public class TwoPlayerActivity extends AppCompatActivity {
 
     private int mediaType;
     private TextView explainProblemTextView;
-    private TextView deviceNameTextView;
-    private String deviceName;
+    private EditText playerNameEditText;
+    private String playerName;
     private String bluetoothNotSupportedString;
-    private String deviceNameCannotBeEmptyString;
+    private String playerNameCannotBeEmptyString;
     private String explainProblemForBluetoothString;
     private String explainProblemForWifiString;
     private String explainProblemForInternetString;
@@ -46,7 +47,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
         toastTextSize = textFontSize * 0.8f;
 
         bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
-        deviceNameCannotBeEmptyString = getString(R.string.deviceNameCannotBeEmptyString);
+        playerNameCannotBeEmptyString = getString(R.string.playerNameCannotBeEmptyString);
         explainProblemForBluetoothString = getString(R.string.explainProblemForBluetoothString);
         explainProblemForWifiString = getString(R.string.explainProblemForWifiString);
         explainProblemForInternetString = getString(R.string.explainProblemForInternetString);
@@ -143,14 +144,32 @@ public class TwoPlayerActivity extends AppCompatActivity {
                 return;
         }
 
-        TextView deviceNameStringTextView = findViewById(R.id.deviceNameStringTextView);
-        ScreenUtil.resizeTextSize(deviceNameStringTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        TextView playerNameStringTextView = findViewById(R.id.playerNameStringTextView);
+        ScreenUtil.resizeTextSize(playerNameStringTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
 
-        deviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothAdapter);
+        String deviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothAdapter);
+        playerName = deviceName;
+        playerNameEditText = findViewById(R.id.playerNameEditText);
+        playerNameEditText.setEnabled(true);
+        playerNameEditText.setText("");
+        playerNameEditText.append(playerName);
+        ScreenUtil.resizeTextSize(playerNameEditText, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        playerNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-        deviceNameTextView = findViewById(R.id.deviceNameTextView);
-        deviceNameTextView.setText(deviceName);
-        ScreenUtil.resizeTextSize(deviceNameTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                playerName = editable.toString();
+            }
+        });
 
         int buttonLeftMargin = ScreenUtil.dpToPixel(this, 100);
         int buttonTopMargin = ScreenUtil.dpToPixel(this, 10);
@@ -170,14 +189,15 @@ public class TwoPlayerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Host game. Turn on Bluetooth and make this device visible to others
-                if (deviceName.isEmpty()) {
-                    ScreenUtil.showToast(TwoPlayerActivity.this, deviceNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                if (playerName.isEmpty()) {
+                    ScreenUtil.showToast(TwoPlayerActivity.this, playerNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     return;
                 }
                 Intent gameIntent;
                 switch (mediaType) {
                     case GameView.BluetoothMediaType:
                         gameIntent = new Intent(TwoPlayerActivity.this, BluetoothCreateGameActivity.class);
+                        gameIntent.putExtra("PlayerName", playerName);
                         startActivity(gameIntent);
                         break;
                 }
@@ -195,14 +215,15 @@ public class TwoPlayerActivity extends AppCompatActivity {
         joinGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (deviceName.isEmpty()) {
-                    ScreenUtil.showToast(TwoPlayerActivity.this, deviceNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                if (playerName.isEmpty()) {
+                    ScreenUtil.showToast(TwoPlayerActivity.this, playerNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     return;
                 }
                 Intent gameIntent;
                 switch (mediaType) {
                     case GameView.BluetoothMediaType:
                         gameIntent = new Intent(TwoPlayerActivity.this, BluetoothJoinGameActivity.class);
+                        gameIntent.putExtra("PlayerName", playerName);
                         startActivity(gameIntent);
                         break;
                 }
