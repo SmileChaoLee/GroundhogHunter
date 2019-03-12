@@ -396,11 +396,11 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                             }
                         }
                     }
-                    stopBluetoothAcceptThread();
+                    // stopBluetoothAcceptThread(); removed on 2019-03-12 because it is not needed
                     break;
                 case BluetoothConstants.BluetoothAcceptThreadNoServerSocket:
                     ScreenUtil.showToast(mContext, cannotCreateServerSocketString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    stopBluetoothAcceptThread();
+                    // stopBluetoothAcceptThread(); removed on 2019-03-12 because it is not needed
                     break;
                 case BluetoothConstants.BluetoothAcceptThreadStarted:
                     ScreenUtil.showToast(mContext, waitingForConnectionString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
@@ -427,7 +427,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     break;
                 case BluetoothConstants.BluetoothAcceptThreadStopped:
                     ScreenUtil.showToast(mContext, waitingStoppedCancelledString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    stopBluetoothAcceptThread();
+                    // stopBluetoothAcceptThread(); removed on 2019-03-12 because it is not needed
                     break;
                 case BluetoothConstants.ClientExitCode:
                     ScreenUtil.showToast(mContext, clientLeftGameString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);

@@ -476,7 +476,6 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         }
                     }
                     if (isAddedName) {
-                        btFunctionThread = mBluetoothConnectToThread.getBtFunctionThread();
                         stopBluetoothDiscoveryTimerThread();    // stop discovery
                         stopBluetoothConnectToThread(false);    // do not close the BluetoothSocket
                     } else {
