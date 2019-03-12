@@ -3,10 +3,16 @@ package com.smile.groundhoghunter.Utilities;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.util.Log;
 
-import java.io.IOException;
+import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
+import java.util.HashMap;
+import java.util.Set;
 
 public class BluetoothUtil {
+
+    private static final String TAG = new String(".Utilities.BluetoothUtil");
+
     public static String getBluetoothDeviceName(BluetoothDevice mBluetoothDevice) {
         String deviceName = mBluetoothDevice.getName();
         String deviceHardwareAddress = mBluetoothDevice.getAddress(); // MAC address
@@ -47,6 +53,33 @@ public class BluetoothUtil {
                 mBluetoothSocket.close();
             } catch (Exception ex) {
                 ex.printStackTrace();
+            }
+        }
+    }
+
+    public static void stopBluetoothFunctionThreads(HashMap<String, BluetoothFunctionThread> btSocketThreadMap) {
+        // Iterator<HashMap.Entry<String, BluetoothFunctionThread>> itr = btSocketThreadMap.entrySet().iterator();
+        Set<String> btSocketThreadSet = btSocketThreadMap.keySet();
+        for (String remoteMacAddress : btSocketThreadSet) {
+            BluetoothFunctionThread btFunctionThread = btSocketThreadMap.get(remoteMacAddress);
+            stopBluetoothFunctionThread(btFunctionThread);
+        }
+    }
+
+    public static void stopBluetoothFunctionThread(BluetoothFunctionThread btFunctionThread) {
+        if (btFunctionThread != null) {
+            btFunctionThread.setKeepRunning(false);
+            btFunctionThread.closeBluetoothSocket();
+            boolean retry = true;
+            while (retry) {
+                try {
+                    btFunctionThread.join();
+                    Log.d(TAG, "btFunctionThread.Join()........\n");
+                    retry = false;
+                    btFunctionThread = null;
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }// continue processing until the thread ends
             }
         }
     }

@@ -280,8 +280,11 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         // if it Still is connecting to other device
         // then notify the other device leaving
 
-        for (BluetoothFunctionThread btFunctionThread : btFunctionThreadList) {
-            btFunctionThread.write(BluetoothConstants.ClientExitCode,"");
+        if (mBluetoothAdapter != null) {
+            String macAddress = mBluetoothAdapter.getAddress();
+            for (BluetoothFunctionThread btFunctionThread : btFunctionThreadList) {
+                btFunctionThread.write(BluetoothConstants.ClientExitCode, macAddress);
+            }
         }
 
         finish();
@@ -378,11 +381,12 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     // Discovery has found a device. Get the BluetoothDevice
                     // object and its info from the Intent.
                     BluetoothDevice mBluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    megString = BluetoothUtil.getBluetoothDeviceName(mBluetoothDevice);
+                    ScreenUtil.showToast(context, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    Log.d(TAG, "Found bluetooth device: " + megString);
                     // start to connect to host game
                     if (mBluetoothDevice != null) {
                         if (!btDeviceDiscoveredHashSet.contains(mBluetoothDevice)) {
-                            megString = BluetoothUtil.getBluetoothDeviceName(mBluetoothDevice);
-                            Log.d(TAG, megString);
                             // ScreenUtil.showToast(context, BluetoothUtil.getBluetoothDeviceName(mBluetoothDevice), toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                             btDeviceDiscoveredHashSet.add(mBluetoothDevice);
                             mBluetoothAdapter.cancelDiscovery();    // stop discovering to speed up connection

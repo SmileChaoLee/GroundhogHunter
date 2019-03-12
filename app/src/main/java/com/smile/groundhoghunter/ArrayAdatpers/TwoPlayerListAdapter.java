@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.smile.groundhoghunter.GroundhogHunterApp;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TwoPlayerListAdapter extends ArrayAdapter {
@@ -59,5 +60,11 @@ public class TwoPlayerListAdapter extends ArrayAdapter {
         }
 
         return view;
+    }
+
+    public void updateData(List newData) {
+        clear();
+        addAll(newData);
+        notifyDataSetChanged();
     }
 }

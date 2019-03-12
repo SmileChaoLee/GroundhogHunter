@@ -99,10 +99,16 @@ public class BluetoothFunctionThread extends Thread {
                         break;
                     case BluetoothConstants.HostExitCode:
                         readMsg = mHandler.obtainMessage(BluetoothConstants.HostExitCode);
+                        data = new Bundle();
+                        data.putString("BluetoothMacAddress", mBuffer);
+                        readMsg.setData(data);
                         readMsg.sendToTarget();
                         break;
                     case BluetoothConstants.ClientExitCode:
                         readMsg = mHandler.obtainMessage(BluetoothConstants.ClientExitCode);
+                        data = new Bundle();
+                        data.putString("BluetoothMacAddress", mBuffer);
+                        readMsg.setData(data);
                         readMsg.sendToTarget();
                         break;
                 }
