@@ -70,21 +70,16 @@ public class BluetoothAcceptThread extends Thread {
 
                 boolean isConnected = false;
                 if (mBluetoothSocket != null) {
+                    isConnected = true;
+                    mServerSocket.close();
                     // A connection was accepted. Perform work associated with
                     // the connection in a separate thread.
-                    String deviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothSocket.getRemoteDevice());
-                    if (deviceName != null) {
-                        if (!deviceName.isEmpty()) {
-                            mServerSocket.close();
-                            btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
-                            btFunctionThread.start();
-                            btFunctionThread.write(BluetoothConstants.OppositePlayerNameHasBeenRead, mPlayerName);
+                    btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
+                    btFunctionThread.start();
+                    btFunctionThread.write(BluetoothConstants.OppositePlayerNameHasBeenRead, mPlayerName);
 
-                            msg = mHandler.obtainMessage(BluetoothConstants.BluetoothAcceptThreadConnected);
-                            msg.sendToTarget();
-                            isConnected = true;
-                        }
-                    }
+                    msg = mHandler.obtainMessage(BluetoothConstants.BluetoothAcceptThreadConnected);
+                    msg.sendToTarget();
                 }
                 if (!isConnected) {
                     throw new Exception("mBluetoothSocket is null or no device name.");

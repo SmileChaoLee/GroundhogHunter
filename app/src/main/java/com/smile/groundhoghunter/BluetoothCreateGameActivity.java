@@ -180,8 +180,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
         refreshCreateGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // stopBluetoothAcceptThread();
-                // Log.d(TAG, "Refresh --> stopBluetoothAcceptThread()");
                 startBluetoothDiscoverability();
                 Log.d(TAG, "Refresh --> startBluetoothDiscoverability()");
             }
@@ -343,7 +341,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     if (extraPreviousScanMode != extraScanMode) {
                         if ((extraScanMode == BluetoothAdapter.SCAN_MODE_CONNECTABLE) || (extraScanMode == BluetoothAdapter.SCAN_MODE_NONE)) {
                             ScreenUtil.showToast(context, bluetoothVisibilityIsDisabledString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                            stopBluetoothAcceptThread();
+                            // stopBluetoothAcceptThread(); // removed on 2019-03-12 because it is a bug
                         }
                     }
                     break;
