@@ -53,7 +53,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     private TextView playerNameTextView;
     private String playerName;
     private String oppositePlayerName;
-    private ListView oppositePlayerListView;
+    private ListView oppositePlayerNameListView;
     private HashMap<String, String> oppositePlayerNameMap;
 
     private String bluetoothNotSupportedString;
@@ -155,12 +155,12 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         playerNameTextView.append(playerName);
         ScreenUtil.resizeTextSize(playerNameTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
 
-        oppositePlayerListView = findViewById(R.id.playerListView);
+        oppositePlayerNameListView = findViewById(R.id.oppositePlayerNameListView);
         ArrayList<String> oppNameList = new ArrayList<>();
         twoPlayerListAdapter = new TwoPlayerListAdapter(this, R.layout.player_list_item_layout, R.id.playerNameTextView, oppNameList, textFontSize);
         twoPlayerListAdapter.setNotifyOnChange(false);  // do not call notifyDataSetChanged() method automatically
-        oppositePlayerListView.setAdapter(twoPlayerListAdapter);
-        oppositePlayerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        oppositePlayerNameListView.setAdapter(twoPlayerListAdapter);
+        oppositePlayerNameListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long rowId) {
                 if (adapterView != null) {
