@@ -466,10 +466,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         if (!oppositeName.isEmpty()) {
                             if (!oppositePlayerNameMap.containsKey(remoteMacAddress)) {
                                 oppositePlayerNameMap.put(remoteMacAddress, oppositeName);
-                                ArrayList<String> oppNameList = new ArrayList<>();
-                                for (String macAddress : oppositePlayerNameMap.keySet()) {
-                                    oppNameList.add(oppositePlayerNameMap.get(macAddress));
-                                }
+                                ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
                                 twoPlayerListAdapter.updateData(oppNameList);
                                 isAddedName = true;
                             }
@@ -520,10 +517,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     oppositePlayerNameMap.remove(remoteMacAddress);
 
                     // update list view
-                    ArrayList<String> oppNameList = new ArrayList<>();
-                    for (String macAddress : oppositePlayerNameMap.keySet()) {
-                        oppNameList.add(oppositePlayerNameMap.get(macAddress));
-                    }
+                    ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
                     twoPlayerListAdapter.updateData(oppNameList);
 
                     break;

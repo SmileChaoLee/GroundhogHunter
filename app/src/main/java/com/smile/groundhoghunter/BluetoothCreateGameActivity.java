@@ -15,7 +15,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,7 +34,6 @@ import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 public class BluetoothCreateGameActivity extends AppCompatActivity {
 
@@ -388,10 +386,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                         if (!oppositeName.isEmpty()) {
                             if (!oppositePlayerNameMap.containsKey(remoteMacAddress)) {
                                 oppositePlayerNameMap.put(remoteMacAddress, oppositeName);
-                                ArrayList<String> oppNameList = new ArrayList<>();
-                                for (String macAddress : oppositePlayerNameMap.keySet()) {
-                                    oppNameList.add(oppositePlayerNameMap.get(macAddress));
-                                }
+                                ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
                                 twoPlayerListAdapter.updateData(oppNameList);
                             }
                         }
@@ -442,10 +437,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     oppositePlayerNameMap.remove(remoteMacAddress);
 
                     // update list view
-                    ArrayList<String> oppNameList = new ArrayList<>();
-                    for (String macAddress : oppositePlayerNameMap.keySet()) {
-                        oppNameList.add(oppositePlayerNameMap.get(macAddress));
-                    }
+                    ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
                     twoPlayerListAdapter.updateData(oppNameList);
 
                     break;
