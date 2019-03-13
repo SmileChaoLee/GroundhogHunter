@@ -4,10 +4,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
-
 import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.ArrayList;
 
 public class BluetoothUtil {
 
@@ -57,11 +55,8 @@ public class BluetoothUtil {
         }
     }
 
-    public static void stopBluetoothFunctionThreads(HashMap<String, BluetoothFunctionThread> btSocketThreadMap) {
-        // Iterator<HashMap.Entry<String, BluetoothFunctionThread>> itr = btSocketThreadMap.entrySet().iterator();
-        Set<String> btSocketThreadSet = btSocketThreadMap.keySet();
-        for (String remoteMacAddress : btSocketThreadSet) {
-            BluetoothFunctionThread btFunctionThread = btSocketThreadMap.get(remoteMacAddress);
+    public static void stopBluetoothFunctionThreads(ArrayList<BluetoothFunctionThread> btFunctionThreadList) {
+        for (BluetoothFunctionThread btFunctionThread : btFunctionThreadList) {
             stopBluetoothFunctionThread(btFunctionThread);
         }
     }

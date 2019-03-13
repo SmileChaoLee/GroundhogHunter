@@ -243,7 +243,9 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        BluetoothUtil.stopBluetoothFunctionThreads(btMacAddressThreadMap);
+        clientLeavingNotification();
+        ArrayList<BluetoothFunctionThread> threadList = new ArrayList<>(btMacAddressThreadMap.values());
+        BluetoothUtil.stopBluetoothFunctionThreads(threadList);
         btMacAddressThreadMap.clear();
         btMacAddressThreadMap = null;
 
@@ -283,21 +285,17 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         // if it Still is connecting to other device
         // then notify the other device leaving
 
-        if (mBluetoothAdapter != null) {
-            String macAddress = mBluetoothAdapter.getAddress();
-            for (String remoteMacAddress : btMacAddressThreadMap.keySet()) {
-                BluetoothFunctionThread btFunctionThread = btMacAddressThreadMap.get(remoteMacAddress);
-                btFunctionThread.write(BluetoothConstants.ClientExitCode, macAddress);
-            }
-        }
-
         finish();
     }
 
     private void startBluetoothDiscovery() {
-        btDeviceDiscoveredHashSet.clear(); // clear HashSet because of starting discovering
-        BluetoothUtil.stopBluetoothFunctionThreads(btMacAddressThreadMap);
+
+        clientLeavingNotification();
+        ArrayList<BluetoothFunctionThread> threadList = new ArrayList<>(btMacAddressThreadMap.values());
+        BluetoothUtil.stopBluetoothFunctionThreads(threadList);
         btMacAddressThreadMap.clear();
+
+        btDeviceDiscoveredHashSet.clear(); // clear HashSet because of starting discovering
         oppositePlayerNameMap.clear();
         twoPlayerListAdapter.clear();
         twoPlayerListAdapter.notifyDataSetChanged();
@@ -306,6 +304,16 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
 
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBtIntent, Request_Enable_Bluetooth_For_Discovering);
+    }
+
+    private void clientLeavingNotification() {
+        if (mBluetoothAdapter != null) {
+            String macAddress = mBluetoothAdapter.getAddress();
+            for (String remoteMacAddress : btMacAddressThreadMap.keySet()) {
+                BluetoothFunctionThread btFunctionThread = btMacAddressThreadMap.get(remoteMacAddress);
+                btFunctionThread.write(BluetoothConstants.ClientExitCode, macAddress);
+            }
+        }
     }
 
     private void startBluetoothDiscoveryTimerThread() {
