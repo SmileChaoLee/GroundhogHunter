@@ -46,7 +46,7 @@
         app:layout_constraintTop_toBottomOf="@id/playerNameLayout"
         app:layout_constraintBottom_toTopOf="@id/refreshCancelJoinGameButtonLayout" >
 
-        <include layout="@layout/name_listview_toast_layout"/>
+        <include layout="@layout/name_listview_message_layout"/>
 
     </LinearLayout>
 
