@@ -132,7 +132,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         // message showing view
         TextView toastMessageTextView = findViewById(R.id.toastMessageTextView);
         ScreenUtil.resizeTextSize(toastMessageTextView,toastTextSize, GroundhogHunterApp.FontSize_Scale_Type);
-        showMessage = new MessageShowingUtil(getApplicationContext(), toastMessageTextView);
+        showMessage = new MessageShowingUtil(this, toastMessageTextView);
 
         // device detecting
         // Bluetooth
