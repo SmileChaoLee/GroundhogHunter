@@ -16,6 +16,7 @@ public class MessageShowingUtil {
     private final Handler mHandler;
     private final TextView mTextView;
     private Queue<Runnable> runnableQueue;
+    private final Runnable setTextViewInvisible;
     private boolean isRunnableRunning;
 
     public MessageShowingUtil(Context context, TextView textView) {
@@ -24,10 +25,8 @@ public class MessageShowingUtil {
         mTextView = textView;
         runnableQueue = new LinkedList<>();
         isRunnableRunning = false;
-    }
 
-    public void showMessageInTextView(final String message, final int duration) {
-        final Runnable setTextViewInvisible = new Runnable() {
+        setTextViewInvisible = new Runnable() {
             @Override
             public void run() {
                 mTextView.setVisibility(View.INVISIBLE);
@@ -41,6 +40,10 @@ public class MessageShowingUtil {
                 }
             }
         };
+
+    }
+
+    public void showMessageInTextView(final String message, final int duration) {
 
         final Runnable setMessageToTextView = new Runnable() {
             @Override
