@@ -42,7 +42,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
     private static final String TAG = new String(".BluetoothCreateGameActivity");
     private static final int Request_Enable_Bluetooth_For_Being_Discovered = 1; // request to enable bluetooth for being discovered
     private static final int Request_Enable_Bluetooth_Discoverability = 3;
-    private static final int durationForBluetoothVisible = GroundhogHunterApp.durationForBluetoothVisible;
+    private static final int durationForBluetoothVisible = 60;  // 60 seconds
     private static final int messageDuration = 1000;    // 1 seconds
 
     private float textFontSize;
@@ -175,7 +175,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                         Log.d(TAG, "adapterView.getItemAtPosition(position) = " + temp);
                         oppositePlayerName = temp;
                         view.setSelected(true);
-                        // send oppositePlayerName to the host
                     }
                 }
             }

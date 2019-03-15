@@ -51,6 +51,9 @@ public class BluetoothConnectToThread extends Thread {
         if (mBluetoothSocket == null) {
             // cannot create Server Socket
             msg = mHandler.obtainMessage(BluetoothConstants.BluetoothConnectToThreadNoClientSocket);
+            data = new Bundle();
+            data.putParcelable("BluetoothDevice", mBluetoothDevice);
+            msg.setData(data);
             msg.sendToTarget();
             return;
         }
@@ -61,7 +64,7 @@ public class BluetoothConnectToThread extends Thread {
             if ( (deviceName == null) || (deviceName.isEmpty()) ) {
                 msg = mHandler.obtainMessage(BluetoothConstants.BluetoothConnectToThreadFailedToConnect);
                 data = new Bundle();
-                data.putString("BluetoothDeviceName", "");
+                data.putParcelable("BluetoothDevice", mBluetoothDevice);
                 msg.setData(data);
                 msg.sendToTarget();
                 return;
@@ -73,7 +76,7 @@ public class BluetoothConnectToThread extends Thread {
 
                 msg = mHandler.obtainMessage(BluetoothConstants.BluetoothConnectToThreadStarted);
                 data = new Bundle();
-                data.putString("BluetoothDeviceName", deviceName);
+                data.putParcelable("BluetoothDevice", mBluetoothDevice);
                 msg.setData(data);
                 msg.sendToTarget();
 
@@ -85,6 +88,9 @@ public class BluetoothConnectToThread extends Thread {
                 btFunctionThread.start();   // default is not reading input stream (startRead = false)
 
                 msg = mHandler.obtainMessage(BluetoothConstants.BluetoothConnectToThreadConnected);
+                data = new Bundle();
+                data.putParcelable("BluetoothDevice", mBluetoothDevice);
+                msg.setData(data);
                 msg.sendToTarget();
 
             } catch (Exception ex) {
@@ -93,7 +99,7 @@ public class BluetoothConnectToThread extends Thread {
 
                 msg = mHandler.obtainMessage(BluetoothConstants.BluetoothConnectToThreadFailedToConnect);
                 data = new Bundle();
-                data.putString("BluetoothDeviceName", deviceName);
+                data.putParcelable("BluetoothDevice", mBluetoothDevice);
                 msg.setData(data);
                 msg.sendToTarget();
 

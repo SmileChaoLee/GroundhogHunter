@@ -90,6 +90,7 @@ public class BluetoothFunctionThread extends Thread {
                         if (!mBuffer.isEmpty()) {
                             readMsg = mHandler.obtainMessage(BluetoothConstants.OppositePlayerNameHasBeenRead);
                             data = new Bundle();
+                            data.putParcelable("BluetoothDevice", mBluetoothSocket.getRemoteDevice());
                             data.putString("OppositePlayerName", mBuffer);
                             readMsg.setData(data);
                             readMsg.sendToTarget();

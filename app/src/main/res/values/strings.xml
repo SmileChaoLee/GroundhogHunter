@@ -86,6 +86,10 @@
     <string name="joinBluetoothGameString">Join Bluetooth Game</string>
     <string name="clientLeftGameString">Client left game.</string>
     <string name="hostLeftGameString">Host left game.</string>
+    <string name="discoveryTimeHasReachedString">Discovery time has reached.</string>
+    <string name="discoveryWasDismissedString">Discovery was dismissed.</string>
+    <string name="foundDeviceString">Found device</string>
+    <string name="hasBeenReadString">has been read</string>
 
     <string name="companyNameString">Smile Information Inc.</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>
