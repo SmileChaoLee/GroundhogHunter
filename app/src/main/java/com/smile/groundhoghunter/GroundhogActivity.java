@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -237,6 +239,27 @@ public class GroundhogActivity extends AppCompatActivity {
             }
         }
 
+        bannerLinearLayout = findViewById(R.id.linearlayout_for_ads_in_myActivity);
+        if (!GroundhogHunterApp.googleAdMobBannerID.isEmpty()) {
+            bannerAdView = new AdView(this);
+            // LinearLayout.LayoutParams bannerLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            // bannerLp.gravity = Gravity.CENTER;
+            // bannerAdView.setLayoutParams(bannerLp);
+            // bannerAdView.setAdSize(AdSize.BANNER);
+            AdSize adSize = new AdSize(AdSize.FULL_WIDTH, AdSize.AUTO_HEIGHT);
+            bannerAdView.setAdSize(adSize);
+            bannerAdView.setAdUnitId(GroundhogHunterApp.googleAdMobBannerID);
+            bannerLinearLayout.addView(bannerAdView);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            bannerAdView.loadAd(adRequest);
+        } else {
+            ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams)bannerLinearLayout.getLayoutParams();
+            float tempPercent = lp.matchConstraintPercentHeight;
+            lp.matchConstraintPercentHeight = 0.0f;
+            lp = (ConstraintLayout.LayoutParams)gameFrameLayout.getLayoutParams();
+            lp.matchConstraintPercentHeight += tempPercent;
+        }
+
         gameFrameLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -366,22 +389,6 @@ public class GroundhogActivity extends AppCompatActivity {
                 quitGame();
             }
         });
-
-        if (!GroundhogHunterApp.googleAdMobBannerID.isEmpty()) {
-            bannerLinearLayout = findViewById(R.id.linearlayout_for_ads_in_myActivity);
-            bannerAdView = new AdView(this);
-
-            // LinearLayout.LayoutParams bannerLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-            // bannerLp.gravity = Gravity.CENTER;
-            // bannerAdView.setLayoutParams(bannerLp);
-            // bannerAdView.setAdSize(AdSize.BANNER);
-            AdSize adSize = new AdSize(AdSize.FULL_WIDTH, AdSize.AUTO_HEIGHT);
-            bannerAdView.setAdSize(adSize);
-            bannerAdView.setAdUnitId(GroundhogHunterApp.googleAdMobBannerID);
-            bannerLinearLayout.addView(bannerAdView);
-            AdRequest adRequest = new AdRequest.Builder().build();
-            bannerAdView.loadAd(adRequest);
-        }
 
         bReceiver = new GroundhogHunterBroadcastReceiver();
 

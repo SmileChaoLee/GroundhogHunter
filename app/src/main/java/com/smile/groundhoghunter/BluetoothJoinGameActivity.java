@@ -42,7 +42,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     private static final String TAG = new String(".BluetoothJoinGameActivity");
     private static final int Request_Enable_Bluetooth_For_Discovering = 2; // request to enable bluetooth for discovering
     private static final int durationForBluetoothDiscovery = 30000;  // 30 seconds one time
-    private static final int messageDuration = 1000;    // 1 seconds
+    private static final int messageDuration = 1000;    // 1 second
 
     private float textFontSize;
     private float fontScale;
