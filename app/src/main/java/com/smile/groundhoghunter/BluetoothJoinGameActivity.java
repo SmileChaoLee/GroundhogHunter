@@ -74,7 +74,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     private BluetoothJoinGameBroadcastReceiver btJoinGameReceiver;
     private BluetoothDiscoveryTimerThread mBluetoothDiscoveryTimerThread;
     private HashMap<BluetoothDevice, BluetoothConnectToThread> btDiscoveredHashMap;
-    private HashMap<String, BluetoothFunctionThread> btMacAddressThreadMap;
+    private HashMap<String, BluetoothFunctionThread> btMacFunctionThreadMap;
 
     private boolean isDefaultBluetoothEnabled;
     private BluetoothAdapter mBluetoothAdapter;
@@ -88,7 +88,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
 
         btDiscoveredHashMap = new HashMap<>();
         oppositePlayerNameMap = new HashMap<>();
-        btMacAddressThreadMap = new HashMap<>();
+        btMacFunctionThreadMap = new HashMap<>();
 
         // BroadcastReceiver and register it
         btJoinGameReceiver = new BluetoothJoinGameBroadcastReceiver();
@@ -186,7 +186,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         for (String remoteMacAddress : oppositePlayerNameMap.keySet()) {
                             oppName = oppositePlayerNameMap.get(remoteMacAddress);
                             if (oppName.equals(oppositePlayerName)) {
-                                BluetoothFunctionThread btFunctionThread = btMacAddressThreadMap.get(remoteMacAddress);
+                                BluetoothFunctionThread btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
                                 if (btFunctionThread != null) {
                                     btFunctionThread.write(BluetoothConstants.OppositePlayerNameHasBeenRead, playerName);
                                 }
@@ -257,10 +257,10 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         super.onDestroy();
 
         clientLeavingNotification();
-        ArrayList<BluetoothFunctionThread> threadList = new ArrayList<>(btMacAddressThreadMap.values());
+        ArrayList<BluetoothFunctionThread> threadList = new ArrayList<>(btMacFunctionThreadMap.values());
         BluetoothUtil.stopBluetoothFunctionThreads(threadList);
-        btMacAddressThreadMap.clear();
-        btMacAddressThreadMap = null;
+        btMacFunctionThreadMap.clear();
+        btMacFunctionThreadMap = null;
 
         clearBtDiscoveredHashMap();
         btDiscoveredHashMap = null;
@@ -304,9 +304,9 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     private void startBluetoothDiscovery() {
 
         clientLeavingNotification();
-        ArrayList<BluetoothFunctionThread> threadList = new ArrayList<>(btMacAddressThreadMap.values());
+        ArrayList<BluetoothFunctionThread> threadList = new ArrayList<>(btMacFunctionThreadMap.values());
         BluetoothUtil.stopBluetoothFunctionThreads(threadList);
-        btMacAddressThreadMap.clear();
+        btMacFunctionThreadMap.clear();
 
         clearBtDiscoveredHashMap();
         oppositePlayerNameMap.clear();
@@ -320,8 +320,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     private void clientLeavingNotification() {
         if (mBluetoothAdapter != null) {
             String macAddress = mBluetoothAdapter.getAddress();
-            for (String remoteMacAddress : btMacAddressThreadMap.keySet()) {
-                BluetoothFunctionThread btFunctionThread = btMacAddressThreadMap.get(remoteMacAddress);
+            for (BluetoothFunctionThread btFunctionThread : btMacFunctionThreadMap.values()) {
                 btFunctionThread.write(BluetoothConstants.ClientExitCode, macAddress);
             }
         }
@@ -351,8 +350,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     }
 
     private void clearBtDiscoveredHashMap() {
-        for(BluetoothDevice btD : btDiscoveredHashMap.keySet()) {
-            BluetoothConnectToThread connectToThread = btDiscoveredHashMap.get(btD);
+        for(BluetoothConnectToThread connectToThread : btDiscoveredHashMap.values()) {
             stopBluetoothConnectToThread(connectToThread, true);
         }
         btDiscoveredHashMap.clear(); // clear HashSet because of starting discovering
@@ -456,8 +454,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     }
                     showMessage.showMessageInTextView(megString, messageDuration);
                     // start to connect all the device that were found
-                    for (BluetoothDevice btD : btDiscoveredHashMap.keySet()) {
-                        BluetoothConnectToThread connectThread = btDiscoveredHashMap.get(btD);
+                    for (BluetoothConnectToThread connectThread : btDiscoveredHashMap.values()) {
                         connectThread.start();
                     }
                     break;
@@ -499,8 +496,8 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         btFunctionThread.setStartRead(true);    // start reading data
                         btFunctionThread.notifyAll();
                     }
-                    if (!btMacAddressThreadMap.containsKey(remoteMacAddress)) {
-                        btMacAddressThreadMap.put(remoteMacAddress, btFunctionThread);
+                    if (!btMacFunctionThreadMap.containsKey(remoteMacAddress)) {
+                        btMacFunctionThreadMap.put(remoteMacAddress, btFunctionThread);
                     }
                     stopBluetoothConnectToThread(connectToThread, false);
                     break;
@@ -533,8 +530,8 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     showMessage.showMessageInTextView(hostLeftGameString, messageDuration);
                     // ScreenUtil.showToast(mContext, hostLeftGameString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     remoteMacAddress = data.getString("BluetoothMacAddress");
-                    btFunctionThread = btMacAddressThreadMap.get(remoteMacAddress);
-                    btMacAddressThreadMap.remove(remoteMacAddress);
+                    btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
+                    btMacFunctionThreadMap.remove(remoteMacAddress);
 
                     // release btFunctionThread (stop communicating)
                     BluetoothUtil.stopBluetoothFunctionThread(btFunctionThread);

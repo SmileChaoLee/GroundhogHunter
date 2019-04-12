@@ -70,10 +70,12 @@ public class MainActivity extends AppCompatActivity {
         final SmileImageButton twoPlayerButton = findViewById(R.id.twoPlayerButton);
         Bitmap twoPlayerBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, twoPlayerString, Color.BLUE);
 
+        /*
         if (!BuildConfig.DEBUG) {
             twoPlayerButton.setEnabled(false);
             twoPlayerButton.setVisibility(View.GONE);
         }
+        */
 
         twoPlayerButton.setImageBitmap(twoPlayerBitmap);
         buttonLp = (LinearLayout.LayoutParams) twoPlayerButton.getLayoutParams();

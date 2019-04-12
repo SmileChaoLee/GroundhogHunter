@@ -1,8 +1,10 @@
 package com.smile.groundhoghunter.Threads;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -13,6 +15,7 @@ import com.smile.groundhoghunter.Utilities.BluetoothUtil;
 public class BluetoothAcceptThread extends Thread {
 
     private static final String TAG = new String(".Threads.BluetoothAcceptThread");
+    private final int acceptThreadId;
     private final Handler mHandler;
     private final String mPlayerName;
     private final java.util.UUID mAppUUID;
@@ -23,8 +26,9 @@ public class BluetoothAcceptThread extends Thread {
     private BluetoothFunctionThread btFunctionThread;
     private boolean isListening;
 
-    public BluetoothAcceptThread(Handler handler, BluetoothAdapter bluetoothAdapter, String playerName, java.util.UUID appUUID) {
+    public BluetoothAcceptThread(int threadId, Handler handler, BluetoothAdapter bluetoothAdapter, String playerName, java.util.UUID appUUID) {
 
+        acceptThreadId = threadId;
         mHandler = handler;
         mBluetoothAdapter = bluetoothAdapter;
         mBluetoothSocket = null;
@@ -50,6 +54,7 @@ public class BluetoothAcceptThread extends Thread {
     public void run() {
 
         Message msg;
+        Bundle data;
 
         if (mServerSocket == null) {
             // cannot create Server Socket
@@ -70,15 +75,20 @@ public class BluetoothAcceptThread extends Thread {
 
                 boolean isConnected = false;
                 if (mBluetoothSocket != null) {
+                    // A connection was accepted.
                     isConnected = true;
                     mServerSocket.close();
-                    // A connection was accepted. Perform work associated with
-                    // the connection in a separate thread.
+
                     btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
                     btFunctionThread.start();
                     btFunctionThread.write(BluetoothConstants.OppositePlayerNameHasBeenRead, mPlayerName);
 
+                    BluetoothDevice btDevice = mBluetoothSocket.getRemoteDevice();
                     msg = mHandler.obtainMessage(BluetoothConstants.BluetoothAcceptThreadConnected);
+                    data = new Bundle();
+                    data.putInt("BluetoothAcceptThreadId", acceptThreadId);
+                    data.putParcelable("BluetoothDevice", btDevice);
+                    msg.setData(data);
                     msg.sendToTarget();
                 }
                 if (!isConnected) {
