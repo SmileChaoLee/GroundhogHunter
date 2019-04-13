@@ -40,6 +40,13 @@ android {
             }
         }
     }
+    sourceSets {
+        main {
+            java {
+                exclude '**/BluetoothCreateGameActivity_Worked_2019_04_12.java'
+            }
+        }
+    }
     buildTypes {
         release {
             debuggable false
