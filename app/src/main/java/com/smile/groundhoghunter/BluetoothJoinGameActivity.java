@@ -3,7 +3,6 @@ package com.smile.groundhoghunter;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +24,7 @@ import android.widget.TextView;
 
 import com.smile.groundhoghunter.ArrayAdatpers.TwoPlayerListAdapter;
 import com.smile.groundhoghunter.Constants.BluetoothConstants;
+import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Threads.BluetoothConnectToThread;
 import com.smile.groundhoghunter.Threads.BluetoothDiscoveryTimerThread;
@@ -35,6 +35,7 @@ import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class BluetoothJoinGameActivity extends AppCompatActivity {
 
@@ -53,7 +54,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     private String oppositePlayerName;
     private ListView oppositePlayerNameListView;
     private MessageShowingUtil showMessage;
-    private HashMap<String, String> oppositePlayerNameMap;
+    private LinkedHashMap<String, String> oppositePlayerNameMap;
 
     private String bluetoothNotSupportedString;
     private String playerNameCannotBeEmptyString;
@@ -73,8 +74,9 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
     private TwoPlayerListAdapter twoPlayerListAdapter;
     private BluetoothJoinGameBroadcastReceiver btJoinGameReceiver;
     private BluetoothDiscoveryTimerThread mBluetoothDiscoveryTimerThread;
-    private HashMap<BluetoothDevice, BluetoothConnectToThread> btDiscoveredHashMap;
+    private HashMap<BluetoothDevice, BluetoothConnectToThread> btDiscoveredMap;
     private HashMap<String, BluetoothFunctionThread> btMacFunctionThreadMap;
+    private BluetoothFunctionThread selectedBtFunctionThread;
 
     private boolean isDefaultBluetoothEnabled;
     private BluetoothAdapter mBluetoothAdapter;
@@ -86,8 +88,8 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
 
         joinGameHandler = new JoinGameHandler(Looper.getMainLooper());
 
-        btDiscoveredHashMap = new HashMap<>();
-        oppositePlayerNameMap = new HashMap<>();
+        btDiscoveredMap = new HashMap<>();
+        oppositePlayerNameMap = new LinkedHashMap<>();
         btMacFunctionThreadMap = new HashMap<>();
 
         // BroadcastReceiver and register it
@@ -178,7 +180,6 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                 if (adapterView != null) {
                     Object item = adapterView.getItemAtPosition(position);
                     if (item != null) {
-                        view.setSelected(true);
                         String temp = item.toString();
                         oppositePlayerName = temp;
                         String oppName;
@@ -188,8 +189,11 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                             if (oppName.equals(oppositePlayerName)) {
                                 BluetoothFunctionThread btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
                                 if (btFunctionThread != null) {
-                                    btFunctionThread.write(BluetoothConstants.OppositePlayerNameHasBeenRead, playerName);
+                                    selectedBtFunctionThread = btFunctionThread;
+                                    selectedBtFunctionThread.write(BluetoothConstants.OppositePlayerNameHasBeenRead, playerName);
+                                    view.setSelected(true);
                                 }
+                                return;
                             }
                         }
                     }
@@ -248,6 +252,11 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     // ScreenUtil.showToast(this, bluetoothCannotBeTurnedOnString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                 }
                 break;
+            case CommonConstants.BluetoothGameByClient:
+                btDiscoveredMap = new HashMap<>();
+                btMacFunctionThreadMap = new HashMap<>();
+                oppositePlayerNameMap = new LinkedHashMap<>();
+                break;
             default:
                 break;
         }
@@ -262,8 +271,8 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         btMacFunctionThreadMap.clear();
         btMacFunctionThreadMap = null;
 
-        clearBtDiscoveredHashMap();
-        btDiscoveredHashMap = null;
+        stopBtConnectToThreadAndClearBtDiscoveredHashMap();
+        btDiscoveredMap = null;
 
         oppositePlayerNameMap.clear();
         oppositePlayerNameMap = null;
@@ -308,7 +317,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         BluetoothUtil.stopBluetoothFunctionThreads(threadList);
         btMacFunctionThreadMap.clear();
 
-        clearBtDiscoveredHashMap();
+        stopBtConnectToThreadAndClearBtDiscoveredHashMap();
         oppositePlayerNameMap.clear();
         twoPlayerListAdapter.clear();
         twoPlayerListAdapter.notifyDataSetChanged();
@@ -349,11 +358,11 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
         }
     }
 
-    private void clearBtDiscoveredHashMap() {
-        for(BluetoothConnectToThread connectToThread : btDiscoveredHashMap.values()) {
+    private void stopBtConnectToThreadAndClearBtDiscoveredHashMap() {
+        for(BluetoothConnectToThread connectToThread : btDiscoveredMap.values()) {
             stopBluetoothConnectToThread(connectToThread, true);
         }
-        btDiscoveredHashMap.clear(); // clear HashSet because of starting discovering
+        btDiscoveredMap.clear(); // clear HashSet because of starting discovering
     }
 
     private void stopBluetoothConnectToThread(BluetoothConnectToThread connectToThread, boolean isCloseBluetoothSocket) {
@@ -395,11 +404,11 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     Log.d(TAG, megString);
                     // start to connect to host game
                     if (btDevice != null) {
-                        if (!btDiscoveredHashMap.containsKey(btDevice)) {
+                        if (!btDiscoveredMap.containsKey(btDevice)) {
                             // ScreenUtil.showToast(context, BluetoothUtil.getBluetoothDeviceName(mBluetoothDevice), toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                             showMessage.showMessageInTextView(megString, MessageDuration);
                             BluetoothConnectToThread connectToThread = new BluetoothConnectToThread(joinGameHandler, btDevice, GroundhogHunterApp.ApplicationUUID);
-                            btDiscoveredHashMap.put(btDevice, connectToThread);
+                            btDiscoveredMap.put(btDevice, connectToThread);
                         }
                     }
                     break;
@@ -437,7 +446,6 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
             String remoteMacAddress;
 
             BluetoothDevice btDevice;
-            BluetoothSocket mBluetoothSocket;
             BluetoothConnectToThread connectToThread;
             BluetoothFunctionThread btFunctionThread;
 
@@ -454,7 +462,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     }
                     showMessage.showMessageInTextView(megString, MessageDuration);
                     // start to connect all the device that were found
-                    for (BluetoothConnectToThread connectThread : btDiscoveredHashMap.values()) {
+                    for (BluetoothConnectToThread connectThread : btDiscoveredMap.values()) {
                         connectThread.start();
                     }
                     break;
@@ -472,7 +480,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     showMessage.showMessageInTextView(megString, MessageDuration);
                     // ScreenUtil.showToast(mContext, cannotCreateClientSocketString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     // stopBluetoothDiscoveryTimerThread();
-                    connectToThread = btDiscoveredHashMap.get(btDevice);
+                    connectToThread = btDiscoveredMap.get(btDevice);
                     stopBluetoothConnectToThread(connectToThread,true);
                     break;
                 case BluetoothConstants.BluetoothConnectToThreadStarted:
@@ -490,7 +498,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     Log.d(TAG, megString);
                     // start reading data from the other device and writing data to the other device
                     // start communicating
-                    connectToThread = btDiscoveredHashMap.get(btDevice);
+                    connectToThread = btDiscoveredMap.get(btDevice);
                     btFunctionThread = connectToThread.getBtFunctionThread();
                     synchronized (btFunctionThread) {
                         btFunctionThread.setStartRead(true);    // start reading data
@@ -523,7 +531,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     deviceName = BluetoothUtil.getBluetoothDeviceName(btDevice);
                     megString = connectToHostFailedString + "(" + deviceName + ")";
                     Log.d(TAG, megString);
-                    connectToThread = btDiscoveredHashMap.get(btDevice);
+                    connectToThread = btDiscoveredMap.get(btDevice);
                     stopBluetoothConnectToThread(connectToThread, true);
                     break;
                 case BluetoothConstants.HostExitCode:
@@ -543,6 +551,28 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
                     twoPlayerListAdapter.updateData(oppNameList);
 
+                    break;
+                case BluetoothConstants.StartGame:
+                    if (selectedBtFunctionThread != null) {
+                        // stop other BluetoothFunctionThreads
+                        for (String remoteMac : btMacFunctionThreadMap.keySet()) {
+                            BluetoothFunctionThread btFuncThread = btMacFunctionThreadMap.get(remoteMac);
+                            if (btFuncThread != selectedBtFunctionThread) {
+                                btFuncThread.write(BluetoothConstants.ClientExitCode, remoteMac);
+                                BluetoothUtil.stopBluetoothFunctionThread(btFuncThread);
+                            }
+                        }
+                        // clear HashMaps
+                        stopBtConnectToThreadAndClearBtDiscoveredHashMap();
+                        btDiscoveredMap = null;
+                        btMacFunctionThreadMap.clear();
+                        btMacFunctionThreadMap = null;
+                        oppositePlayerNameMap.clear();
+                        oppositePlayerNameMap = null;
+                        //
+                        Intent gameIntent = new Intent(getApplicationContext(), GroundhogActivity.class);
+                        startActivityForResult(gameIntent, CommonConstants.BluetoothGameByClient);
+                    }
                     break;
             }
         }

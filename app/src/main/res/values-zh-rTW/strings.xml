@@ -92,6 +92,7 @@
     <string name="discoveryWasDismissedString">偵測動作已經被取消.</string>
     <string name="foundDeviceString">偵測到設備</string>
     <string name="hasBeenReadString">已讀到</string>
+    <string name="noOppositePlayerString">沒有指定對手玩家</string>
 
     <string name="companyNameString">微笑資訊有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

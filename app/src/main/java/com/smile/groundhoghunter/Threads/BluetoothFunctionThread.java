@@ -112,6 +112,14 @@ public class BluetoothFunctionThread extends Thread {
                         readMsg.setData(data);
                         readMsg.sendToTarget();
                         break;
+                    case BluetoothConstants.StartGame:
+                        readMsg = mHandler.obtainMessage(BluetoothConstants.StartGame);
+                        readMsg.sendToTarget();
+                        break;
+                    case BluetoothConstants.LeaveGame:
+                        readMsg = mHandler.obtainMessage(BluetoothConstants.LeaveGame);
+                        readMsg.sendToTarget();
+                        break;
                 }
 
                 Log.d(TAG, "BluetoothFunctionThread: " + mBuffer);

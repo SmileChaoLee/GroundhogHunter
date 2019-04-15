@@ -3,6 +3,7 @@ package com.smile.groundhoghunter.Constants;
 public final class BluetoothConstants {
     private BluetoothConstants() {
     }
+
     public static final int BluetoothAcceptThreadNoServerSocket = 1;
     public static final int BluetoothAcceptThreadStarted = 2;
     public static final int BluetoothAcceptThreadStopped = 3;
@@ -16,5 +17,6 @@ public final class BluetoothConstants {
     public static final int DiscoveryTimerHasBeenDismissed = 32;
     public static final int HostExitCode = 35;
     public static final int ClientExitCode = 36;
-
+    public static final int StartGame = 40;
+    public static final int LeaveGame = 41;
 }

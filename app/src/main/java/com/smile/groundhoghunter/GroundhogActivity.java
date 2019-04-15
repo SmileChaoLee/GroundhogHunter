@@ -27,6 +27,8 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.smile.groundhoghunter.Constants.BluetoothConstants;
+import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Services.LocalTop10IntentService;
@@ -40,6 +42,10 @@ public class GroundhogActivity extends AppCompatActivity {
     // private properties
     private final static String TAG = "MainActivity";
     private final static String LoadingDialogTag = "LoadingDialogTag";
+
+    private final int SettingRequestCode = 0;
+    private final int LocalTop10RequestCode = 1;
+    private final int GlobalTop10RequestCode = 2;
 
     private GameView gameView;
     private int rowNum;
@@ -73,9 +79,7 @@ public class GroundhogActivity extends AppCompatActivity {
     private final String showingAdsString;
     private final String loadingString;
 
-    private final int SettingRequestCode = 0;
-    private final int LocalTop10RequestCode = 1;
-    private final int GlobalTop10RequestCode = 2;
+    private int gameType;
 
     // public static properties
     public static boolean GamePause = false;
@@ -109,13 +113,14 @@ public class GroundhogActivity extends AppCompatActivity {
         }
         */
 
+
+        Intent callingIntent = getIntent();
+        gameType = callingIntent.getIntExtra("GameType", CommonConstants.GameBySinglePlayer);
+
         super.onCreate(savedInstanceState);
         // the following 2 statements have been moved to AndroidManifest.xml
         // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         // getSupportActionBar().hide();
-
-        Intent intent = getIntent();
-        final int gameType = intent.getIntExtra("GameType", GameView.SinglePlayerGame);
 
         setContentView(R.layout.activity_groundhog);
 
@@ -556,11 +561,15 @@ public class GroundhogActivity extends AppCompatActivity {
                             , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
                         @Override
                         public void executeAfterDismissAds(int endPoint) {
+                            Intent returnIntent = new Intent(); // used to bundle data
+                            setResult(Activity.RESULT_OK, returnIntent);
                             finish();
                         }
                     });
             showAdAsyncTask.execute();
         } else {
+            Intent returnIntent = new Intent(); // used to bundle data
+            setResult(Activity.RESULT_OK, returnIntent);
             finish();
         }
     }

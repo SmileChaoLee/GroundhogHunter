@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import com.smile.groundhoghunter.ArrayAdatpers.TwoPlayerListAdapter;
 import com.smile.groundhoghunter.Constants.BluetoothConstants;
+import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Threads.BluetoothAcceptThread;
 import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
@@ -67,13 +68,13 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
     private String waitingStoppedCancelledString;
     private String serverAcceptedConnectionString;
     private String clientLeftGameString;
+    private String noOppositePlayerString;
 
     private TwoPlayerListAdapter twoPlayerListAdapter;
     private BluetoothCreateGameBroadcastReceiver btCreateGameReceiver;
-    // private int btAcceptThreadId;
-    // private HashMap<Integer, BluetoothAcceptThread> btAcceptThreadMap;
     private BluetoothAcceptThread mBluetoothAcceptThread;
     private HashMap<String, BluetoothFunctionThread> btMacFunctionThreadMap;
+    private BluetoothFunctionThread selectedBtFunctionThread;
 
     private boolean isDefaultBluetoothEnabled;
     private BluetoothAdapter mBluetoothAdapter;
@@ -85,10 +86,11 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
 
         createGameHandler = new CreateGameHandler(Looper.getMainLooper());
 
+        oppositePlayerName = "";    // empty
         oppositePlayerNameMap = new LinkedHashMap<>();
-        // btAcceptThreadId = 0;
-        // btAcceptThreadMap = new HashMap<>();
+        mBluetoothAcceptThread = null;
         btMacFunctionThreadMap = new HashMap<>();
+        selectedBtFunctionThread = null;
 
         // BroadcastReceiver and register it
         btCreateGameReceiver = new BluetoothCreateGameBroadcastReceiver();
@@ -114,6 +116,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
         serverAcceptedConnectionString = getString(R.string.serverAcceptedConnectionString);
         cannotCreateServerSocketString = getString(R.string.cannotCreateServerSocketString);
         clientLeftGameString = getString(R.string.clientLeftGameString);
+        noOppositePlayerString = getString(R.string.noOppositePlayerString);
 
         // int colorDarkOrange = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkOrange);
         // int colorRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.red);
@@ -178,7 +181,17 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                         String temp = item.toString();
                         Log.d(TAG, "adapterView.getItemAtPosition(position) = " + temp);
                         oppositePlayerName = temp;
-                        view.setSelected(true);
+                        for (String remoteMacAddress : oppositePlayerNameMap.keySet()) {
+                            String oppName = oppositePlayerNameMap.get(remoteMacAddress);
+                            if (oppName.equals(oppositePlayerName)) {
+                                // found
+                                BluetoothFunctionThread btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
+                                if (btFunctionThread != null) {
+                                    selectedBtFunctionThread = btFunctionThread;
+                                    view.setSelected(true);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -205,6 +218,32 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     // ScreenUtil.showToast(BluetoothCreateGameActivity.this, playerNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);    // removed on 2019-04-11
                     showMessage.showMessageInTextView(playerNameCannotBeEmptyString, MessageDuration);
                     return;
+                }
+                if (oppositePlayerName.isEmpty()) {
+                    showMessage.showMessageInTextView(noOppositePlayerString, MessageDuration);
+                    return;
+                }
+                // Notify client to start game
+                if (selectedBtFunctionThread != null) {
+                    // stop BluetoothAcceptThread and close server socket
+                    stopBluetoothAcceptThread();
+                    // stop other BluetoothFunctionThreads
+                    for (String remoteMacAddress : btMacFunctionThreadMap.keySet()) {
+                        BluetoothFunctionThread btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
+                        if (btFunctionThread != selectedBtFunctionThread) {
+                            btFunctionThread.write(BluetoothConstants.HostExitCode, remoteMacAddress);
+                            BluetoothUtil.stopBluetoothFunctionThread(btFunctionThread);
+                        }
+                    }
+                    // clear HashMaps
+                    btMacFunctionThreadMap.clear();
+                    btMacFunctionThreadMap = null;
+                    oppositePlayerNameMap.clear();
+                    oppositePlayerNameMap = null;
+                    //
+                    selectedBtFunctionThread.write(BluetoothConstants.StartGame, "");
+                    Intent gameIntent = new Intent(getApplicationContext(), GroundhogActivity.class);
+                    startActivityForResult(gameIntent, CommonConstants.BluetoothGameByHost);
                 }
             }
         });
@@ -246,13 +285,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     showMessage.showMessageInTextView(bluetoothVisibilityForPeriodString, MessageDuration);
                     // create a BluetoothSocket for listening for connection using a thread
 
-                    /*
-                    btAcceptThreadId++;
-                    BluetoothAcceptThread btAcceptThread = new BluetoothAcceptThread(btAcceptThreadId, createGameHandler, mBluetoothAdapter, playerName, GroundhogHunterApp.ApplicationUUID);
-                    btAcceptThreadMap.put(btAcceptThreadId, btAcceptThread);
-                    btAcceptThread.start();
-                    */
-
                     mBluetoothAcceptThread = new BluetoothAcceptThread(createGameHandler, mBluetoothAdapter, playerName, GroundhogHunterApp.ApplicationUUID);
                     mBluetoothAcceptThread.start();
                 } else {
@@ -260,6 +292,20 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     showMessage.showMessageInTextView(bluetoothCannotBeVisibleString, MessageDuration);
                 }
                 break;
+            case CommonConstants.BluetoothGameByHost:
+                // from
+                oppositePlayerName = "";
+                oppositePlayerNameMap = new LinkedHashMap<>();
+                mBluetoothAcceptThread = null;
+                btMacFunctionThreadMap = new HashMap<>();
+                selectedBtFunctionThread = null;
+
+                // update list view
+                ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
+                twoPlayerListAdapter.updateData(oppNameList);
+
+                break;
+
             default:
                 break;
         }
@@ -274,9 +320,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
         oppositePlayerNameMap = null;
 
         stopBluetoothAcceptThread();
-        // stopBluetoothAcceptThreadMap();
-        // btAcceptThreadMap.clear();
-        // btAcceptThreadMap = null;
 
         ArrayList<BluetoothFunctionThread> threadList = new ArrayList<>(btMacFunctionThreadMap.values());
         BluetoothUtil.stopBluetoothFunctionThreads(threadList);
@@ -320,9 +363,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
         oppositePlayerNameMap.clear();
 
         stopBluetoothAcceptThread();
-        // stopBluetoothAcceptThreadMap();
-        // btAcceptThreadId = 0;
-        // btAcceptThreadMap.clear();
 
         ArrayList<BluetoothFunctionThread> threadList = new ArrayList<>(btMacFunctionThreadMap.values());
         BluetoothUtil.stopBluetoothFunctionThreads(threadList);
@@ -361,27 +401,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
             }
         }
     }
-
-    /*
-    private void stopBluetoothAcceptThreadMap() {
-        if (btAcceptThreadMap != null) {
-            for (BluetoothAcceptThread btAcceptThread : btAcceptThreadMap.values()) {
-                btAcceptThread.closeServerSocket();
-                boolean retry = true;
-                while (retry) {
-                    try {
-                        btAcceptThread.join();
-                        Log.d(TAG, "btAcceptThread.Join()........\n");
-                        retry = false;
-                        btAcceptThread = null;
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }// continue processing until the thread ends
-                }
-            }
-        }
-    }
-    */
 
     private class BluetoothCreateGameBroadcastReceiver extends BroadcastReceiver {
 
@@ -470,10 +489,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     // start reading data from the other device and writing data to the other device
                     // start communicating
 
-                    // int threadId = data.getInt("BluetoothAcceptThreadId");
-                    // BluetoothAcceptThread btAcceptThread = btAcceptThreadMap.get(threadId);
-                    // btFunctionThread = btoothAcceptThread.getBtFunctionThread();
-
                     btFunctionThread = mBluetoothAcceptThread.getBtFunctionThread(btDevice);
                     synchronized (btFunctionThread) {
                         Log.d(TAG, "Started to read player name.");
@@ -483,14 +498,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     if (!btMacFunctionThreadMap.containsKey(remoteMacAddress)) {
                         btMacFunctionThreadMap.put(remoteMacAddress, btFunctionThread);
                     }
-
-                    // create another BluetoothAcceptThread to accept another connection from another guest
-                    /*
-                    btAcceptThreadId++;
-                    BluetoothAcceptThread btAcceptThread = new BluetoothAcceptThread(btAcceptThreadId, createGameHandler, mBluetoothAdapter, playerName, GroundhogHunterApp.ApplicationUUID);
-                    btAcceptThreadMap.put(btAcceptThreadId, btAcceptThread);
-                    btAcceptThread.start();
-                    */
                     break;
                 case BluetoothConstants.BluetoothAcceptThreadStopped:
                     showMessage.showMessageInTextView(waitingStoppedCancelledString, MessageDuration);

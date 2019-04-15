@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.privacy_policy.PrivacyPolicyUtil;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent gameIntent = new Intent(MainActivity.this, GroundhogActivity.class);
-                gameIntent.putExtra("GameType", GameView.SinglePlayerGame);
+                gameIntent.putExtra("GameType", CommonConstants.GameBySinglePlayer);
                 startActivity(gameIntent);
             }
         });
@@ -133,23 +134,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void exitGame() {
-        if (GroundhogHunterApp.InterstitialAd != null) {
-            // free version
-            int entryPoint = 0; //  no used
-            ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdAsyncTask =
-                    GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(MainActivity.this
-                            , entryPoint
-                            , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
-                        @Override
-                        public void executeAfterDismissAds(int endPoint) {
-                            exitApplication();
-                        }
-                    });
-            showAdAsyncTask.execute();
-        } else {
-            exitApplication();
-        }
+        exitApplication();
     }
+
     private void exitApplication() {
         final Handler handlerClose = new Handler();
         final int timeDelay = 200;
