@@ -293,13 +293,11 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                 }
                 break;
             case CommonConstants.BluetoothGameByHost:
-                // from
                 oppositePlayerName = "";
                 oppositePlayerNameMap = new LinkedHashMap<>();
                 mBluetoothAcceptThread = null;
                 btMacFunctionThreadMap = new HashMap<>();
                 selectedBtFunctionThread = null;
-
                 // update list view
                 ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
                 twoPlayerListAdapter.updateData(oppNameList);

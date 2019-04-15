@@ -249,13 +249,16 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     megString = bluetoothCannotBeTurnedOnString;
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView(bluetoothCannotBeTurnedOnString, MessageDuration);
-                    // ScreenUtil.showToast(this, bluetoothCannotBeTurnedOnString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                 }
                 break;
             case CommonConstants.BluetoothGameByClient:
+                oppositePlayerName = "";
                 btDiscoveredMap = new HashMap<>();
                 btMacFunctionThreadMap = new HashMap<>();
                 oppositePlayerNameMap = new LinkedHashMap<>();
+                // update list view
+                ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
+                twoPlayerListAdapter.updateData(oppNameList);
                 break;
             default:
                 break;
