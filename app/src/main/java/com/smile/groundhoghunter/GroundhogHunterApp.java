@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.support.multidex.MultiDexApplication;
 
 import com.google.android.gms.ads.MobileAds;
+import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
 import com.smile.smilepublicclasseslibrary.facebook_ads_util.*;
 import com.smile.smilepublicclasseslibrary.google_admob_ads_util.GoogleAdMobInterstitial;
 import com.smile.smilepublicclasseslibrary.scoresqlite.*;
@@ -27,6 +28,7 @@ public class GroundhogHunterApp extends MultiDexApplication {
     public static Resources AppResources;
     public static Context AppContext;
     public static ScoreSQLite ScoreSQLiteDB;
+    public static BluetoothFunctionThread selectedBtFuncThread;
 
     public static ShowingInterstitialAdsUtil InterstitialAd;
     public static String googleAdMobBannerID = "";

@@ -6,7 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.smile.groundhoghunter.Constants.BluetoothConstants;
+import com.smile.groundhoghunter.Constants.CommonConstants;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -86,9 +86,9 @@ public class BluetoothFunctionThread extends Thread {
                 mBuffer = sb.toString();
 
                 switch (byteHead) {
-                    case BluetoothConstants.OppositePlayerNameHasBeenRead:
+                    case CommonConstants.OppositePlayerNameHasBeenRead:
                         if (!mBuffer.isEmpty()) {
-                            readMsg = mHandler.obtainMessage(BluetoothConstants.OppositePlayerNameHasBeenRead);
+                            readMsg = mHandler.obtainMessage(CommonConstants.OppositePlayerNameHasBeenRead);
                             data = new Bundle();
                             data.putParcelable("BluetoothDevice", mBluetoothSocket.getRemoteDevice());
                             data.putString("OppositePlayerName", mBuffer);
@@ -98,26 +98,26 @@ public class BluetoothFunctionThread extends Thread {
                             Log.d(TAG, "Opposite player name is empty.");
                         }
                         break;
-                    case BluetoothConstants.HostExitCode:
-                        readMsg = mHandler.obtainMessage(BluetoothConstants.HostExitCode);
+                    case CommonConstants.BluetoothHostExitCode:
+                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothHostExitCode);
                         data = new Bundle();
                         data.putString("BluetoothMacAddress", mBuffer);
                         readMsg.setData(data);
                         readMsg.sendToTarget();
                         break;
-                    case BluetoothConstants.ClientExitCode:
-                        readMsg = mHandler.obtainMessage(BluetoothConstants.ClientExitCode);
+                    case CommonConstants.BluetoothClientExitCode:
+                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothClientExitCode);
                         data = new Bundle();
                         data.putString("BluetoothMacAddress", mBuffer);
                         readMsg.setData(data);
                         readMsg.sendToTarget();
                         break;
-                    case BluetoothConstants.StartGame:
-                        readMsg = mHandler.obtainMessage(BluetoothConstants.StartGame);
+                    case CommonConstants.BluetoothStartGame:
+                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothStartGame);
                         readMsg.sendToTarget();
                         break;
-                    case BluetoothConstants.LeaveGame:
-                        readMsg = mHandler.obtainMessage(BluetoothConstants.LeaveGame);
+                    case CommonConstants.BluetoothLeaveGame:
+                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothLeaveGame);
                         readMsg.sendToTarget();
                         break;
                 }

@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 
-import com.smile.groundhoghunter.Constants.BluetoothConstants;
+import com.smile.groundhoghunter.Constants.CommonConstants;
 
 public class BluetoothDiscoveryTimerThread extends Thread {
 
@@ -36,10 +36,10 @@ public class BluetoothDiscoveryTimerThread extends Thread {
         Intent broadcastIntent = new Intent();
         if (keepRunning) {
             // send message to activity to cancel discovery
-            msg = mHandler.obtainMessage(BluetoothConstants.DiscoveryTimerHasReached);
+            msg = mHandler.obtainMessage(CommonConstants.DiscoveryTimerHasReached);
             msg.sendToTarget();
         } else {
-            msg = mHandler.obtainMessage(BluetoothConstants.DiscoveryTimerHasBeenDismissed);
+            msg = mHandler.obtainMessage(CommonConstants.DiscoveryTimerHasBeenDismissed);
             msg.sendToTarget();
         }
     }

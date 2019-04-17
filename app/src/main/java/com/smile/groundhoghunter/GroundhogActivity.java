@@ -27,7 +27,6 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.smile.groundhoghunter.Constants.BluetoothConstants;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
@@ -302,6 +301,9 @@ public class GroundhogActivity extends AppCompatActivity {
         startGameButton.setClickable(true);
         startGameButton.setEnabled(true);
         startGameButton.setVisibility(View.VISIBLE);
+        if (gameType == CommonConstants.BluetoothGameByClient) {
+            startGameButton.setEnabled(false);
+        }
 
         pauseGameButton = findViewById(R.id.pauseGameButton);
         Bitmap pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseString, Color.BLUE);
@@ -309,6 +311,9 @@ public class GroundhogActivity extends AppCompatActivity {
         pauseGameButton.setClickable(false);
         pauseGameButton.setEnabled(false);
         pauseGameButton.setVisibility(View.GONE);
+        if (gameType == CommonConstants.BluetoothGameByClient) {
+            pauseGameButton.setEnabled(false);
+        }
 
         resumeGameButton = findViewById(R.id.resumeGameButton);
         Bitmap resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeString, Color.BLUE);
@@ -316,6 +321,9 @@ public class GroundhogActivity extends AppCompatActivity {
         resumeGameButton.setClickable(false);
         resumeGameButton.setEnabled(false);
         resumeGameButton.setVisibility(View.GONE);
+        if (gameType == CommonConstants.BluetoothGameByClient) {
+            resumeGameButton.setEnabled(false);
+        }
 
         startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -367,6 +375,9 @@ public class GroundhogActivity extends AppCompatActivity {
         newGameButton = findViewById(R.id.newGameButton);
         Bitmap newGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.new_game_button, newGameString, Color.BLUE);
         newGameButton.setImageBitmap(newGameBitmap);
+        if (gameType == CommonConstants.BluetoothGameByClient) {
+            newGameButton.setEnabled(false);
+        }
         newGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -390,7 +401,7 @@ public class GroundhogActivity extends AppCompatActivity {
         quitGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                quitGame();
+                quitGame(gameType);
             }
         });
 
@@ -541,7 +552,7 @@ public class GroundhogActivity extends AppCompatActivity {
     public void onBackPressed() {
         // capture the event of back button when it is pressed
         // change back button behavior
-        quitGame();
+        quitGame(gameType);
     }
 
     // private methods
@@ -551,7 +562,12 @@ public class GroundhogActivity extends AppCompatActivity {
         gameView.stopThreads();
         gameView.releaseResources();
     }
-    private void quitGame() {
+    private void quitGame(int mGameType) {
+        if (mGameType != CommonConstants.GameBySinglePlayer) {
+            // not single player
+            GroundhogHunterApp.selectedBtFuncThread.write(CommonConstants.BluetoothLeaveGame, "");
+        }
+
         if (GroundhogHunterApp.InterstitialAd != null) {
             // free version
             int entryPoint = 0; //  no used

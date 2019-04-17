@@ -9,7 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.smile.groundhoghunter.Constants.BluetoothConstants;
+import com.smile.groundhoghunter.Constants.CommonConstants;
 
 import java.util.HashMap;
 
@@ -66,7 +66,7 @@ public class BluetoothAcceptThread extends Thread {
 
         if (mServerSocket == null) {
             // cannot create Server Socket
-            msg = mHandler.obtainMessage(BluetoothConstants.BluetoothAcceptThreadNoServerSocket);
+            msg = mHandler.obtainMessage(CommonConstants.BluetoothAcceptThreadNoServerSocket);
             msg.sendToTarget();
             return;
         }
@@ -76,7 +76,7 @@ public class BluetoothAcceptThread extends Thread {
                 // Keep listening until exception occurs or a socket is returned.
                 try {
 
-                    msg = mHandler.obtainMessage(BluetoothConstants.BluetoothAcceptThreadStarted);
+                    msg = mHandler.obtainMessage(CommonConstants.BluetoothAcceptThreadStarted);
                     msg.sendToTarget();
 
                     mBluetoothSocket = mServerSocket.accept();
@@ -92,18 +92,18 @@ public class BluetoothAcceptThread extends Thread {
                         /*
                         btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
                         btFunctionThread.start();
-                        btFunctionThread.write(BluetoothConstants.OppositePlayerNameHasBeenRead, mPlayerName);
+                        btFunctionThread.write(CommonConstants.OppositePlayerNameHasBeenRead, mPlayerName);
                         */
 
                         BluetoothFunctionThread btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
                         btFunctionThread.start();
-                        btFunctionThread.write(BluetoothConstants.OppositePlayerNameHasBeenRead, mPlayerName);
+                        btFunctionThread.write(CommonConstants.OppositePlayerNameHasBeenRead, mPlayerName);
 
                         BluetoothDevice btDevice = mBluetoothSocket.getRemoteDevice();
 
                         btFunctionThreadMap.put(btDevice, btFunctionThread);
 
-                        msg = mHandler.obtainMessage(BluetoothConstants.BluetoothAcceptThreadConnected);
+                        msg = mHandler.obtainMessage(CommonConstants.BluetoothAcceptThreadConnected);
                         data = new Bundle();
                         // data.putInt("BluetoothAcceptThreadId", acceptThreadId);
                         data.putParcelable("BluetoothDevice", btDevice);
@@ -117,7 +117,7 @@ public class BluetoothAcceptThread extends Thread {
                     Log.e(TAG, "BluetoothSocket's accept() method failed", ex);
 
                     // listening is stopped (means BluetoothServerSocket closed or exception occurred)
-                    msg = mHandler.obtainMessage(BluetoothConstants.BluetoothAcceptThreadStopped);
+                    msg = mHandler.obtainMessage(CommonConstants.BluetoothAcceptThreadStopped);
                     msg.sendToTarget();
                 }
             }
