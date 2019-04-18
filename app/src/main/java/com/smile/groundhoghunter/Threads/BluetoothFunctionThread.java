@@ -121,6 +121,22 @@ public class BluetoothFunctionThread extends Thread {
                         readMsg = mHandler.obtainMessage(CommonConstants.BluetoothLeaveGame);
                         readMsg.sendToTarget();
                         break;
+                    case CommonConstants.BluetoothStartGameButton:
+                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothStartGameButton);
+                        readMsg.sendToTarget();
+                        break;
+                    case CommonConstants.BluetoothPauseGameButton:
+                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothPauseGameButton);
+                        readMsg.sendToTarget();
+                        break;
+                    case CommonConstants.BluetoothResumeGameButton:
+                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothResumeGameButton);
+                        readMsg.sendToTarget();
+                        break;
+                    case CommonConstants.BluetoothNewGameButton:
+                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothNewGameButton);
+                        readMsg.sendToTarget();
+                        break;
                 }
                 Log.d(TAG, "byteHead: " + byteHead);
                 Log.d(TAG, "BluetoothFunctionThread: " + mBuffer);

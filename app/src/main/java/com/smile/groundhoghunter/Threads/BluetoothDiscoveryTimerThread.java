@@ -36,10 +36,10 @@ public class BluetoothDiscoveryTimerThread extends Thread {
         Intent broadcastIntent = new Intent();
         if (keepRunning) {
             // send message to activity to cancel discovery
-            msg = mHandler.obtainMessage(CommonConstants.DiscoveryTimerHasReached);
+            msg = mHandler.obtainMessage(CommonConstants.BluetoothDiscoveryTimerHasReached);
             msg.sendToTarget();
         } else {
-            msg = mHandler.obtainMessage(CommonConstants.DiscoveryTimerHasBeenDismissed);
+            msg = mHandler.obtainMessage(CommonConstants.BluetoothDiscoveryTimerHasBeenDismissed);
             msg.sendToTarget();
         }
     }

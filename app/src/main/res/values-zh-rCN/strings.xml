@@ -93,6 +93,7 @@
     <string name="foundDeviceString">侦测到设备</string>
     <string name="hasBeenReadString">已读到</string>
     <string name="noOppositePlayerString">没有指定对手玩家</string>
+    <string name="oppositePlayerLeftGameString">对手已离开游戏.</string>
 
     <string name="companyNameString">微笑资讯有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

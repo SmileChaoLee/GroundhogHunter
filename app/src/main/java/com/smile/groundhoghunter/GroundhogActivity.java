@@ -35,6 +35,7 @@ import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Services.LocalTop10IntentService;
 import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
+import com.smile.groundhoghunter.Utilities.BluetoothUtil;
 import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.alertdialogfragment.AlertDialogFragment;
 import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
@@ -312,56 +313,49 @@ public class GroundhogActivity extends AppCompatActivity {
         startGameButton.setClickable(true);
         startGameButton.setEnabled(true);
         startGameButton.setVisibility(View.VISIBLE);
-        if (gameType == CommonConstants.BluetoothGameByClient) {
-            startGameButton.setEnabled(false);
-        }
 
         pauseGameButton = findViewById(R.id.pauseGameButton);
         Bitmap pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseString, Color.BLUE);
         pauseGameButton.setImageBitmap(pauseGameBitmap);
         pauseGameButton.setClickable(false);
         pauseGameButton.setEnabled(false);
-        pauseGameButton.setVisibility(View.GONE);
-        if (gameType == CommonConstants.BluetoothGameByClient) {
-            pauseGameButton.setEnabled(false);
-        }
+        pauseGameButton.setVisibility(View.INVISIBLE);
 
         resumeGameButton = findViewById(R.id.resumeGameButton);
         Bitmap resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeString, Color.BLUE);
         resumeGameButton.setImageBitmap(resumeGameBitmap);
         resumeGameButton.setClickable(false);
         resumeGameButton.setEnabled(false);
-        resumeGameButton.setVisibility(View.GONE);
-        if (gameType == CommonConstants.BluetoothGameByClient) {
-            resumeGameButton.setEnabled(false);
-        }
+        resumeGameButton.setVisibility(View.INVISIBLE);
 
         startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (gameType != CommonConstants.GameBySinglePlayer) {
+                    selectedBtFunctionThread.write(CommonConstants.BluetoothStartGameButton, "");
+                }
                 gameView.startGame();
 
                 startGameButton.setEnabled(false);
-                startGameButton.setVisibility(View.GONE);
-
+                startGameButton.setVisibility(View.INVISIBLE);
                 pauseGameButton.setEnabled(true);
                 pauseGameButton.setVisibility(View.VISIBLE);
-
                 resumeGameButton.setEnabled(false);
-                resumeGameButton.setVisibility(View.GONE);
+                resumeGameButton.setVisibility(View.INVISIBLE);
             }
         });
         pauseGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (gameType != CommonConstants.GameBySinglePlayer) {
+                    selectedBtFunctionThread.write(CommonConstants.BluetoothPauseGameButton, "");
+                }
                 gameView.pauseGame();
 
                 startGameButton.setEnabled(false);
-                startGameButton.setVisibility(View.GONE);
-
+                startGameButton.setVisibility(View.INVISIBLE);
                 pauseGameButton.setEnabled(false);
-                pauseGameButton.setVisibility(View.GONE);
-
+                pauseGameButton.setVisibility(View.INVISIBLE);
                 resumeGameButton.setEnabled(true);
                 resumeGameButton.setVisibility(View.VISIBLE);
             }
@@ -369,16 +363,17 @@ public class GroundhogActivity extends AppCompatActivity {
         resumeGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (gameType != CommonConstants.GameBySinglePlayer) {
+                    selectedBtFunctionThread.write(CommonConstants.BluetoothResumeGameButton, "");
+                }
                 gameView.resumeGame();
 
                 startGameButton.setEnabled(false);
-                startGameButton.setVisibility(View.GONE);
-
+                startGameButton.setVisibility(View.INVISIBLE);
                 pauseGameButton.setEnabled(true);
                 pauseGameButton.setVisibility(View.VISIBLE);
-
                 resumeGameButton.setEnabled(false);
-                resumeGameButton.setVisibility(View.GONE);
+                resumeGameButton.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -386,22 +381,20 @@ public class GroundhogActivity extends AppCompatActivity {
         newGameButton = findViewById(R.id.newGameButton);
         Bitmap newGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.new_game_button, newGameString, Color.BLUE);
         newGameButton.setImageBitmap(newGameBitmap);
-        if (gameType == CommonConstants.BluetoothGameByClient) {
-            newGameButton.setEnabled(false);
-        }
         newGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (gameType != CommonConstants.GameBySinglePlayer) {
+                    selectedBtFunctionThread.write(CommonConstants.BluetoothNewGameButton, "");
+                }
                 gameView.newGame();
 
                 startGameButton.setEnabled(true);
                 startGameButton.setVisibility(View.VISIBLE);
-
                 pauseGameButton.setEnabled(false);
-                pauseGameButton.setVisibility(View.GONE);
-
+                pauseGameButton.setVisibility(View.INVISIBLE);
                 resumeGameButton.setEnabled(false);
-                resumeGameButton.setVisibility(View.GONE);
+                resumeGameButton.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -412,9 +405,18 @@ public class GroundhogActivity extends AppCompatActivity {
         quitGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                quitGame(gameType);
+                quitGame();
             }
         });
+
+        if (gameType == CommonConstants.BluetoothGameByClient) {
+            startGameButton.setVisibility(View.INVISIBLE);
+            startGameButton.setEnabled(false);
+            // pauseGameButton.setEnabled(false);
+            // resumeGameButton.setEnabled(false);
+            newGameButton.setVisibility(View.INVISIBLE);
+            newGameButton.setEnabled(false);
+        }
 
         bReceiver = new GroundhogHunterBroadcastReceiver();
 
@@ -544,6 +546,7 @@ public class GroundhogActivity extends AppCompatActivity {
             }
         }
 
+        BluetoothUtil.stopBluetoothFunctionThread(selectedBtFunctionThread);
         selectedBtFunctionThread = null;
 
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
@@ -565,7 +568,7 @@ public class GroundhogActivity extends AppCompatActivity {
     public void onBackPressed() {
         // capture the event of back button when it is pressed
         // change back button behavior
-        quitGame(gameType);
+        quitGame();
     }
 
     // private methods
@@ -575,8 +578,9 @@ public class GroundhogActivity extends AppCompatActivity {
         gameView.stopThreads();
         gameView.releaseResources();
     }
-    private void quitGame(int mGameType) {
-        if (mGameType != CommonConstants.GameBySinglePlayer) {
+
+    private void quitGame() {
+        if (gameType != CommonConstants.GameBySinglePlayer) {
             // not single player
             Log.d(TAG, "Notify opposite player that you are quiting game");
             selectedBtFunctionThread.write(CommonConstants.BluetoothLeaveGame, "");
@@ -758,10 +762,60 @@ public class GroundhogActivity extends AppCompatActivity {
 
             Context mContext = getApplicationContext();
             Bundle data = msg.getData();
+            String msgString = "";
+
             Log.d(TAG, "Message received: " + msg.what);
             switch (msg.what) {
                 case CommonConstants.BluetoothLeaveGame:
-                    ScreenUtil.showToast(mContext, "Opposite player quit game.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    // received by host and client sides
+                    msgString = mContext.getString(R.string.oppositePlayerLeftGameString);
+                    ScreenUtil.showToast(mContext, msgString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    break;
+                case CommonConstants.BluetoothNewGameButton:
+                    // received by client side
+                    // ScreenUtil.showToast(mContext, "Host pressed new game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    gameView.newGame(); // new game on client side
+                    pauseGameButton.setEnabled(false);
+                    pauseGameButton.setVisibility(View.INVISIBLE);
+                    resumeGameButton.setEnabled(false);
+                    resumeGameButton.setVisibility(View.INVISIBLE);
+                    break;
+                case CommonConstants.BluetoothStartGameButton:
+                    // received by client side
+                    // ScreenUtil.showToast(mContext, "Host pressed start game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    gameView.startGame();   // start game on client side
+                    pauseGameButton.setEnabled(true);
+                    pauseGameButton.setVisibility(View.VISIBLE);
+                    resumeGameButton.setEnabled(false);
+                    resumeGameButton.setVisibility(View.INVISIBLE);
+                    break;
+                case CommonConstants.BluetoothPauseGameButton:
+                    // received by host and client sides
+                    // ScreenUtil.showToast(mContext, "Opposite player pressed pause game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    gameView.pauseGame();
+                    if (gameType == CommonConstants.BluetoothGameByHost) {
+                        startGameButton.setEnabled(false);
+                        startGameButton.setVisibility(View.INVISIBLE);
+                    }
+                    // gameType = CommonConstants.BluetoothGameByClient
+                    pauseGameButton.setEnabled(false);
+                    pauseGameButton.setVisibility(View.INVISIBLE);
+                    resumeGameButton.setEnabled(true);
+                    resumeGameButton.setVisibility(View.VISIBLE);
+                    break;
+                case CommonConstants.BluetoothResumeGameButton:
+                    // received by host and client sides
+                    // ScreenUtil.showToast(mContext, "Opposite player pressed resume game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    gameView.resumeGame();
+                    if (gameType == CommonConstants.BluetoothGameByHost) {
+                        startGameButton.setEnabled(false);
+                        startGameButton.setVisibility(View.INVISIBLE);
+                    }
+                    // gameType = CommonConstants.BluetoothGameByClient
+                    pauseGameButton.setEnabled(true);
+                    pauseGameButton.setVisibility(View.VISIBLE);
+                    resumeGameButton.setEnabled(false);
+                    resumeGameButton.setVisibility(View.INVISIBLE);
                     break;
                 default:
                     break;

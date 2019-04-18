@@ -469,7 +469,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
             Bundle data = msg.getData();
 
             switch (msg.what) {
-                case CommonConstants.DiscoveryTimerHasReached:
+                case CommonConstants.BluetoothDiscoveryTimerHasReached:
                     megString = discoveryTimeHasReachedString;
                     Log.d(TAG, megString);
                     // ScreenUtil.showToast(mContext, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
@@ -482,7 +482,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         connectThread.start();
                     }
                     break;
-                case CommonConstants.DiscoveryTimerHasBeenDismissed:
+                case CommonConstants.BluetoothDiscoveryTimerHasBeenDismissed:
                     megString = discoveryWasDismissedString;
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView(megString, MessageDuration);
