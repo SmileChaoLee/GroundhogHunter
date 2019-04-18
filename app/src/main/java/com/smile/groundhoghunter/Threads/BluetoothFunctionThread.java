@@ -13,10 +13,11 @@ import java.io.OutputStream;
 
 public class BluetoothFunctionThread extends Thread {
     private final String TAG = new String(".Threads.BluetoothFunctionThread");
-    private final Handler mHandler;
     private final BluetoothSocket mBluetoothSocket;
     private final InputStream inputStream;
     private final OutputStream outputStream;
+
+    private Handler mHandler;
     private String mBuffer;
     private boolean keepRunning;
     private boolean startRead;
@@ -121,7 +122,7 @@ public class BluetoothFunctionThread extends Thread {
                         readMsg.sendToTarget();
                         break;
                 }
-
+                Log.d(TAG, "byteHead: " + byteHead);
                 Log.d(TAG, "BluetoothFunctionThread: " + mBuffer);
             } catch (Exception ex) {
                 Log.d(TAG, "Failed to read data.", ex);
@@ -157,13 +158,14 @@ public class BluetoothFunctionThread extends Thread {
     public void setKeepRunning(boolean keepRunning) {
         this.keepRunning = keepRunning;
     }
-
     public void setStartRead(boolean startRead) {
         this.startRead = startRead;
     }
-
     public BluetoothSocket getBluetoothSocket() {
         return mBluetoothSocket;
+    }
+    public void setHandler(Handler mHandler) {
+        this.mHandler = mHandler;
     }
 
     public void closeBluetoothSocket() {

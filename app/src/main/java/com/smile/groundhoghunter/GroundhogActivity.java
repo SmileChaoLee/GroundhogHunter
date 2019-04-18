@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
@@ -23,6 +25,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -31,6 +34,7 @@ import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Services.LocalTop10IntentService;
+import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
 import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.alertdialogfragment.AlertDialogFragment;
 import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
@@ -51,6 +55,7 @@ public class GroundhogActivity extends AppCompatActivity {
     private int colNum;
     private float textFontSize;
     private float fontScale;
+    private float toastTextSize;
     private int highestScore;
     private ImageView soundOnOffImageView;
     private TextView highScoreTextView;
@@ -79,6 +84,7 @@ public class GroundhogActivity extends AppCompatActivity {
     private final String loadingString;
 
     private int gameType;
+    private BluetoothFunctionThread selectedBtFunctionThread;
 
     // public static properties
     public static boolean GamePause = false;
@@ -97,6 +103,7 @@ public class GroundhogActivity extends AppCompatActivity {
         float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
         textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
         fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        toastTextSize = textFontSize * 0.8f;
 
         isShowingLoadingMessage = false;
 
@@ -112,9 +119,13 @@ public class GroundhogActivity extends AppCompatActivity {
         }
         */
 
-
         Intent callingIntent = getIntent();
         gameType = callingIntent.getIntExtra("GameType", CommonConstants.GameBySinglePlayer);
+        if (gameType != CommonConstants.GameBySinglePlayer) {
+            GroundhogGameHandler groundhogGameHandler = new GroundhogGameHandler(Looper.getMainLooper());
+            selectedBtFunctionThread = GroundhogHunterApp.selectedBtFuncThread;
+            selectedBtFunctionThread.setHandler(groundhogGameHandler);
+        }
 
         super.onCreate(savedInstanceState);
         // the following 2 statements have been moved to AndroidManifest.xml
@@ -533,6 +544,8 @@ public class GroundhogActivity extends AppCompatActivity {
             }
         }
 
+        selectedBtFunctionThread = null;
+
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.unregisterReceiver(bReceiver);
 
@@ -565,7 +578,10 @@ public class GroundhogActivity extends AppCompatActivity {
     private void quitGame(int mGameType) {
         if (mGameType != CommonConstants.GameBySinglePlayer) {
             // not single player
-            GroundhogHunterApp.selectedBtFuncThread.write(CommonConstants.BluetoothLeaveGame, "");
+            Log.d(TAG, "Notify opposite player that you are quiting game");
+            selectedBtFunctionThread.write(CommonConstants.BluetoothLeaveGame, "");
+        } else {
+            Log.d(TAG, "Single player is quiting game");
         }
 
         if (GroundhogHunterApp.InterstitialAd != null) {
@@ -724,6 +740,33 @@ public class GroundhogActivity extends AppCompatActivity {
                     break;
             }
 
+        }
+    }
+
+    private class GroundhogGameHandler extends Handler {
+
+        private final Looper mLooper;
+
+        public GroundhogGameHandler(Looper looper) {
+            super(looper);
+            mLooper = looper;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            // super.handleMessage(msg);
+
+            Context mContext = getApplicationContext();
+            Bundle data = msg.getData();
+            Log.d(TAG, "Message received: " + msg.what);
+            switch (msg.what) {
+                case CommonConstants.BluetoothLeaveGame:
+                    ScreenUtil.showToast(mContext, "Opposite player quit game.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    break;
+                default:
+                    break;
+
+            }
         }
     }
 

@@ -105,7 +105,6 @@ public class BluetoothAcceptThread extends Thread {
 
                         msg = mHandler.obtainMessage(CommonConstants.BluetoothAcceptThreadConnected);
                         data = new Bundle();
-                        // data.putInt("BluetoothAcceptThreadId", acceptThreadId);
                         data.putParcelable("BluetoothDevice", btDevice);
                         msg.setData(data);
                         msg.sendToTarget();
