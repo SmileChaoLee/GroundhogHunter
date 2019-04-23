@@ -126,6 +126,7 @@ public class GroundhogActivity extends AppCompatActivity {
             GroundhogGameHandler groundhogGameHandler = new GroundhogGameHandler(Looper.getMainLooper());
             selectedBtFunctionThread = GroundhogHunterApp.selectedBtFuncThread;
             selectedBtFunctionThread.setHandler(groundhogGameHandler);
+            selectedBtFunctionThread.setStartRead(true);    // start reading data
         }
 
         super.onCreate(savedInstanceState);
@@ -760,9 +761,10 @@ public class GroundhogActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             // super.handleMessage(msg);
 
+            String msgString = "";
+
             Context mContext = getApplicationContext();
             Bundle data = msg.getData();
-            String msgString = "";
 
             Log.d(TAG, "Message received: " + msg.what);
             switch (msg.what) {
@@ -817,9 +819,16 @@ public class GroundhogActivity extends AppCompatActivity {
                     resumeGameButton.setEnabled(false);
                     resumeGameButton.setVisibility(View.INVISIBLE);
                     break;
+                case CommonConstants.BluetoothDefaultReading:
                 default:
+                    // wrong or read error
                     break;
 
+            }
+
+            if (selectedBtFunctionThread != null) {
+                // read the next data
+                selectedBtFunctionThread.setStartRead(true);    // start reading data
             }
         }
     }

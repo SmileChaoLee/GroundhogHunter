@@ -45,9 +45,12 @@ public class BluetoothFunctionThread extends Thread {
         inputStream = inpStream;
         outputStream = outStream;
         keepRunning = true;
-        startRead = false;  // default is not reading the input stream
 
         thisThread = this;
+
+        synchronized (thisThread) {
+            startRead = false;  // default is not reading the input stream
+        }
     }
 
     public void run() {
@@ -57,7 +60,8 @@ public class BluetoothFunctionThread extends Thread {
         }
 
         Message readMsg;
-        Bundle data;
+        Bundle data = new Bundle();
+        data.putParcelable("BluetoothDevice", mBluetoothSocket.getRemoteDevice());
 
         while (keepRunning) {
 
@@ -65,6 +69,7 @@ public class BluetoothFunctionThread extends Thread {
                 // wait until start reading data
                 while (!startRead) {
                     try {
+                        Log.d(TAG, "Waiting for notification to read data.");
                         thisThread.wait();
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
@@ -88,56 +93,45 @@ public class BluetoothFunctionThread extends Thread {
 
                 switch (byteHead) {
                     case CommonConstants.OppositePlayerNameHasBeenRead:
-                        if (!mBuffer.isEmpty()) {
-                            readMsg = mHandler.obtainMessage(CommonConstants.OppositePlayerNameHasBeenRead);
-                            data = new Bundle();
-                            data.putParcelable("BluetoothDevice", mBluetoothSocket.getRemoteDevice());
-                            data.putString("OppositePlayerName", mBuffer);
-                            readMsg.setData(data);
-                            readMsg.sendToTarget();
-                        } else {
-                            Log.d(TAG, "Opposite player name is empty.");
-                        }
+                        readMsg = mHandler.obtainMessage(CommonConstants.OppositePlayerNameHasBeenRead);
+                        data.putString("OppositePlayerName", mBuffer);
                         break;
                     case CommonConstants.BluetoothHostExitCode:
                         readMsg = mHandler.obtainMessage(CommonConstants.BluetoothHostExitCode);
-                        data = new Bundle();
-                        data.putString("BluetoothMacAddress", mBuffer);
-                        readMsg.setData(data);
-                        readMsg.sendToTarget();
                         break;
                     case CommonConstants.BluetoothClientExitCode:
                         readMsg = mHandler.obtainMessage(CommonConstants.BluetoothClientExitCode);
-                        data = new Bundle();
-                        data.putString("BluetoothMacAddress", mBuffer);
-                        readMsg.setData(data);
-                        readMsg.sendToTarget();
                         break;
                     case CommonConstants.BluetoothStartGame:
                         readMsg = mHandler.obtainMessage(CommonConstants.BluetoothStartGame);
-                        readMsg.sendToTarget();
                         break;
                     case CommonConstants.BluetoothLeaveGame:
                         readMsg = mHandler.obtainMessage(CommonConstants.BluetoothLeaveGame);
-                        readMsg.sendToTarget();
                         break;
                     case CommonConstants.BluetoothStartGameButton:
                         readMsg = mHandler.obtainMessage(CommonConstants.BluetoothStartGameButton);
-                        readMsg.sendToTarget();
                         break;
                     case CommonConstants.BluetoothPauseGameButton:
                         readMsg = mHandler.obtainMessage(CommonConstants.BluetoothPauseGameButton);
-                        readMsg.sendToTarget();
                         break;
                     case CommonConstants.BluetoothResumeGameButton:
                         readMsg = mHandler.obtainMessage(CommonConstants.BluetoothResumeGameButton);
-                        readMsg.sendToTarget();
                         break;
                     case CommonConstants.BluetoothNewGameButton:
                         readMsg = mHandler.obtainMessage(CommonConstants.BluetoothNewGameButton);
-                        readMsg.sendToTarget();
+                        break;
+                    default:
+                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothDefaultReading);
                         break;
                 }
+
+                synchronized (thisThread) {
+                    startRead = false;
+                }
+
+                readMsg.setData(data);
+                readMsg.sendToTarget();
+
                 Log.d(TAG, "byteHead: " + byteHead);
                 Log.d(TAG, "BluetoothFunctionThread: " + mBuffer);
             } catch (Exception ex) {
@@ -145,10 +139,6 @@ public class BluetoothFunctionThread extends Thread {
                 break;
             }
         }
-    }
-
-    public String getDataRead() {
-        return mBuffer;
     }
 
     public void write(int headByte, String data) {
@@ -175,7 +165,11 @@ public class BluetoothFunctionThread extends Thread {
         this.keepRunning = keepRunning;
     }
     public void setStartRead(boolean startRead) {
-        this.startRead = startRead;
+        synchronized (thisThread) {
+            this.startRead = startRead;
+            thisThread.notify();
+            Log.d(TAG, "Notification for reading by setting startRead");
+        }
     }
     public BluetoothSocket getBluetoothSocket() {
         return mBluetoothSocket;

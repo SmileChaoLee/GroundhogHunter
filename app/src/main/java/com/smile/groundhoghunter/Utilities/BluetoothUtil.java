@@ -63,8 +63,12 @@ public class BluetoothUtil {
 
     public static void stopBluetoothFunctionThread(BluetoothFunctionThread btFunctionThread) {
         if (btFunctionThread != null) {
-            btFunctionThread.setKeepRunning(false);
-            btFunctionThread.closeBluetoothSocket();
+            synchronized (btFunctionThread) {
+                btFunctionThread.setKeepRunning(false);
+                btFunctionThread.closeBluetoothSocket();
+                btFunctionThread.setStartRead(true);
+                btFunctionThread.notify();
+            }
             boolean retry = true;
             while (retry) {
                 try {

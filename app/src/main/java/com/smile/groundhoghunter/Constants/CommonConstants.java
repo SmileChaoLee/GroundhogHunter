@@ -4,14 +4,14 @@ public final class CommonConstants {
     private CommonConstants() {
     }
 
-    public static final int OppositePlayerNameHasBeenRead = 0;
+    public static final int BluetoothFailedReading = 255;   // failed to read
+    public static final int BluetoothDefaultReading = 254;    // data outside the range
 
+    public static final int OppositePlayerNameHasBeenRead = 0;
     public static final int BluetoothAcceptThreadNoServerSocket = 1;
-    public static final int BluetoothAcceptThreadStarted = 2;
     public static final int BluetoothAcceptThreadStopped = 3;
     public static final int BluetoothAcceptThreadConnected = 4;
     public static final int BluetoothConnectToThreadNoClientSocket = 11;
-    public static final int BluetoothConnectToThreadStarted = 12;
     public static final int BluetoothConnectToThreadConnected = 13;
     public static final int BluetoothConnectToThreadFailedToConnect = 14;
     public static final int BluetoothDiscoveryTimerHasReached = 31;

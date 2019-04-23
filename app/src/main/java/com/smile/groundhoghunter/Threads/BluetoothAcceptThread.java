@@ -76,9 +76,6 @@ public class BluetoothAcceptThread extends Thread {
                 // Keep listening until exception occurs or a socket is returned.
                 try {
 
-                    msg = mHandler.obtainMessage(CommonConstants.BluetoothAcceptThreadStarted);
-                    msg.sendToTarget();
-
                     mBluetoothSocket = mServerSocket.accept();
                     Log.e(TAG, "BluetoothSocket's accept() method finished.");
 
@@ -88,12 +85,6 @@ public class BluetoothAcceptThread extends Thread {
                         numOfConnections++;
                         isConnected = true;
                         // mServerSocket.close();
-
-                        /*
-                        btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
-                        btFunctionThread.start();
-                        btFunctionThread.write(CommonConstants.OppositePlayerNameHasBeenRead, mPlayerName);
-                        */
 
                         BluetoothFunctionThread btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
                         btFunctionThread.start();
@@ -137,16 +128,8 @@ public class BluetoothAcceptThread extends Thread {
         }
     }
 
-    public BluetoothSocket getBluetoothSocket() {
-        return mBluetoothSocket;
-    }
-    /*
-    public BluetoothFunctionThread getBtFunctionThread() {
-        return btFunctionThread;
-    }
-    */
-    public BluetoothFunctionThread getBtFunctionThread(BluetoothDevice btDvice) {
-        return btFunctionThreadMap.get(btDvice);
+    public BluetoothFunctionThread getBtFunctionThread(BluetoothDevice btDevice) {
+        return btFunctionThreadMap.get(btDevice);
     }
     public void setKeepRunning(boolean keepRunning) {
         this.keepRunning = keepRunning;

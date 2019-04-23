@@ -3,7 +3,6 @@ package com.smile.groundhoghunter;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -231,7 +230,8 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     for (String remoteMacAddress : btMacFunctionThreadMap.keySet()) {
                         BluetoothFunctionThread btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
                         if (btFunctionThread != selectedBtFunctionThread) {
-                            btFunctionThread.write(CommonConstants.BluetoothHostExitCode, remoteMacAddress);
+                            // btFunctionThread.write(CommonConstants.BluetoothHostExitCode, remoteMacAddress);
+                            btFunctionThread.write(CommonConstants.BluetoothHostExitCode, "");
                             BluetoothUtil.stopBluetoothFunctionThread(btFunctionThread);
                         }
                     }
@@ -380,7 +380,8 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
         if (mBluetoothAdapter != null) {
             String macAddress = mBluetoothAdapter.getAddress();
             for (BluetoothFunctionThread btFunctionThread : btMacFunctionThreadMap.values()) {
-                btFunctionThread.write(CommonConstants.BluetoothHostExitCode, macAddress);
+                // btFunctionThread.write(CommonConstants.BluetoothHostExitCode, macAddress);
+                btFunctionThread.write(CommonConstants.BluetoothHostExitCode, "");
             }
         }
     }
@@ -444,7 +445,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
             String deviceName = "";
             String remoteMacAddress;
 
-            BluetoothSocket mBluetoothSocket;
             BluetoothDevice btDevice;
             BluetoothFunctionThread btFunctionThread;
 
@@ -458,7 +458,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     megString = oppositeName + " " + megString;
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView(megString, MessageDuration);
-                    // ScreenUtil.showToast(mContext, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     btDevice = data.getParcelable("BluetoothDevice");
                     remoteMacAddress = btDevice.getAddress();
                     if (oppositeName != null) {
@@ -470,14 +469,15 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                             }
                         }
                     }
+
+                    // read the next data
+                    // btFunctionThread = mBluetoothAcceptThread.getBtFunctionThread(btDevice);
+                    btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
+                    btFunctionThread.setStartRead(true);    // start reading data
+
                     break;
                 case CommonConstants.BluetoothAcceptThreadNoServerSocket:
                     showMessage.showMessageInTextView(cannotCreateServerSocketString, MessageDuration);
-                    // ScreenUtil.showToast(mContext, cannotCreateServerSocketString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    break;
-                case CommonConstants.BluetoothAcceptThreadStarted:
-                    showMessage.showMessageInTextView(waitingForConnectionString, MessageDuration);
-                    // ScreenUtil.showToast(mContext, waitingForConnectionString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
                 case CommonConstants.BluetoothAcceptThreadConnected:
                     btDevice = data.getParcelable("BluetoothDevice");
@@ -486,26 +486,22 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     megString = serverAcceptedConnectionString + "(" + deviceName+ ")";
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView(serverAcceptedConnectionString, MessageDuration);
-                    // ScreenUtil.showToast(mContext, serverAcceptedConnectionString , toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
-                    // start reading data from the other device and writing data to the other device
-                    // start communicating
 
+                    // start reading data from the other device and writing data to the other device
                     btFunctionThread = mBluetoothAcceptThread.getBtFunctionThread(btDevice);
-                    synchronized (btFunctionThread) {
-                        Log.d(TAG, "Started to read player name.");
-                        btFunctionThread.setStartRead(true);    // start reading data
-                        btFunctionThread.notifyAll();
-                    }
+                    btFunctionThread.setStartRead(true);    // start reading data
+
                     if (!btMacFunctionThreadMap.containsKey(remoteMacAddress)) {
                         btMacFunctionThreadMap.put(remoteMacAddress, btFunctionThread);
                     }
+
                     break;
                 case CommonConstants.BluetoothAcceptThreadStopped:
                     showMessage.showMessageInTextView(waitingStoppedCancelledString, MessageDuration);
-                    // ScreenUtil.showToast(mContext, waitingStoppedCancelledString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
                 case CommonConstants.BluetoothClientExitCode:
-                    remoteMacAddress = data.getString("BluetoothMacAddress");
+                    btDevice = data.getParcelable("BluetoothDevice");
+                    remoteMacAddress = btDevice.getAddress();
                     btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
                     btMacFunctionThreadMap.remove(remoteMacAddress);
                     // release btFunctionThread (stop communicating)
@@ -521,6 +517,15 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
                     twoPlayerListAdapter.updateData(oppNameList);
 
+                    break;
+                case CommonConstants.BluetoothDefaultReading:
+                    Log.d(TAG, "Default reading.");
+                    btDevice = data.getParcelable("BluetoothDevice");
+                    remoteMacAddress = btDevice.getAddress();
+                    // read the next data
+                    // btFunctionThread = mBluetoothAcceptThread.getBtFunctionThread(btDevice);
+                    btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
+                    btFunctionThread.setStartRead(true);    // start reading data
                     break;
             }
         }
