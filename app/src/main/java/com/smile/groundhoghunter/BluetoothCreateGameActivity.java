@@ -223,7 +223,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                 }
                 // Notify client to start game
                 if (selectedBtFunctionThread != null) {
-                    GroundhogHunterApp.selectedBtFuncThread = selectedBtFunctionThread;
+                    GroundhogHunterApp.selectedIoFuncThread = selectedBtFunctionThread;
                     // stop BluetoothAcceptThread and close server socket
                     stopBluetoothAcceptThread();
                     // stop other BluetoothFunctionThreads

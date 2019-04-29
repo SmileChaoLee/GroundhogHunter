@@ -65,7 +65,7 @@ public class BluetoothUtil {
         if (btFunctionThread != null) {
             synchronized (btFunctionThread) {
                 btFunctionThread.setKeepRunning(false);
-                btFunctionThread.closeBluetoothSocket();
+                btFunctionThread.closeIoSocket();
                 btFunctionThread.setStartRead(true);
                 btFunctionThread.notify();
             }

@@ -124,7 +124,8 @@ public class GroundhogActivity extends AppCompatActivity {
         gameType = callingIntent.getIntExtra("GameType", CommonConstants.GameBySinglePlayer);
         if (gameType != CommonConstants.GameBySinglePlayer) {
             GroundhogGameHandler groundhogGameHandler = new GroundhogGameHandler(Looper.getMainLooper());
-            selectedBtFunctionThread = GroundhogHunterApp.selectedBtFuncThread;
+            // selectedBtFunctionThread = GroundhogHunterApp.selectedBtFuncThread;
+            selectedBtFunctionThread = (BluetoothFunctionThread) GroundhogHunterApp.selectedIoFuncThread;
             selectedBtFunctionThread.setHandler(groundhogGameHandler);
             selectedBtFunctionThread.setStartRead(true);    // start reading data
         }

@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.groundhoghunter.Threads.GameTimerThread;
 import com.smile.groundhoghunter.Threads.GameViewDrawThread;
@@ -37,6 +38,7 @@ import org.json.JSONObject;
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = "GameView";
+    private final int gameType;
 
     private float textFontSize;
     private float fontScale;
@@ -113,7 +115,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         Log.d(TAG, "GameView.GameView(Context context, int gWidth, int gHeight) is called.");
 
-        groundhogActivity = (GroundhogActivity)context;
+        this.groundhogActivity = (GroundhogActivity)context;
+        this.gameType = gameType;
 
         float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(groundhogActivity, GroundhogHunterApp.FontSize_Scale_Type, null);
         textFontSize = ScreenUtil.suitableFontSize(groundhogActivity, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
@@ -455,10 +458,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         gameTimerThread.setKeepRunning(false);
 
         runningStatus = 2;
-        boolean isInTop10 = GroundhogHunterApp.ScoreSQLiteDB.isInTop10(currentScore);
-        if (isInTop10) {
-            // record the current score
-            recordScore(currentScore);
+        if (gameType == CommonConstants.GameBySinglePlayer) {
+            // single player then record the score
+            boolean isInTop10 = GroundhogHunterApp.ScoreSQLiteDB.isInTop10(currentScore);
+            if (isInTop10) {
+                // record the current score
+                recordScore(currentScore);
+            }
         }
     }
 

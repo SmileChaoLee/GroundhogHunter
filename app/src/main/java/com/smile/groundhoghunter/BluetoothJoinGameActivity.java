@@ -574,7 +574,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     break;
                 case CommonConstants.BluetoothStartGame:
                     if (selectedBtFunctionThread != null) {
-                        GroundhogHunterApp.selectedBtFuncThread = selectedBtFunctionThread;
+                        GroundhogHunterApp.selectedIoFuncThread = selectedBtFunctionThread;
                         // stop other BluetoothFunctionThreads
                         for (String remoteMac : btMacFunctionThreadMap.keySet()) {
                             BluetoothFunctionThread btFuncThread = btMacFunctionThreadMap.get(remoteMac);

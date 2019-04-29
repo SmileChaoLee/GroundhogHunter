@@ -6,26 +6,19 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class BluetoothFunctionThread extends Thread {
+public class BluetoothFunctionThread extends IoFunctionThread {
     private final String TAG = new String(".Threads.BluetoothFunctionThread");
     private final BluetoothSocket mBluetoothSocket;
-    private final InputStream inputStream;
-    private final OutputStream outputStream;
-
-    private Handler mHandler;
-    private String mBuffer;
-    private boolean keepRunning;
-    private boolean startRead;
-
-    private BluetoothFunctionThread thisThread;
+    private final IoFunctionThread ioFunctionThread;
 
     public BluetoothFunctionThread(Handler handler, BluetoothSocket bluetoothSocket) {
-        mHandler = handler;
+        super(handler);
         mBluetoothSocket = bluetoothSocket;
         InputStream inpStream = null;
         OutputStream outStream = null;
@@ -46,9 +39,9 @@ public class BluetoothFunctionThread extends Thread {
         outputStream = outStream;
         keepRunning = true;
 
-        thisThread = this;
+        ioFunctionThread = getThisThread();
 
-        synchronized (thisThread) {
+        synchronized (ioFunctionThread) {
             startRead = false;  // default is not reading the input stream
         }
     }
@@ -65,12 +58,12 @@ public class BluetoothFunctionThread extends Thread {
 
         while (keepRunning) {
 
-            synchronized (thisThread) {
+            synchronized (ioFunctionThread) {
                 // wait until start reading data
                 while (!startRead) {
                     try {
                         Log.d(TAG, "Waiting for notification to read data.");
-                        thisThread.wait();
+                        ioFunctionThread.wait();
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
@@ -125,7 +118,7 @@ public class BluetoothFunctionThread extends Thread {
                         break;
                 }
 
-                synchronized (thisThread) {
+                synchronized (ioFunctionThread) {
                     startRead = false;
                 }
 
@@ -141,44 +134,11 @@ public class BluetoothFunctionThread extends Thread {
         }
     }
 
-    public void write(int headByte, String data) {
-        try {
-            Log.d(TAG, "Started to write data to the other.");
-
-            int dataLength = data.length();
-            byte[] byteWrite = new byte[dataLength + 3];
-            byteWrite[0] = (byte)headByte;
-            byteWrite[1] = (byte)dataLength;
-            System.arraycopy(data.getBytes(), 0, byteWrite, 2, dataLength);
-            byteWrite[byteWrite.length - 1] = '\n';
-            Log.d(TAG, "byteWrite = " + new String(byteWrite));
-
-            outputStream.write(byteWrite);
-
-            Log.d(TAG, "Succeeded to write data to the other.");
-        } catch (Exception ex) {
-            Log.d(TAG, "Failed to write data.", ex);
-        }
-    }
-
-    public void setKeepRunning(boolean keepRunning) {
-        this.keepRunning = keepRunning;
-    }
-    public void setStartRead(boolean startRead) {
-        synchronized (thisThread) {
-            this.startRead = startRead;
-            thisThread.notify();
-            Log.d(TAG, "Notification for reading by setting startRead");
-        }
-    }
     public BluetoothSocket getBluetoothSocket() {
         return mBluetoothSocket;
     }
-    public void setHandler(Handler mHandler) {
-        this.mHandler = mHandler;
-    }
 
-    public void closeBluetoothSocket() {
+    public void closeIoSocket() {
         try {
             mBluetoothSocket.close();
         } catch (Exception ex) {
