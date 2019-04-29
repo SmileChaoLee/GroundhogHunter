@@ -16,6 +16,8 @@
         android:label="${appName}${appNameSuffix}"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".BtHostGameActivity"></activity>
+        <activity android:name=".BtClientGameActivity" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -37,46 +39,38 @@
         <activity
             android:name=".GroundhogActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".BluetoothCreateGameActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".BluetoothJoinGameActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Top10ScoreActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeForTop10">
-        </activity>
+            android:theme="@style/AppThemeForTop10" />
         <activity
             android:name=".SettingActivity"
             android:label="@string/settingString"
-            android:theme="@style/AppThemeTransparent">
-        </activity>
+            android:theme="@style/AppThemeTransparent" />
         <activity
             android:name=".TwoPlayerActivity"
             android:configChanges="orientation"
             android:label="@string/twoPlayerString"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".Services.LocalTop10IntentService"
             android:enabled="true"
-            android:exported="false">
-        </service>
+            android:exported="false" />
         <service
             android:name=".Services.GlobalTop10IntentService"
             android:enabled="true"
-            android:exported="false">
-        </service>
+            android:exported="false" />
     </application>
 
 </manifest>

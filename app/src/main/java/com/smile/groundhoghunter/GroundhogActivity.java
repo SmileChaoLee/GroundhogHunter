@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
@@ -25,7 +24,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -34,8 +32,6 @@ import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Services.LocalTop10IntentService;
-import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
-import com.smile.groundhoghunter.Utilities.BluetoothUtil;
 import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.alertdialogfragment.AlertDialogFragment;
 import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
@@ -44,19 +40,17 @@ import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 public class GroundhogActivity extends AppCompatActivity {
 
     // private properties
-    private final static String TAG = "MainActivity";
+    private final static String TAG = "GroundhogActivity";
     private final static String LoadingDialogTag = "LoadingDialogTag";
 
     private final int SettingRequestCode = 0;
     private final int LocalTop10RequestCode = 1;
     private final int GlobalTop10RequestCode = 2;
+    private final String showingAdsString;
+    private final String loadingString;
 
-    private GameView gameView;
     private int rowNum;
     private int colNum;
-    private float textFontSize;
-    private float fontScale;
-    private float toastTextSize;
     private int highestScore;
     private ImageView soundOnOffImageView;
     private TextView highScoreTextView;
@@ -65,11 +59,6 @@ public class GroundhogActivity extends AppCompatActivity {
     private TextView hitNumTextView;
     private ImageView messageImageView;
 
-    private SmileImageButton startGameButton;
-    private SmileImageButton pauseGameButton;
-    private SmileImageButton resumeGameButton;
-    private SmileImageButton newGameButton;
-    private SmileImageButton quitGameButton;
     private SmileImageButton settingButton;
     private SmileImageButton top10Button;
     private SmileImageButton globalTop10Button;
@@ -81,11 +70,17 @@ public class GroundhogActivity extends AppCompatActivity {
 
     private BroadcastReceiver bReceiver;
 
-    private final String showingAdsString;
-    private final String loadingString;
-
     private int gameType;
-    private BluetoothFunctionThread selectedBtFunctionThread;
+
+    protected GameView gameView;
+    protected float textFontSize;
+    protected float fontScale;
+    protected float toastTextSize;
+    protected SmileImageButton startGameButton;
+    protected SmileImageButton pauseGameButton;
+    protected SmileImageButton resumeGameButton;
+    protected SmileImageButton newGameButton;
+    protected SmileImageButton quitGameButton;
 
     // public static properties
     public static boolean GamePause = false;
@@ -108,27 +103,8 @@ public class GroundhogActivity extends AppCompatActivity {
 
         isShowingLoadingMessage = false;
 
-        /*
-        if (savedInstanceState != null) {
-            isShowingLoadingMessage = savedInstanceState.getBoolean("IsShowingLoadingMessage");
-            if (isShowingLoadingMessage) {
-                // showing loading message
-                showLoadingMessage();
-            } else {
-                dismissShowingLoadingMessage();
-            }
-        }
-        */
-
         Intent callingIntent = getIntent();
         gameType = callingIntent.getIntExtra("GameType", CommonConstants.GameBySinglePlayer);
-        if (gameType != CommonConstants.GameBySinglePlayer) {
-            GroundhogGameHandler groundhogGameHandler = new GroundhogGameHandler(Looper.getMainLooper());
-            // selectedBtFunctionThread = GroundhogHunterApp.selectedBtFuncThread;
-            selectedBtFunctionThread = (BluetoothFunctionThread) GroundhogHunterApp.selectedIoFuncThread;
-            selectedBtFunctionThread.setHandler(groundhogGameHandler);
-            selectedBtFunctionThread.setStartRead(true);    // start reading data
-        }
 
         super.onCreate(savedInstanceState);
         // the following 2 statements have been moved to AndroidManifest.xml
@@ -333,49 +309,21 @@ public class GroundhogActivity extends AppCompatActivity {
         startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (gameType != CommonConstants.GameBySinglePlayer) {
-                    selectedBtFunctionThread.write(CommonConstants.BluetoothStartGameButton, "");
-                }
-                gameView.startGame();
-
-                startGameButton.setEnabled(false);
-                startGameButton.setVisibility(View.INVISIBLE);
-                pauseGameButton.setEnabled(true);
-                pauseGameButton.setVisibility(View.VISIBLE);
-                resumeGameButton.setEnabled(false);
-                resumeGameButton.setVisibility(View.INVISIBLE);
+                startGame();
             }
         });
+
         pauseGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (gameType != CommonConstants.GameBySinglePlayer) {
-                    selectedBtFunctionThread.write(CommonConstants.BluetoothPauseGameButton, "");
-                }
-                gameView.pauseGame();
-
-                startGameButton.setEnabled(false);
-                startGameButton.setVisibility(View.INVISIBLE);
-                pauseGameButton.setEnabled(false);
-                pauseGameButton.setVisibility(View.INVISIBLE);
-                resumeGameButton.setEnabled(true);
-                resumeGameButton.setVisibility(View.VISIBLE);
+                pauseGame();
             }
         });
+
         resumeGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (gameType != CommonConstants.GameBySinglePlayer) {
-                    selectedBtFunctionThread.write(CommonConstants.BluetoothResumeGameButton, "");
-                }
-                gameView.resumeGame();
-
-                startGameButton.setEnabled(false);
-                startGameButton.setVisibility(View.INVISIBLE);
-                pauseGameButton.setEnabled(true);
-                pauseGameButton.setVisibility(View.VISIBLE);
-                resumeGameButton.setEnabled(false);
-                resumeGameButton.setVisibility(View.INVISIBLE);
+                resumeGame();
             }
         });
 
@@ -386,17 +334,7 @@ public class GroundhogActivity extends AppCompatActivity {
         newGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (gameType != CommonConstants.GameBySinglePlayer) {
-                    selectedBtFunctionThread.write(CommonConstants.BluetoothNewGameButton, "");
-                }
-                gameView.newGame();
-
-                startGameButton.setEnabled(true);
-                startGameButton.setVisibility(View.VISIBLE);
-                pauseGameButton.setEnabled(false);
-                pauseGameButton.setVisibility(View.INVISIBLE);
-                resumeGameButton.setEnabled(false);
-                resumeGameButton.setVisibility(View.INVISIBLE);
+                newGame();
             }
         });
 
@@ -410,15 +348,6 @@ public class GroundhogActivity extends AppCompatActivity {
                 quitGame();
             }
         });
-
-        if (gameType == CommonConstants.BluetoothGameByClient) {
-            startGameButton.setVisibility(View.INVISIBLE);
-            startGameButton.setEnabled(false);
-            // pauseGameButton.setEnabled(false);
-            // resumeGameButton.setEnabled(false);
-            newGameButton.setVisibility(View.INVISIBLE);
-            newGameButton.setEnabled(false);
-        }
 
         bReceiver = new GroundhogHunterBroadcastReceiver();
 
@@ -548,9 +477,6 @@ public class GroundhogActivity extends AppCompatActivity {
             }
         }
 
-        BluetoothUtil.stopBluetoothFunctionThread(selectedBtFunctionThread);
-        selectedBtFunctionThread = null;
-
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.unregisterReceiver(bReceiver);
 
@@ -581,15 +507,47 @@ public class GroundhogActivity extends AppCompatActivity {
         gameView.releaseResources();
     }
 
-    private void quitGame() {
-        if (gameType != CommonConstants.GameBySinglePlayer) {
-            // not single player
-            Log.d(TAG, "Notify opposite player that you are quiting game");
-            selectedBtFunctionThread.write(CommonConstants.BluetoothLeaveGame, "");
-        } else {
-            Log.d(TAG, "Single player is quiting game");
-        }
+    protected void startGame() {
+        gameView.startGame();
+        startGameButton.setEnabled(false);
+        startGameButton.setVisibility(View.INVISIBLE);
+        pauseGameButton.setEnabled(true);
+        pauseGameButton.setVisibility(View.VISIBLE);
+        resumeGameButton.setEnabled(false);
+        resumeGameButton.setVisibility(View.INVISIBLE);
+    }
 
+    protected void pauseGame() {
+        gameView.pauseGame();
+        startGameButton.setEnabled(false);
+        startGameButton.setVisibility(View.INVISIBLE);
+        pauseGameButton.setEnabled(false);
+        pauseGameButton.setVisibility(View.INVISIBLE);
+        resumeGameButton.setEnabled(true);
+        resumeGameButton.setVisibility(View.VISIBLE);
+    }
+
+    protected void resumeGame() {
+        gameView.resumeGame();
+        startGameButton.setEnabled(false);
+        startGameButton.setVisibility(View.INVISIBLE);
+        pauseGameButton.setEnabled(true);
+        pauseGameButton.setVisibility(View.VISIBLE);
+        resumeGameButton.setEnabled(false);
+        resumeGameButton.setVisibility(View.INVISIBLE);
+    }
+
+    protected void newGame() {
+        gameView.newGame();
+        startGameButton.setEnabled(true);
+        startGameButton.setVisibility(View.VISIBLE);
+        pauseGameButton.setEnabled(false);
+        pauseGameButton.setVisibility(View.INVISIBLE);
+        resumeGameButton.setEnabled(false);
+        resumeGameButton.setVisibility(View.INVISIBLE);
+    }
+
+    protected void quitGame() {
         if (GroundhogHunterApp.InterstitialAd != null) {
             // free version
             int entryPoint = 0; //  no used
@@ -654,24 +612,12 @@ public class GroundhogActivity extends AppCompatActivity {
     public void showLoadingMessage() {
         isShowingLoadingMessage = true;
 
-        /*
-        Bitmap dialog_board_image = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.dialog_background_image);
-        Bitmap loadingBitmap = FontAndBitmapUtil.getBitmapFromBitmapWithText(dialog_board_image, loadingString, Color.RED);
-        messageImageView.setVisibility(View.VISIBLE);
-        messageImageView.setImageBitmap(loadingBitmap);
-        */
-
         loadingDialog = AlertDialogFragment.newInstance(loadingString, GroundhogHunterApp.FontSize_Scale_Type, textFontSize, Color.RED, 0, 0, true);
         loadingDialog.show(getSupportFragmentManager(), LoadingDialogTag);
     }
 
     public void dismissShowingLoadingMessage() {
         isShowingLoadingMessage = false;
-
-        /*
-        messageImageView.setImageBitmap(null);
-        messageImageView.setVisibility(View.GONE);
-        */
 
         if (loadingDialog != null) {
             if (loadingDialog.isStateSaved()) {
@@ -748,90 +694,4 @@ public class GroundhogActivity extends AppCompatActivity {
 
         }
     }
-
-    private class GroundhogGameHandler extends Handler {
-
-        private final Looper mLooper;
-
-        public GroundhogGameHandler(Looper looper) {
-            super(looper);
-            mLooper = looper;
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            // super.handleMessage(msg);
-
-            String msgString = "";
-
-            Context mContext = getApplicationContext();
-            Bundle data = msg.getData();
-
-            Log.d(TAG, "Message received: " + msg.what);
-            switch (msg.what) {
-                case CommonConstants.BluetoothLeaveGame:
-                    // received by host and client sides
-                    msgString = mContext.getString(R.string.oppositePlayerLeftGameString);
-                    ScreenUtil.showToast(mContext, msgString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    break;
-                case CommonConstants.BluetoothNewGameButton:
-                    // received by client side
-                    // ScreenUtil.showToast(mContext, "Host pressed new game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    gameView.newGame(); // new game on client side
-                    pauseGameButton.setEnabled(false);
-                    pauseGameButton.setVisibility(View.INVISIBLE);
-                    resumeGameButton.setEnabled(false);
-                    resumeGameButton.setVisibility(View.INVISIBLE);
-                    break;
-                case CommonConstants.BluetoothStartGameButton:
-                    // received by client side
-                    // ScreenUtil.showToast(mContext, "Host pressed start game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    gameView.startGame();   // start game on client side
-                    pauseGameButton.setEnabled(true);
-                    pauseGameButton.setVisibility(View.VISIBLE);
-                    resumeGameButton.setEnabled(false);
-                    resumeGameButton.setVisibility(View.INVISIBLE);
-                    break;
-                case CommonConstants.BluetoothPauseGameButton:
-                    // received by host and client sides
-                    // ScreenUtil.showToast(mContext, "Opposite player pressed pause game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    gameView.pauseGame();
-                    if (gameType == CommonConstants.BluetoothGameByHost) {
-                        startGameButton.setEnabled(false);
-                        startGameButton.setVisibility(View.INVISIBLE);
-                    }
-                    // gameType = CommonConstants.BluetoothGameByClient
-                    pauseGameButton.setEnabled(false);
-                    pauseGameButton.setVisibility(View.INVISIBLE);
-                    resumeGameButton.setEnabled(true);
-                    resumeGameButton.setVisibility(View.VISIBLE);
-                    break;
-                case CommonConstants.BluetoothResumeGameButton:
-                    // received by host and client sides
-                    // ScreenUtil.showToast(mContext, "Opposite player pressed resume game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    gameView.resumeGame();
-                    if (gameType == CommonConstants.BluetoothGameByHost) {
-                        startGameButton.setEnabled(false);
-                        startGameButton.setVisibility(View.INVISIBLE);
-                    }
-                    // gameType = CommonConstants.BluetoothGameByClient
-                    pauseGameButton.setEnabled(true);
-                    pauseGameButton.setVisibility(View.VISIBLE);
-                    resumeGameButton.setEnabled(false);
-                    resumeGameButton.setVisibility(View.INVISIBLE);
-                    break;
-                case CommonConstants.BluetoothDefaultReading:
-                default:
-                    // wrong or read error
-                    break;
-
-            }
-
-            if (selectedBtFunctionThread != null) {
-                // read the next data
-                selectedBtFunctionThread.setStartRead(true);    // start reading data
-            }
-        }
-    }
-
 }

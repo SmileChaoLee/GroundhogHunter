@@ -242,7 +242,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     oppositePlayerNameMap = null;
                     //
                     selectedBtFunctionThread.write(CommonConstants.BluetoothStartGame, "");
-                    Intent gameIntent = new Intent(getApplicationContext(), GroundhogActivity.class);
+                    Intent gameIntent = new Intent(getApplicationContext(), BtHostGameActivity.class);
                     gameIntent.putExtra("GameType", CommonConstants.BluetoothGameByHost);
                     startActivityForResult(gameIntent, CommonConstants.BluetoothGameByHost);
                 }

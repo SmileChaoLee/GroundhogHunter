@@ -407,7 +407,6 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     // object and its info from the Intent.
                     btDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     megString = foundDeviceString + ": " + BluetoothUtil.getBluetoothDeviceName(btDevice);
-                    // ScreenUtil.showToast(context, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     Log.d(TAG, megString);
                     // start to connect to host game
                     /*
@@ -433,13 +432,11 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     megString = scanBluetoothStartedString;
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView(scanBluetoothStartedString, MessageDuration);
-                    // ScreenUtil.showToast(context, scanBluetoothStartedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
                     megString = scanBluetoothFinishedString;
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView(scanBluetoothFinishedString, MessageDuration);
-                    // ScreenUtil.showToast(context, scanBluetoothFinishedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
             }
         }
@@ -474,7 +471,6 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                 case CommonConstants.BluetoothDiscoveryTimerHasReached:
                     megString = discoveryTimeHasReachedString;
                     Log.d(TAG, megString);
-                    // ScreenUtil.showToast(mContext, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     if (mBluetoothAdapter.isDiscovering()) {
                         mBluetoothAdapter.cancelDiscovery();
                     }
@@ -488,7 +484,6 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     megString = discoveryWasDismissedString;
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView(megString, MessageDuration);
-                    // ScreenUtil.showToast(mContext, megString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
                 case CommonConstants.BluetoothConnectToThreadNoClientSocket:
                     btDevice = data.getParcelable("BluetoothDevice");
@@ -556,7 +551,6 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     btDevice = data.getParcelable("BluetoothDevice");
                     remoteMacAddress = btDevice.getAddress();
                     showMessage.showMessageInTextView(hostLeftGameString, MessageDuration);
-                    // ScreenUtil.showToast(mContext, hostLeftGameString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     // remoteMacAddress = data.getString("BluetoothMacAddress");
                     btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
                     btMacFunctionThreadMap.remove(remoteMacAddress);
@@ -596,7 +590,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         oppositePlayerNameMap.clear();
                         oppositePlayerNameMap = null;
                         //
-                        Intent gameIntent = new Intent(getApplicationContext(), GroundhogActivity.class);
+                        Intent gameIntent = new Intent(getApplicationContext(), BtClientGameActivity.class);
                         gameIntent.putExtra("GameType", CommonConstants.BluetoothGameByClient);
                         startActivityForResult(gameIntent, CommonConstants.BluetoothGameByClient);
                     }
