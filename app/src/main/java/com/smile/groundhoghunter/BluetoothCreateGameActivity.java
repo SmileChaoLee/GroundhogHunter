@@ -231,7 +231,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                         BluetoothFunctionThread btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
                         if (btFunctionThread != selectedBtFunctionThread) {
                             // btFunctionThread.write(CommonConstants.BluetoothHostExitCode, remoteMacAddress);
-                            btFunctionThread.write(CommonConstants.BluetoothHostExitCode, "");
+                            btFunctionThread.write(CommonConstants.TwoPlayerHostExitCode, "");
                             BluetoothUtil.stopBluetoothFunctionThread(btFunctionThread);
                         }
                     }
@@ -241,7 +241,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     oppositePlayerNameMap.clear();
                     oppositePlayerNameMap = null;
                     //
-                    selectedBtFunctionThread.write(CommonConstants.BluetoothStartGame, "");
+                    selectedBtFunctionThread.write(CommonConstants.TwoPlayerHostStartGame, "");
                     Intent gameIntent = new Intent(getApplicationContext(), BtHostGameActivity.class);
                     gameIntent.putExtra("GameType", CommonConstants.BluetoothGameByHost);
                     startActivityForResult(gameIntent, CommonConstants.BluetoothGameByHost);
@@ -380,8 +380,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
         if (mBluetoothAdapter != null) {
             String macAddress = mBluetoothAdapter.getAddress();
             for (BluetoothFunctionThread btFunctionThread : btMacFunctionThreadMap.values()) {
-                // btFunctionThread.write(CommonConstants.BluetoothHostExitCode, macAddress);
-                btFunctionThread.write(CommonConstants.BluetoothHostExitCode, "");
+                btFunctionThread.write(CommonConstants.TwoPlayerHostExitCode, "");
             }
         }
     }
@@ -420,7 +419,6 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     if (extraPreviousScanMode != extraScanMode) {
                         if ((extraScanMode == BluetoothAdapter.SCAN_MODE_CONNECTABLE) || (extraScanMode == BluetoothAdapter.SCAN_MODE_NONE)) {
                             showMessage.showMessageInTextView(bluetoothVisibilityIsDisabledString, MessageDuration);
-                            // ScreenUtil.showToast(context, bluetoothVisibilityIsDisabledString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                         }
                     }
                     break;
@@ -499,7 +497,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                 case CommonConstants.BluetoothAcceptThreadStopped:
                     showMessage.showMessageInTextView(waitingStoppedCancelledString, MessageDuration);
                     break;
-                case CommonConstants.BluetoothClientExitCode:
+                case CommonConstants.TwoPlayerClientExitCode:
                     btDevice = data.getParcelable("BluetoothDevice");
                     remoteMacAddress = btDevice.getAddress();
                     btFunctionThread = btMacFunctionThreadMap.get(remoteMacAddress);
@@ -518,7 +516,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     twoPlayerListAdapter.updateData(oppNameList);
 
                     break;
-                case CommonConstants.BluetoothDefaultReading:
+                case CommonConstants.TwoPlayerDefaultReading:
                     Log.d(TAG, "Default reading.");
                     btDevice = data.getParcelable("BluetoothDevice");
                     remoteMacAddress = btDevice.getAddress();

@@ -89,32 +89,32 @@ public class BluetoothFunctionThread extends IoFunctionThread {
                         readMsg = mHandler.obtainMessage(CommonConstants.OppositePlayerNameHasBeenRead);
                         data.putString("OppositePlayerName", mBuffer);
                         break;
-                    case CommonConstants.BluetoothHostExitCode:
-                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothHostExitCode);
+                    case CommonConstants.TwoPlayerHostExitCode:
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerHostExitCode);
                         break;
-                    case CommonConstants.BluetoothClientExitCode:
-                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothClientExitCode);
+                    case CommonConstants.TwoPlayerClientExitCode:
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerClientExitCode);
                         break;
-                    case CommonConstants.BluetoothStartGame:
-                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothStartGame);
+                    case CommonConstants.TwoPlayerHostStartGame:
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerHostStartGame);
                         break;
-                    case CommonConstants.BluetoothLeaveGame:
-                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothLeaveGame);
+                    case CommonConstants.TwoPlayerOppositeLeftGame:
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerOppositeLeftGame);
                         break;
-                    case CommonConstants.BluetoothStartGameButton:
-                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothStartGameButton);
+                    case CommonConstants.TwoPlayerStartGameButton:
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerStartGameButton);
                         break;
-                    case CommonConstants.BluetoothPauseGameButton:
-                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothPauseGameButton);
+                    case CommonConstants.TwoPlayerPauseGameButton:
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerPauseGameButton);
                         break;
-                    case CommonConstants.BluetoothResumeGameButton:
-                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothResumeGameButton);
+                    case CommonConstants.TwoPlayerResumeGameButton:
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerResumeGameButton);
                         break;
-                    case CommonConstants.BluetoothNewGameButton:
-                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothNewGameButton);
+                    case CommonConstants.TwoPlayerNewGameButton:
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerNewGameButton);
                         break;
                     default:
-                        readMsg = mHandler.obtainMessage(CommonConstants.BluetoothDefaultReading);
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerDefaultReading);
                         break;
                 }
 

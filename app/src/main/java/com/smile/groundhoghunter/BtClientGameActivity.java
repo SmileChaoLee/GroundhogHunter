@@ -46,7 +46,7 @@ public class BtClientGameActivity extends GroundhogActivity {
 
     @Override
     protected void pauseGame() {
-        selectedBtFunctionThread.write(CommonConstants.BluetoothPauseGameButton, "");
+        selectedBtFunctionThread.write(CommonConstants.TwoPlayerPauseGameButton, "");
         gameView.pauseGame();
         pauseGameButton.setEnabled(false);
         pauseGameButton.setVisibility(View.INVISIBLE);
@@ -56,7 +56,7 @@ public class BtClientGameActivity extends GroundhogActivity {
 
     @Override
     protected void resumeGame() {
-        selectedBtFunctionThread.write(CommonConstants.BluetoothResumeGameButton, "");
+        selectedBtFunctionThread.write(CommonConstants.TwoPlayerResumeGameButton, "");
         gameView.resumeGame();
         pauseGameButton.setEnabled(true);
         pauseGameButton.setVisibility(View.VISIBLE);
@@ -66,7 +66,7 @@ public class BtClientGameActivity extends GroundhogActivity {
 
     @Override
     protected void quitGame() {
-        selectedBtFunctionThread.write(CommonConstants.BluetoothLeaveGame, "");
+        selectedBtFunctionThread.write(CommonConstants.TwoPlayerOppositeLeftGame, "");
         super.quitGame();
     }
 
@@ -92,12 +92,12 @@ public class BtClientGameActivity extends GroundhogActivity {
 
             Log.d(TAG, "Message received: " + msg.what);
             switch (msg.what) {
-                case CommonConstants.BluetoothLeaveGame:
+                case CommonConstants.TwoPlayerOppositeLeftGame:
                     // received by host and client sides
                     msgString = mContext.getString(R.string.oppositePlayerLeftGameString);
                     ScreenUtil.showToast(mContext, msgString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     break;
-                case CommonConstants.BluetoothNewGameButton:
+                case CommonConstants.TwoPlayerNewGameButton:
                     // received by client side
                     // ScreenUtil.showToast(mContext, "Host pressed new game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     gameView.newGame(); // new game on client side
@@ -106,7 +106,7 @@ public class BtClientGameActivity extends GroundhogActivity {
                     resumeGameButton.setEnabled(false);
                     resumeGameButton.setVisibility(View.INVISIBLE);
                     break;
-                case CommonConstants.BluetoothStartGameButton:
+                case CommonConstants.TwoPlayerStartGameButton:
                     // received by client side
                     // ScreenUtil.showToast(mContext, "Host pressed start game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     gameView.startGame();   // start game on client side
@@ -115,7 +115,7 @@ public class BtClientGameActivity extends GroundhogActivity {
                     resumeGameButton.setEnabled(false);
                     resumeGameButton.setVisibility(View.INVISIBLE);
                     break;
-                case CommonConstants.BluetoothPauseGameButton:
+                case CommonConstants.TwoPlayerPauseGameButton:
                     // received by host and client sides
                     // ScreenUtil.showToast(mContext, "Opposite player pressed pause game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     gameView.pauseGame();
@@ -124,7 +124,7 @@ public class BtClientGameActivity extends GroundhogActivity {
                     resumeGameButton.setEnabled(true);
                     resumeGameButton.setVisibility(View.VISIBLE);
                     break;
-                case CommonConstants.BluetoothResumeGameButton:
+                case CommonConstants.TwoPlayerResumeGameButton:
                     // received by host and client sides
                     // ScreenUtil.showToast(mContext, "Opposite player pressed resume game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     gameView.resumeGame();
@@ -133,7 +133,7 @@ public class BtClientGameActivity extends GroundhogActivity {
                     pauseGameButton.setEnabled(true);
                     pauseGameButton.setVisibility(View.VISIBLE);
                     break;
-                case CommonConstants.BluetoothDefaultReading:
+                case CommonConstants.TwoPlayerDefaultReading:
                 default:
                     // wrong or read error
                     break;

@@ -4,27 +4,27 @@ public final class CommonConstants {
     private CommonConstants() {
     }
 
-    public static final int BluetoothFailedReading = 255;   // failed to read
-    public static final int BluetoothDefaultReading = 254;    // data outside the range
+    public static final int TwoPlayerFailedReading = 255;   // failed to read
+    public static final int TwoPlayerDefaultReading = 254;    // data outside the range
 
     public static final int OppositePlayerNameHasBeenRead = 0;
-    public static final int BluetoothAcceptThreadNoServerSocket = 1;
-    public static final int BluetoothAcceptThreadStopped = 3;
-    public static final int BluetoothAcceptThreadConnected = 4;
-    public static final int BluetoothConnectToThreadNoClientSocket = 11;
-    public static final int BluetoothConnectToThreadConnected = 13;
-    public static final int BluetoothConnectToThreadFailedToConnect = 14;
-    public static final int BluetoothDiscoveryTimerHasReached = 31;
-    public static final int BluetoothDiscoveryTimerHasBeenDismissed = 32;
-    public static final int BluetoothHostExitCode = 35;
-    public static final int BluetoothClientExitCode = 36;
+    public static final int TwoPlayerHostStartGame = 1;
+    public static final int TwoPlayerOppositeLeftGame = 2;
+    public static final int TwoPlayerStartGameButton = 3;
+    public static final int TwoPlayerPauseGameButton = 4;
+    public static final int TwoPlayerResumeGameButton = 5;
+    public static final int TwoPlayerNewGameButton = 6;
+    public static final int TwoPlayerHostExitCode = 7;
+    public static final int TwoPlayerClientExitCode = 8;
 
-    public static final int BluetoothStartGame = 40;
-    public static final int BluetoothLeaveGame = 41;
-    public static final int BluetoothStartGameButton = 43;
-    public static final int BluetoothPauseGameButton = 44;
-    public static final int BluetoothResumeGameButton = 45;
-    public static final int BluetoothNewGameButton = 46;
+    public static final int BluetoothAcceptThreadNoServerSocket = 21;
+    public static final int BluetoothAcceptThreadStopped = 22;
+    public static final int BluetoothAcceptThreadConnected = 23;
+    public static final int BluetoothConnectToThreadNoClientSocket = 24;
+    public static final int BluetoothConnectToThreadConnected = 25;
+    public static final int BluetoothConnectToThreadFailedToConnect = 26;
+    public static final int BluetoothDiscoveryTimerHasReached = 27;
+    public static final int BluetoothDiscoveryTimerHasBeenDismissed = 28;
 
     public static final int GameBySinglePlayer = 1000;
     public static final int BluetoothGameByHost = 1001;

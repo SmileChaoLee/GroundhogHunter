@@ -16,7 +16,8 @@
         android:label="${appName}${appNameSuffix}"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".BtHostGameActivity"></activity>
+        <activity android:name=".HostGameActivity"></activity>
+        <activity android:name=".BtHostGameActivity" />
         <activity android:name=".BtClientGameActivity" />
 
         <meta-data
