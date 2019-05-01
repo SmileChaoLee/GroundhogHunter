@@ -16,9 +16,6 @@
         android:label="${appName}${appNameSuffix}"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".HostGameActivity"></activity>
-        <activity android:name=".BtHostGameActivity" />
-        <activity android:name=".BtClientGameActivity" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -63,6 +60,10 @@
             android:configChanges="orientation"
             android:label="@string/twoPlayerString"
             android:screenOrientation="portrait" />
+        <activity android:name=".HostGameActivity" />
+        <activity android:name=".BtHostGameActivity" />
+        <activity android:name=".BtClientGameActivity" />
+        <activity android:name=".ClientGameActivity" />
 
         <service
             android:name=".Services.LocalTop10IntentService"
