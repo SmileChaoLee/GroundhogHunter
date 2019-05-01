@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
@@ -67,9 +68,7 @@ public class GroundhogActivity extends AppCompatActivity {
 
     private boolean isShowingLoadingMessage;
     private AlertDialogFragment loadingDialog;
-
     private BroadcastReceiver bReceiver;
-
     private int gameType;
 
     protected GameView gameView;
@@ -82,6 +81,8 @@ public class GroundhogActivity extends AppCompatActivity {
     protected SmileImageButton newGameButton;
     protected SmileImageButton quitGameButton;
 
+    protected IoFunctionThread selectedIoFunctionThread;
+
     // public static properties
     public static boolean GamePause = false;
     // public static final properties
@@ -91,6 +92,8 @@ public class GroundhogActivity extends AppCompatActivity {
         highestScore = GroundhogHunterApp.ScoreSQLiteDB.readHighestScore();
         showingAdsString = GroundhogHunterApp.AppResources.getString(R.string.showingAdsString);
         loadingString = GroundhogHunterApp.AppResources.getString(R.string.loadingString);
+
+        selectedIoFunctionThread = GroundhogHunterApp.selectedIoFuncThread;
     }
 
     @Override
@@ -266,13 +269,10 @@ public class GroundhogActivity extends AppCompatActivity {
                 }
                 int frameWidth = gameFrameLayout.getWidth();
                 int frameHeight = gameFrameLayout.getHeight();
-                Log.i(TAG, "The width of gameFrameLayout = " + frameWidth);
-                Log.i(TAG, "The height of gameFrameLayout = " + frameHeight);
 
-                gameView = new GameView(GroundhogActivity.this, gameType, frameWidth, frameHeight);
+                gameView = new GameView(GroundhogActivity.this, gameType, frameWidth, frameHeight, selectedIoFunctionThread);
                 Log.i(TAG, "gameView created.");
                 gameFrameLayout.addView(gameView);
-                Log.i(TAG, "Added gameView to gameFrameLayout.");
                 soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
             }
         });

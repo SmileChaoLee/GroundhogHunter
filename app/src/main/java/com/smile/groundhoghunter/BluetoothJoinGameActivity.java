@@ -589,7 +589,8 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         oppositePlayerNameMap = null;
                         //
                         Intent gameIntent = new Intent(getApplicationContext(), BtClientGameActivity.class);
-                        gameIntent.putExtra("GameType", CommonConstants.BluetoothGameByClient);
+                        // gameIntent.putExtra("GameType", CommonConstants.BluetoothGameByClient);
+                        gameIntent.putExtra("GameType", CommonConstants.TwoPlayerGameByClient);
                         startActivityForResult(gameIntent, CommonConstants.BluetoothGameByClient);
                     }
                     break;

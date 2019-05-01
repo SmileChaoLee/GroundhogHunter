@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.groundhoghunter.Threads.GameTimerThread;
@@ -61,6 +62,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean surfaceViewCreated;
     private int runningStatus;
     private boolean hasSound;
+
+    private IoFunctionThread selectedIoFunctionThread;
 
     // default properties (package modifier)
     public Groundhog[] groundhogArray;
@@ -110,10 +113,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         score_board = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.score_board);
     }
 
-    public GameView(Context context, int gameType, int gWidth, int gHeight) {
+    public GameView(Context context, int gameType, int gWidth, int gHeight,IoFunctionThread ioFunctionThread) {
         super(context);
 
         Log.d(TAG, "GameView.GameView(Context context, int gWidth, int gHeight) is called.");
+
+        selectedIoFunctionThread = ioFunctionThread;
 
         this.groundhogActivity = (GroundhogActivity)context;
         this.gameType = gameType;
@@ -382,6 +387,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public int getRunningStatus() {
         return runningStatus;
+    }
+
+    public IoFunctionThread getIoFunctionThread() {
+        return this.selectedIoFunctionThread;
     }
 
     // private methods

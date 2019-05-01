@@ -243,7 +243,8 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     //
                     selectedBtFunctionThread.write(CommonConstants.TwoPlayerHostStartGame, "");
                     Intent gameIntent = new Intent(getApplicationContext(), BtHostGameActivity.class);
-                    gameIntent.putExtra("GameType", CommonConstants.BluetoothGameByHost);
+                    // gameIntent.putExtra("GameType", CommonConstants.BluetoothGameByHost);
+                    gameIntent.putExtra("GameType", CommonConstants.TwoPlayerGameByHost);
                     startActivityForResult(gameIntent, CommonConstants.BluetoothGameByHost);
                 }
             }

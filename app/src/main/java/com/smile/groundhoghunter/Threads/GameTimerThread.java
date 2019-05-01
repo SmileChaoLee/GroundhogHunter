@@ -1,17 +1,29 @@
 package com.smile.groundhoghunter.Threads;
 
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
+
+import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
+import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.GameView;
 import com.smile.groundhoghunter.GroundhogActivity;
 
 public class GameTimerThread extends Thread {
 
+    private final static String TAG = "Threads.GameTimerThread";
     private GameView gameView;
     private boolean keepRunning;
     private int synchronizeTime = 1000; // one second
     private int timeRemaining;
+    private IoFunctionThread selectedIoFunctionThread;
 
     public GameTimerThread(GameView gView) {
         this.gameView = gView;
+        selectedIoFunctionThread = this.gameView.getIoFunctionThread();
         keepRunning = true;
         timeRemaining = GameView.TimerInterval;
     }

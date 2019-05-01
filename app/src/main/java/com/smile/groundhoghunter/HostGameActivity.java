@@ -8,20 +8,16 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class HostGameActivity extends GroundhogActivity {
 
     private final static String TAG = "HostGameActivity";
-    protected IoFunctionThread selectedIoFunctionThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        selectedIoFunctionThread = GroundhogHunterApp.selectedIoFuncThread;
     }
 
     @Override
@@ -70,8 +66,6 @@ public class HostGameActivity extends GroundhogActivity {
             // super.handleMessage(msg);
 
             String msgString = "";
-
-            // Context mContext = getApplicationContext();
             Bundle data = msg.getData();
 
             Log.d(TAG, "Message received: " + msg.what);
@@ -80,27 +74,20 @@ public class HostGameActivity extends GroundhogActivity {
                     // received by host and client sides
                     msgString = mContext.getString(R.string.oppositePlayerLeftGameString);
                     ScreenUtil.showToast(mContext, msgString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
                 case CommonConstants.TwoPlayerPauseGameButton:
                     // received by host and client sides
                     // ScreenUtil.showToast(mContext, "Opposite player pressed pause game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     HostGameActivity.super.pauseGame();
+                    selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
                 case CommonConstants.TwoPlayerResumeGameButton:
                     // received by host and client sides
                     // ScreenUtil.showToast(mContext, "Opposite player pressed resume game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     HostGameActivity.super.resumeGame();
+                    selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerDefaultReading:
-                default:
-                    // wrong or read error
-                    break;
-
-            }
-
-            if (selectedIoFunctionThread != null) {
-                // read the next data
-                selectedIoFunctionThread.setStartRead(true);    // start reading data
             }
         }
     }

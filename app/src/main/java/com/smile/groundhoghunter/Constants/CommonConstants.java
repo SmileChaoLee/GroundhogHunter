@@ -27,6 +27,8 @@ public final class CommonConstants {
     public static final int BluetoothDiscoveryTimerHasBeenDismissed = 28;
 
     public static final int GameBySinglePlayer = 1000;
-    public static final int BluetoothGameByHost = 1001;
-    public static final int BluetoothGameByClient = 1002;
+    public static final int TwoPlayerGameByHost = 1001;
+    public static final int TwoPlayerGameByClient = 1002;
+    public static final int BluetoothGameByHost = 1003;
+    public static final int BluetoothGameByClient = 1004;
 }

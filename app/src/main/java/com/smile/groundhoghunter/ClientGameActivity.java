@@ -9,14 +9,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class ClientGameActivity extends GroundhogActivity {
 
     private final static String TAG = "ClientGameActivity";
-    protected IoFunctionThread selectedIoFunctionThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +26,6 @@ public class ClientGameActivity extends GroundhogActivity {
         // resumeGameButton.setEnabled(false);
         newGameButton.setVisibility(View.INVISIBLE);
         newGameButton.setEnabled(false);
-
-        selectedIoFunctionThread = GroundhogHunterApp.selectedIoFuncThread;
     }
 
     @Override
@@ -60,8 +56,8 @@ public class ClientGameActivity extends GroundhogActivity {
 
     protected class ClientGameHandler extends Handler {
 
-        private final Looper mLooper;
-        private final Context mContext;
+        protected final Looper mLooper;
+        protected final Context mContext;
 
         public ClientGameHandler(Looper looper, Context context) {
             super(looper);
@@ -74,8 +70,6 @@ public class ClientGameActivity extends GroundhogActivity {
             // super.handleMessage(msg);
 
             String msgString = "";
-
-            Context mContext = getApplicationContext();
             Bundle data = msg.getData();
 
             Log.d(TAG, "Message received: " + msg.what);
@@ -84,6 +78,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     // received by host and client sides
                     msgString = mContext.getString(R.string.oppositePlayerLeftGameString);
                     ScreenUtil.showToast(mContext, msgString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
                 case CommonConstants.TwoPlayerNewGameButton:
                     // received by client side
@@ -93,6 +88,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     pauseGameButton.setVisibility(View.INVISIBLE);
                     resumeGameButton.setEnabled(false);
                     resumeGameButton.setVisibility(View.INVISIBLE);
+                    selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
                 case CommonConstants.TwoPlayerStartGameButton:
                     // received by client side
@@ -102,6 +98,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     pauseGameButton.setVisibility(View.VISIBLE);
                     resumeGameButton.setEnabled(false);
                     resumeGameButton.setVisibility(View.INVISIBLE);
+                    selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
                 case CommonConstants.TwoPlayerPauseGameButton:
                     // received by host and client sides
@@ -111,6 +108,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     pauseGameButton.setVisibility(View.INVISIBLE);
                     resumeGameButton.setEnabled(true);
                     resumeGameButton.setVisibility(View.VISIBLE);
+                    selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
                 case CommonConstants.TwoPlayerResumeGameButton:
                     // received by host and client sides
@@ -120,17 +118,8 @@ public class ClientGameActivity extends GroundhogActivity {
                     resumeGameButton.setVisibility(View.INVISIBLE);
                     pauseGameButton.setEnabled(true);
                     pauseGameButton.setVisibility(View.VISIBLE);
+                    selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerDefaultReading:
-                default:
-                    // wrong or read error
-                    break;
-
-            }
-
-            if (selectedIoFunctionThread != null) {
-                // read the next data
-                selectedIoFunctionThread.setStartRead(true);    // start reading data
             }
         }
     }
