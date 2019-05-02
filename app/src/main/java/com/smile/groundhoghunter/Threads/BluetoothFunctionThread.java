@@ -113,6 +113,14 @@ public class BluetoothFunctionThread extends IoFunctionThread {
                     case CommonConstants.TwoPlayerNewGameButton:
                         readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerNewGameButton);
                         break;
+                    case CommonConstants.TwoPlayerClientGameTimerRead:
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerClientGameTimerRead);
+                        data.putString("TimerRemaining", mBuffer);
+                        break;
+                    case CommonConstants.TwoPlayerClientGameGroundhogRead:
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerClientGameGroundhogRead);
+                        data.putString("GroundhogData", mBuffer);
+                        break;
                     default:
                         readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerDefaultReading);
                         break;

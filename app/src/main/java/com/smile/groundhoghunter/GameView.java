@@ -389,8 +389,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         return runningStatus;
     }
 
+    public int getGameType() {
+        return gameType;
+    }
+
     public IoFunctionThread getIoFunctionThread() {
-        return this.selectedIoFunctionThread;
+        return selectedIoFunctionThread;
+    }
+
+    public GameTimerThread getGameTimerThread() {
+        return gameTimerThread;
     }
 
     // private methods

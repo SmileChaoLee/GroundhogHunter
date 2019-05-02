@@ -60,10 +60,19 @@
             android:configChanges="orientation"
             android:label="@string/twoPlayerString"
             android:screenOrientation="portrait" />
-        <activity android:name=".HostGameActivity" />
-        <activity android:name=".BtHostGameActivity" />
-        <activity android:name=".BtClientGameActivity" />
-        <activity android:name=".ClientGameActivity" />
+
+        <activity android:name=".HostGameActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity android:name=".BtHostGameActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity android:name=".ClientGameActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity android:name=".BtClientGameActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".Services.LocalTop10IntentService"

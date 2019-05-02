@@ -5,10 +5,12 @@ import android.os.Looper;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
 import com.smile.groundhoghunter.Utilities.BluetoothUtil;
+import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class BtHostGameActivity extends HostGameActivity {
 
@@ -43,14 +45,9 @@ public class BtHostGameActivity extends HostGameActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+
             Log.d(TAG, "Message received: " + msg.what);
             switch (msg.what) {
-                case CommonConstants.TwoPlayerDefaultReading:
-                default:
-                    // wrong or read error
-                    // read the next data
-                    selectedBtFunctionThread.setStartRead(true);    // start reading data
-                    break;
             }
         }
     }

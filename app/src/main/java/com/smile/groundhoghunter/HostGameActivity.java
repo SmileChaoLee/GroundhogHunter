@@ -88,6 +88,10 @@ public class HostGameActivity extends GroundhogActivity {
                     HostGameActivity.super.resumeGame();
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
+                case CommonConstants.TwoPlayerDefaultReading:
+                    // wrong or read error
+                    selectedIoFunctionThread.setStartRead(true);    // start reading data
+                    break;
             }
         }
     }

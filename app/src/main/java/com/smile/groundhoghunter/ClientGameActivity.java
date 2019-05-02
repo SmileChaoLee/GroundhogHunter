@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.smile.groundhoghunter.Constants.CommonConstants;
+import com.smile.groundhoghunter.Models.Groundhog;
+import com.smile.groundhoghunter.Threads.GameTimerThread;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class ClientGameActivity extends GroundhogActivity {
@@ -67,7 +69,6 @@ public class ClientGameActivity extends GroundhogActivity {
 
         @Override
         public void handleMessage(Message msg) {
-            // super.handleMessage(msg);
 
             String msgString = "";
             Bundle data = msg.getData();
@@ -82,7 +83,6 @@ public class ClientGameActivity extends GroundhogActivity {
                     break;
                 case CommonConstants.TwoPlayerNewGameButton:
                     // received by client side
-                    // ScreenUtil.showToast(mContext, "Host pressed new game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     gameView.newGame(); // new game on client side
                     pauseGameButton.setEnabled(false);
                     pauseGameButton.setVisibility(View.INVISIBLE);
@@ -92,7 +92,6 @@ public class ClientGameActivity extends GroundhogActivity {
                     break;
                 case CommonConstants.TwoPlayerStartGameButton:
                     // received by client side
-                    // ScreenUtil.showToast(mContext, "Host pressed start game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     gameView.startGame();   // start game on client side
                     pauseGameButton.setEnabled(true);
                     pauseGameButton.setVisibility(View.VISIBLE);
@@ -102,7 +101,6 @@ public class ClientGameActivity extends GroundhogActivity {
                     break;
                 case CommonConstants.TwoPlayerPauseGameButton:
                     // received by host and client sides
-                    // ScreenUtil.showToast(mContext, "Opposite player pressed pause game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     gameView.pauseGame();
                     pauseGameButton.setEnabled(false);
                     pauseGameButton.setVisibility(View.INVISIBLE);
@@ -112,12 +110,53 @@ public class ClientGameActivity extends GroundhogActivity {
                     break;
                 case CommonConstants.TwoPlayerResumeGameButton:
                     // received by host and client sides
-                    // ScreenUtil.showToast(mContext, "Opposite player pressed resume game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     gameView.resumeGame();
                     resumeGameButton.setEnabled(false);
                     resumeGameButton.setVisibility(View.INVISIBLE);
                     pauseGameButton.setEnabled(true);
                     pauseGameButton.setVisibility(View.VISIBLE);
+                    selectedIoFunctionThread.setStartRead(true);    // start reading data
+                    break;
+                case CommonConstants.TwoPlayerClientGameTimerRead:
+                    msgString = data.getString("TimerRemaining");
+                    int timeRemaining = Integer.valueOf(msgString);
+                    GameTimerThread gameTimerThread = gameView.getGameTimerThread();
+                    if (gameTimerThread != null) {
+                        gameTimerThread.setTimeRemaining(timeRemaining);
+                    }
+                    selectedIoFunctionThread.setStartRead(true);
+                    break;
+                case CommonConstants.TwoPlayerClientGameGroundhogRead:
+                    msgString = data.getString("GroundhogData");
+                    int status;
+                    boolean hiding;
+                    int hideByte;
+                    int numOfTimeIntervalShown;
+                    int i = 0;
+                    for (Groundhog groundhog : gameView.groundhogArray) {
+                        status = Integer.valueOf(msgString.substring(i, i+1));
+                        Log.d(TAG, "status = " + status);
+                        groundhog.setStatus(status);
+
+                        hideByte = Integer.valueOf(msgString.substring(i+1, i+2));
+                        Log.d(TAG, "hideByte = " + hideByte);
+                        if (hideByte == 1) {
+                            hiding = true;
+                        } else {
+                            hiding = false;
+                        }
+                        groundhog.setIsHiding(hiding);
+
+                        numOfTimeIntervalShown = Integer.valueOf(msgString.substring(i+2, i+4));
+                        Log.d(TAG, "numOfTimeIntervalShown = " + numOfTimeIntervalShown);
+                        groundhog.setNumOfTimeIntervalShown(numOfTimeIntervalShown);
+
+                        i += 4;
+                    }
+                    selectedIoFunctionThread.setStartRead(true);
+                    break;
+                case CommonConstants.TwoPlayerDefaultReading:
+                    // wrong or read error
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
             }
