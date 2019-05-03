@@ -28,6 +28,7 @@ public class GroundhogRandomThread extends Thread {
         selectedIoFunctionThread = gameView.getIoFunctionThread();
         synchronizeTime = GameView.TimeIntervalShown;       // 500 mini seconds (1 second)
         chanceToShow = 10;   // 2-->1/2, 3-->1/3, 4-->1/4, 5-->1/5, 6-->1/6, .. 10--> 1/10;
+
         groundhogRandom = new Random(System.currentTimeMillis());
 
         keepRunning = true; // keepRunning = true -> loop in run() still going
@@ -57,12 +58,13 @@ public class GroundhogRandomThread extends Thread {
                 }
             }
 
+            String writeString;
             switch (gameType) {
                 case CommonConstants.GameBySinglePlayer:
-                    setGroundhogArray();
+                    writeString = setGroundhogArray();
                     break;
                 case CommonConstants.TwoPlayerGameByHost:
-                    String writeString = setGroundhogArray();
+                    writeString = setGroundhogArray();
                     selectedIoFunctionThread.write(CommonConstants.TwoPlayerClientGameGroundhogRead, writeString);
                     break;
                 case CommonConstants.TwoPlayerGameByClient:

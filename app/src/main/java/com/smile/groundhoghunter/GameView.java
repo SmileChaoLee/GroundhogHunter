@@ -47,9 +47,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private final GroundhogActivity groundhogActivity;
     private final int rowNum;
     private final int colNum;
+    private final int gameViewWidth;
+    private final int gameViewHeight;
 
-    private int gameViewWidth;
-    private int gameViewHeight;
     private float rectWidthForOneGroundhog;
     private float rectHeightForOneGroundhog;
     private int highestScore;
@@ -153,7 +153,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         hasSound = true;    // default is having sound
 
-        // Creating 25 groundhogs' object
+        // Creating groundhogs' object
         Log.d(TAG, "Creating groundhogArray....");
         groundhogArray = new Groundhog[rowNum * colNum];
 
@@ -207,7 +207,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 case MotionEvent.ACTION_DOWN:
                     int i = (int) (y / rectHeightForOneGroundhog);   // row
                     int j = (int) (x / rectWidthForOneGroundhog);    // col
-                    int index = rowNum * i + j;
+                    int index = colNum * i + j;
                     groundhog = groundhogArray[index];
                     if (!groundhog.getIsHiding()) {
                         // showing but not hiding
@@ -405,8 +405,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private void createGroundhogs() {
         float x;
         float y = 0;
-        rectWidthForOneGroundhog = gameViewWidth / (float) rowNum;
-        rectHeightForOneGroundhog = gameViewHeight / (float) colNum;
+        rectWidthForOneGroundhog = gameViewWidth / (float) colNum;
+        rectHeightForOneGroundhog = gameViewHeight / (float) rowNum;
         float bottomY;
         int index;
         Groundhog groundhog;
@@ -416,7 +416,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             x = 0;
             bottomY = y + rectHeightForOneGroundhog;
             for (int j = 0; j < colNum; ++j) {
-                index = rowNum * i + j;
+                index = colNum * i + j;
                 temp.left = x;
                 x += rectWidthForOneGroundhog;
                 temp.right = x;

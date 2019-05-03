@@ -210,6 +210,7 @@ public class GroundhogActivity extends AppCompatActivity {
         ScreenUtil.resizeTextSize(hitNumTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         hitNumTextView.setText("0");
 
+        final LinearLayout gameLinearLayout = findViewById(R.id.gameViewAreaLinearLayout);
         final FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
         // game view area
         GridLayout gameGrid = findViewById(R.id.gameAreaGridLayout);
@@ -251,7 +252,8 @@ public class GroundhogActivity extends AppCompatActivity {
             ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams)bannerLinearLayout.getLayoutParams();
             float tempPercent = lp.matchConstraintPercentHeight;
             lp.matchConstraintPercentHeight = 0.0f;
-            lp = (ConstraintLayout.LayoutParams)gameFrameLayout.getLayoutParams();
+            // lp = (ConstraintLayout.LayoutParams)FrameLayout.getLayoutParams();
+            lp = (ConstraintLayout.LayoutParams)gameLinearLayout.getLayoutParams();
             lp.matchConstraintPercentHeight += tempPercent;
         }
 

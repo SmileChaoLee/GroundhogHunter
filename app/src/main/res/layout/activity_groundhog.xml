@@ -254,48 +254,56 @@
 
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/gameViewAreaFrameLayout"
+    <LinearLayout
+        android:id="@+id/gameViewAreaLinearLayout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@drawable/grass"
         app:layout_constraintHeight_percent="0.53"
-        app:layout_constraintTop_toBottomOf="@id/scoreLayout">
+        app:layout_constraintTop_toBottomOf="@id/scoreLayout"
+        android:weightSum="5" >
 
-        <android.support.v7.widget.GridLayout
-            android:id="@+id/gameAreaGridLayout"
+        <FrameLayout
+            android:id="@+id/gameViewAreaFrameLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:rowCount="5"
-            app:columnCount="5">
-        </android.support.v7.widget.GridLayout>
+            android:layout_height="0dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_weight="4">
+            <android.support.v7.widget.GridLayout
+                android:id="@+id/gameAreaGridLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:rowCount="4"
+                app:columnCount="5">
+            </android.support.v7.widget.GridLayout>
+            <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/messageConstraintLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:id="@+id/messageImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:scaleType="fitXY"
+                    android:adjustViewBounds="true"
+                    android:clickable="false"
+                    android:background="@android:color/transparent"
+                    app:layout_constraintHeight_default="percent"
+                    app:layout_constraintHeight_percent="0.3"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent">
+                </ImageView>
+            </android.support.constraint.ConstraintLayout>
+        </FrameLayout>
 
-        <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/messageConstraintLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/messageImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"
-                android:clickable="false"
-                android:background="@android:color/transparent"
-                app:layout_constraintHeight_default="percent"
-                app:layout_constraintHeight_percent="0.3"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent">
-            </ImageView>
-        </android.support.constraint.ConstraintLayout>
-
-    </FrameLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/buttonLinearLayout"
@@ -303,7 +311,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintHeight_percent="0.1"
-        app:layout_constraintTop_toBottomOf="@id/gameViewAreaFrameLayout"
+        app:layout_constraintTop_toBottomOf="@id/gameViewAreaLinearLayout"
         android:weightSum="3">
 
         <FrameLayout
