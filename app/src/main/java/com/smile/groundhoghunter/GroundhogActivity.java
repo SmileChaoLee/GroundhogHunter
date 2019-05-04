@@ -19,6 +19,7 @@ import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,6 +47,7 @@ public class GroundhogActivity extends AppCompatActivity {
     private final int SettingRequestCode = 0;
     private final int LocalTop10RequestCode = 1;
     private final int GlobalTop10RequestCode = 2;
+    private final int TwoPlayerResultRequestCode = 3;
     private final String showingAdsString;
     private final String loadingString;
 
@@ -57,7 +59,6 @@ public class GroundhogActivity extends AppCompatActivity {
     private TextView scoreTextView;
     private TextView timerTextView;
     private TextView hitNumTextView;
-    private ImageView messageImageView;
 
     private SmileImageButton settingButton;
     private SmileImageButton top10Button;
@@ -278,9 +279,6 @@ public class GroundhogActivity extends AppCompatActivity {
             }
         });
 
-        messageImageView = findViewById(R.id.messageImageView);
-        messageImageView.setVisibility(View.GONE);
-
         // buttons for start game, new game, quit game
         String startString = getString(R.string.startString);
         String pauseString = getString(R.string.pauseString);
@@ -385,35 +383,8 @@ public class GroundhogActivity extends AppCompatActivity {
                 }
                 break;
             case LocalTop10RequestCode:
-                if (resultCode == Activity.RESULT_OK) {
-                    Log.i(TAG, "Top10ScoreActivity (Local top 10) returned successfully.");
-                } else {
-                    Log.i(TAG, "Top10ScoreActivity (Local top 10) did not return successfully.");
-                }
-                Log.i(TAG, "Showing ads");
-                if (GroundhogHunterApp.InterstitialAd != null) {
-                    int entryPoint = 0; //  no used
-                    ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdAsyncTask =
-                            GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(GroundhogActivity.this
-                                    , entryPoint
-                                    , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
-                        @Override
-                        public void executeAfterDismissAds(int endPoint) {
-                            enableAllButtons();
-                        }
-                    });
-                    showAdAsyncTask.execute();
-                } else {
-                    enableAllButtons();
-                }
-                break;
             case GlobalTop10RequestCode:
-                if (resultCode == Activity.RESULT_OK) {
-                    Log.i(TAG, "Top10ScoreActivity (Global top 10) returned successfully.");
-                } else {
-                    Log.i(TAG, "Top10ScoreActivity (Global top 10) did not return successfully.");
-                }
-                Log.i(TAG, "Showing ads");
+            case TwoPlayerResultRequestCode:
                 if (GroundhogHunterApp.InterstitialAd != null) {
                     int entryPoint = 0; //  no used
                     ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdsAsyncTask =
@@ -627,6 +598,15 @@ public class GroundhogActivity extends AppCompatActivity {
                 loadingDialog.dismiss();
             }
         }
+    }
+
+    public void displayTwoPlayerResult(int hostScore, int hostHitNum, int clientScore, int clientHitNum) {
+        Intent resultIntent = new Intent(this, TwoPlayerResultActivity.class);
+        resultIntent.putExtra("HostScore", hostScore);
+        resultIntent.putExtra("HostHitNum", hostHitNum);
+        resultIntent.putExtra("ClientScore", clientScore);
+        resultIntent.putExtra("ClientHitNum", clientHitNum);
+        startActivityForResult(resultIntent, TwoPlayerResultRequestCode);
     }
 
     // public methods

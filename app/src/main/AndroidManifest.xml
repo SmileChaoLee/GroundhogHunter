@@ -74,6 +74,11 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".TwoPlayerResultActivity"
+            android:label="@string/twoPlayerString"
+            android:theme="@style/AppThemeTransparent" />
+
         <service
             android:name=".Services.LocalTop10IntentService"
             android:enabled="true"

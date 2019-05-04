@@ -94,6 +94,8 @@
     <string name="hasBeenReadString">已讀到</string>
     <string name="noOppositePlayerString">沒有指定對手玩家</string>
     <string name="oppositePlayerLeftGameString">對手已離開遊戲.</string>
+    <string name="gameCreatorString">創立者</string>
+    <string name="gameJoinerString">加入者</string>
 
     <string name="companyNameString">微笑資訊有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

@@ -220,6 +220,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                     SoundUtil.playSound(groundhogActivity, R.raw.ouh);
                                 }
                                 groundhog.setIsHit(true);
+                                if (gameType != CommonConstants.GameBySinglePlayer) {
+                                    // not single player
+                                    String writeString = "";
+                                    writeString += String.format("%02d", index);
+                                    int status = groundhog.getStatus();
+                                    writeString += String.format("%01d", status);
+                                    boolean isHiding = groundhog.getIsHiding();
+                                    if (isHiding) {
+                                        writeString += "1";
+                                    } else {
+                                        writeString += "0";
+                                    }
+                                    int numOfTimeIntervalShown = groundhog.getNumOfTimeIntervalShown();
+                                    writeString += String.format("%02d", numOfTimeIntervalShown);
+                                    writeString += "1"; // is hit
+                                    selectedIoFunctionThread.write(CommonConstants.TwoPlayerGameGroundhogHit, writeString);
+                                }
                                 ++numOfHits;
                                 currentScore += hitScores[groundhog.getStatus()];
                                 startDrawingScreen();   // added on 2018-10-29 for testing
@@ -401,6 +418,34 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         return gameTimerThread;
     }
 
+    public void setGroundhogByMsgString(String msgString) {
+        int numOfTimeIntervalShown;
+
+        int index = Integer.valueOf(msgString.substring(0, 2));
+        Groundhog groundhog = groundhogArray[index];
+
+        int status = Integer.valueOf(msgString.substring(2, 3));
+        groundhog.setStatus(status);
+
+        int hideByte = Integer.valueOf(msgString.substring(3, 4));
+        if (hideByte == 1) {
+            groundhog.setIsHiding(true);
+        } else {
+            groundhog.setIsHiding(false);
+        }
+
+        numOfTimeIntervalShown = Integer.valueOf(msgString.substring(4, 6));
+        groundhog.setNumOfTimeIntervalShown(numOfTimeIntervalShown);
+
+        int hitByte = Integer.valueOf(msgString.substring(6, 7));
+        if (hitByte == 1) {
+            groundhog.setIsHit(true);
+        } else {
+            groundhog.setIsHit(false);
+        }
+
+    }
+
     // private methods
     private void createGroundhogs() {
         float x;
@@ -482,6 +527,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 // record the current score
                 recordScore(currentScore);
             }
+        } else {
+            // display the competition result
+            /*
+            groundhogActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    groundhogActivity.displayTwoPlayerResult(currentScore, numOfHits, currentScore, numOfHits);
+                }
+            });
+            */
+            groundhogActivity.displayTwoPlayerResult(currentScore, numOfHits, currentScore, numOfHits);
         }
     }
 

@@ -92,6 +92,8 @@
     <string name="hasBeenReadString">has been read</string>
     <string name="noOppositePlayerString">No opposite player</string>
     <string name="oppositePlayerLeftGameString">Opposite player left game.</string>
+    <string name="gameCreatorString">Creator</string>
+    <string name="gameJoinerString">Joiner</string>
 
     <string name="companyNameString">Smile Information Inc.</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

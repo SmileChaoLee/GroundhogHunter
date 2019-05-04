@@ -73,6 +73,11 @@ public class ClientGameActivity extends GroundhogActivity {
             String msgString = "";
             Bundle data = msg.getData();
 
+            int i;
+            int status;
+            int hideByte;
+            int numOfTimeIntervalShown;
+
             Log.d(TAG, "Message received: " + msg.what);
             switch (msg.what) {
                 case CommonConstants.TwoPlayerOppositeLeftGame:
@@ -128,31 +133,28 @@ public class ClientGameActivity extends GroundhogActivity {
                     break;
                 case CommonConstants.TwoPlayerClientGameGroundhogRead:
                     msgString = data.getString("GroundhogData");
-                    int status;
-                    boolean hiding;
-                    int hideByte;
-                    int numOfTimeIntervalShown;
-                    int i = 0;
+                    i = 0;
                     for (Groundhog groundhog : gameView.groundhogArray) {
                         status = Integer.valueOf(msgString.substring(i, i+1));
-                        Log.d(TAG, "status = " + status);
                         groundhog.setStatus(status);
 
                         hideByte = Integer.valueOf(msgString.substring(i+1, i+2));
-                        Log.d(TAG, "hideByte = " + hideByte);
                         if (hideByte == 1) {
-                            hiding = true;
+                            groundhog.setIsHiding(true);
                         } else {
-                            hiding = false;
+                            groundhog.setIsHiding(false);
                         }
-                        groundhog.setIsHiding(hiding);
 
                         numOfTimeIntervalShown = Integer.valueOf(msgString.substring(i+2, i+4));
-                        Log.d(TAG, "numOfTimeIntervalShown = " + numOfTimeIntervalShown);
                         groundhog.setNumOfTimeIntervalShown(numOfTimeIntervalShown);
 
                         i += 4;
                     }
+                    selectedIoFunctionThread.setStartRead(true);
+                    break;
+                case CommonConstants.TwoPlayerGameGroundhogHit:
+                    msgString = data.getString("GroundhogHitData");
+                    gameView.setGroundhogByMsgString(msgString);
                     selectedIoFunctionThread.setStartRead(true);
                     break;
                 case CommonConstants.TwoPlayerDefaultReading:

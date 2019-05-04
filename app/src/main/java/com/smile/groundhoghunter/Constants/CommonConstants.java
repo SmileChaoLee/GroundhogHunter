@@ -18,6 +18,7 @@ public final class CommonConstants {
     public static final int TwoPlayerClientExitCode = 8;
     public static final int TwoPlayerClientGameTimerRead = 10;
     public static final int TwoPlayerClientGameGroundhogRead = 11;
+    public static final int TwoPlayerGameGroundhogHit = 12;
 
     public static final int BluetoothAcceptThreadNoServerSocket = 21;
     public static final int BluetoothAcceptThreadStopped = 22;

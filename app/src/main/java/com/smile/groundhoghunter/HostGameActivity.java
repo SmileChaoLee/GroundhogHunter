@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.smile.groundhoghunter.Constants.CommonConstants;
+import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class HostGameActivity extends GroundhogActivity {
@@ -87,6 +88,11 @@ public class HostGameActivity extends GroundhogActivity {
                     // ScreenUtil.showToast(mContext, "Opposite player pressed resume game button.", toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
                     HostGameActivity.super.resumeGame();
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
+                    break;
+                case CommonConstants.TwoPlayerGameGroundhogHit:
+                    msgString = data.getString("GroundhogHitData");
+                    gameView.setGroundhogByMsgString(msgString);
+                    selectedIoFunctionThread.setStartRead(true);
                     break;
                 case CommonConstants.TwoPlayerDefaultReading:
                     // wrong or read error
