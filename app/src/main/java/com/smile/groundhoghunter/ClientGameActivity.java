@@ -84,6 +84,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     // received by host and client sides
                     msgString = mContext.getString(R.string.oppositePlayerLeftGameString);
                     ScreenUtil.showToast(mContext, msgString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    gameView.setOppositePlayerLeft(true);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
                 case CommonConstants.TwoPlayerNewGameButton:
@@ -156,6 +157,10 @@ public class ClientGameActivity extends GroundhogActivity {
                     msgString = data.getString("GroundhogHitData");
                     gameView.setGroundhogByMsgString(msgString);
                     selectedIoFunctionThread.setStartRead(true);
+                    break;
+                case CommonConstants.TwoPlayerGameScoreReceived:
+                    gameView.setReceivedScoreFromOpposite(true);
+                    selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
                 case CommonConstants.TwoPlayerDefaultReading:
                     // wrong or read error

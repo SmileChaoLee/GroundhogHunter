@@ -243,9 +243,8 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     //
                     selectedBtFunctionThread.write(CommonConstants.TwoPlayerHostStartGame, "");
                     Intent gameIntent = new Intent(getApplicationContext(), BtHostGameActivity.class);
-                    // gameIntent.putExtra("GameType", CommonConstants.BluetoothGameByHost);
                     gameIntent.putExtra("GameType", CommonConstants.TwoPlayerGameByHost);
-                    startActivityForResult(gameIntent, CommonConstants.BluetoothGameByHost);
+                    startActivityForResult(gameIntent, CommonConstants.TwoPlayerGameByHost);
                 }
             }
         });
@@ -294,7 +293,7 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     showMessage.showMessageInTextView(bluetoothCannotBeVisibleString, MessageDuration);
                 }
                 break;
-            case CommonConstants.BluetoothGameByHost:
+            case CommonConstants.TwoPlayerGameByHost:
                 oppositePlayerName = "";
                 oppositePlayerNameMap = new LinkedHashMap<>();
                 mBluetoothAcceptThread = null;

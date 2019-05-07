@@ -157,7 +157,7 @@ public class GroundhogActivity extends AppCompatActivity {
                     if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
                         // client is not playing game or not pause status
                         disableAllButtons();
-                        getLocalTop10ScoreList();
+                        getLocalTop10ScoreList();    // removed for testing on 2019-05-07
                     }
                 }
             }

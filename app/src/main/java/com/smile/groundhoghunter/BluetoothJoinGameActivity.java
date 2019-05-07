@@ -249,7 +249,7 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                     showMessage.showMessageInTextView(bluetoothCannotBeTurnedOnString, MessageDuration);
                 }
                 break;
-            case CommonConstants.BluetoothGameByClient:
+            case CommonConstants.TwoPlayerGameByClient:
                 oppositePlayerName = "";
                 btDiscoveredMap = new HashMap<>();
                 btMacFunctionThreadMap = new HashMap<>();
@@ -589,9 +589,8 @@ public class BluetoothJoinGameActivity extends AppCompatActivity {
                         oppositePlayerNameMap = null;
                         //
                         Intent gameIntent = new Intent(getApplicationContext(), BtClientGameActivity.class);
-                        // gameIntent.putExtra("GameType", CommonConstants.BluetoothGameByClient);
                         gameIntent.putExtra("GameType", CommonConstants.TwoPlayerGameByClient);
-                        startActivityForResult(gameIntent, CommonConstants.BluetoothGameByClient);
+                        startActivityForResult(gameIntent, CommonConstants.TwoPlayerGameByClient);
                     }
                     break;
                 case CommonConstants.TwoPlayerDefaultReading:

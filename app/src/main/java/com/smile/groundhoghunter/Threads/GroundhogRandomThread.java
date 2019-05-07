@@ -69,6 +69,10 @@ public class GroundhogRandomThread extends Thread {
                     break;
                 case CommonConstants.TwoPlayerGameByClient:
                     // only read data from Host game
+                    boolean isOppositePlayerLeft = gameView.getOppositePlayerLeft();
+                    if (isOppositePlayerLeft) {
+                        writeString = setGroundhogArray();
+                    }
                     break;
             }
 

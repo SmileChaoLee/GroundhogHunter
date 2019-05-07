@@ -1,176 +1,239 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="0dp"
-    android:layout_marginBottom="5dp"
-    android:background="#ff00ff00"
-    android:weightSum="5" >
+    android:orientation="vertical"
+    android:background="@color/transparent"
+    tools:context=".TwoPlayerResultActivity">
 
     <LinearLayout
-        android:id="@+id/hostGameScoreLayout"
+        android:id="@+id/topLinearLayoutForTwoPlayerResult"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
-        android:weightSum="2">
+        app:layout_constraintHeight_percent="0.25"
+        app:layout_constraintTop_toTopOf="parent">
+    </LinearLayout>
 
-        <TextView
-            android:id="@+id/gameCreatorTitle"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:text="@string/gameCreatorString"
-            android:layout_weight="1">
-        </TextView>
+    <LinearLayout
+        android:id="@+id/mainLinearLayoutForTwoPlayerResult"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintTop_toBottomOf="@id/topLinearLayoutForTwoPlayerResult"
+        android:weightSum="8">
 
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:weightSum="2">
-            <RelativeLayout
-                android:gravity="center_vertical"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="6"
+            android:weightSum="10">
+
+            <LinearLayout
+                android:id="@+id/hostGameScoreLayout"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:divider="@drawable/layout_horizontal_divider"
+                android:showDividers="beginning|end"
+                android:background="@color/yellow"
+                android:layout_weight="4"
+                android:weightSum="2">
                 <TextView
-                    android:id="@+id/hostGameScoreTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:textColor="@color/lightDarkGreen"
-                    android:text="@string/scoreString">
+                    android:id="@+id/gameCreatorTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:text="@string/gameCreatorString"
+                    android:layout_weight="1">
                 </TextView>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:weightSum="2">
+                    <RelativeLayout
+                        android:gravity="center_vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+                        <TextView
+                            android:id="@+id/hostGameScoreTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:textColor="@color/lightDarkGreen"
+                            android:text="@string/scoreString">
+                        </TextView>
+                        <TextView
+                            android:id="@+id/hostGameScoreText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/hostGameScoreTitle"
+                            android:layout_alignTop="@+id/hostGameScoreTitle"
+                            android:textColor="@color/darkRed"
+                            android:text="1000">
+                        </TextView>
+                    </RelativeLayout>
+                    <RelativeLayout
+                        android:gravity="center_vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+                        <TextView
+                            android:id="@+id/hostGameHitNumTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:textColor="@color/lightDarkGreen"
+                            android:text="@string/numHitString">
+                        </TextView>
+                        <TextView
+                            android:id="@+id/hostGameHitNumText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/hostGameHitNumTitle"
+                            android:layout_alignTop="@+id/hostGameHitNumTitle"
+                            android:textColor="@color/darkRed"
+                            android:text="1000">
+                        </TextView>
+                    </RelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/clientGameScoreLayout"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:divider="@drawable/layout_horizontal_divider"
+                android:showDividers="beginning|end"
+                android:background="@color/yellow2"
+                android:layout_weight="4"
+                android:weightSum="2">
                 <TextView
-                    android:id="@+id/hostGameScoreText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/hostGameScoreTitle"
-                    android:layout_alignTop="@+id/hostGameScoreTitle"
-                    android:textColor="@color/darkRed"
-                    android:text="1000">
+                    android:id="@+id/gameJoinerTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:text="@string/gameJoinerString"
+                    android:gravity="center"
+                    android:layout_weight="1">
                 </TextView>
-            </RelativeLayout>
-            <RelativeLayout
-                android:gravity="center_vertical"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-                <TextView
-                    android:id="@+id/hostGameHitNumTitle"
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:weightSum="2">
+                    <RelativeLayout
+                        android:gravity="center_vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+                        <TextView
+                            android:id="@+id/clientGameScoreTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:textColor="@color/lightDarkGreen"
+                            android:text="@string/scoreString">
+                        </TextView>
+                        <TextView
+                            android:id="@+id/clientGameScoreText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/clientGameScoreTitle"
+                            android:layout_alignTop="@+id/clientGameScoreTitle"
+                            android:textColor="@color/darkRed"
+                            android:text="1000">
+                        </TextView>
+                    </RelativeLayout>
+                    <RelativeLayout
+                        android:gravity="center_vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+                        <TextView
+                            android:id="@+id/clientGameHitNumTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:textColor="@color/lightDarkGreen"
+                            android:text="@string/numHitString">
+                        </TextView>
+                        <TextView
+                            android:id="@+id/clientGameHitNumText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/clientGameHitNumTitle"
+                            android:layout_alignTop="@+id/clientGameHitNumTitle"
+                            android:textColor="@color/darkRed"
+                            android:text="1000">
+                        </TextView>
+                    </RelativeLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@color/yellow3"
+                android:layout_weight="2">
+                <Button
+                    android:id="@+id/messageArea_OK_button"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:textColor="@color/lightDarkGreen"
-                    android:text="@string/numHitString">
-                </TextView>
-                <TextView
-                    android:id="@+id/hostGameHitNumText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/hostGameHitNumTitle"
-                    android:layout_alignTop="@+id/hostGameHitNumTitle"
-                    android:textColor="@color/darkRed"
-                    android:text="1000">
-                </TextView>
-            </RelativeLayout>
+                    android:layout_height="match_parent"
+                    android:text="@string/okString"
+                    android:textStyle="bold"
+                    android:layout_margin="10dp"
+                    android:background="@color/green"
+                    android:layout_gravity="center"
+                    android:textColor="#ffff0000">
+                </Button>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/clientGameScoreLayout"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
-        android:weightSum="2">
-
-        <TextView
-            android:id="@+id/gameJoinerTitle"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:text="@string/gameJoinerString"
-            android:layout_weight="1">
-        </TextView>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:weightSum="2">
-            <RelativeLayout
-                android:gravity="center_vertical"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-                <TextView
-                    android:id="@+id/clientGameScoreTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:textColor="@color/lightDarkGreen"
-                    android:text="@string/scoreString">
-                </TextView>
-                <TextView
-                    android:id="@+id/clientGameScoreText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/clientGameScoreTitle"
-                    android:layout_alignTop="@+id/clientGameScoreTitle"
-                    android:textColor="@color/darkRed"
-                    android:text="1000">
-                </TextView>
-            </RelativeLayout>
-            <RelativeLayout
-                android:gravity="center_vertical"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-                <TextView
-                    android:id="@+id/clientGameHitNumTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:textColor="@color/lightDarkGreen"
-                    android:text="@string/numHitString">
-                </TextView>
-                <TextView
-                    android:id="@+id/clientGameHitNumText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/clientGameHitNumTitle"
-                    android:layout_alignTop="@+id/clientGameHitNumTitle"
-                    android:textColor="@color/darkRed"
-                    android:text="1000">
-                </TextView>
-            </RelativeLayout>
-        </LinearLayout>
-
+        app:layout_constraintHeight_percent="0.25"
+        app:layout_constraintBottom_toBottomOf="parent">
     </LinearLayout>
 
-    <Button
-        android:id="@+id/messageArea_OK_button"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:text="@string/okString"
-        android:textStyle="bold"
-        android:background="@android:drawable/btn_default"
-        android:layout_gravity="center"
-        android:textColor="#ffff0000"
-        android:layout_weight="1" >
-    </Button>
-
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

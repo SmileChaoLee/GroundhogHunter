@@ -32,6 +32,10 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:textSize">66px</item>
+    </style>
+
+    <style name="AppSettingTransparent" parent="AppThemeTransparent">
         <item name="android:textSize">90px</item>
     </style>
 

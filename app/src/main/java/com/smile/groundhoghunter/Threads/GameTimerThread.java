@@ -64,6 +64,10 @@ public class GameTimerThread extends Thread {
                     break;
                 case CommonConstants.TwoPlayerGameByClient:
                     // only read timeRemaining from Host game
+                    boolean isOppositePlayerLeft = gameView.getOppositePlayerLeft();
+                    if (isOppositePlayerLeft) {
+                        --timeRemaining;
+                    }
                     break;
             }
 

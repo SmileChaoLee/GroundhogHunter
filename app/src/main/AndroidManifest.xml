@@ -54,7 +54,7 @@
         <activity
             android:name=".SettingActivity"
             android:label="@string/settingString"
-            android:theme="@style/AppThemeTransparent" />
+            android:theme="@style/AppSettingTransparent" />
         <activity
             android:name=".TwoPlayerActivity"
             android:configChanges="orientation"
