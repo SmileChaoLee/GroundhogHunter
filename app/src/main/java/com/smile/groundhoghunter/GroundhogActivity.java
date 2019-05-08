@@ -520,6 +520,8 @@ public class GroundhogActivity extends AppCompatActivity {
     }
 
     protected void quitGame() {
+        // close the socket (BluetoothSocket, Wifi socket, or internet socket)
+        gameView.newGame(); // set to new game (refresh the UI and stop threads) before quiting game
         if (GroundhogHunterApp.InterstitialAd != null) {
             // free version
             int entryPoint = 0; //  no used

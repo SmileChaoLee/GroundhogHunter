@@ -41,6 +41,9 @@ import org.json.JSONObject;
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = "GameView";
+    private static final int singlePlayerHitStatus = 1;
+    private static final int hostPlayerHitStatus = 1;
+    private static final int clientPlayerHitStatus = 2;
     private final int gameType;
 
     private float textFontSize;
@@ -220,7 +223,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     groundhog = groundhogArray[index];
                     if (!groundhog.getIsHiding()) {
                         // showing but not hiding
-                        if (!groundhog.getIsHit()) {
+                        int hitStatus = groundhog.getHitStatus();
+                        if (hitStatus == 0) {
                             // not hit
                             if (groundhog.getDrawArea().contains(x, y)) {
                                 // hit
@@ -228,9 +232,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                     // needs to play sound for hitting
                                     SoundUtil.playSound(groundhogActivity, R.raw.ouh);
                                 }
-                                groundhog.setIsHit(true);
-                                if (gameType != CommonConstants.GameBySinglePlayer) {
+
+                                if (gameType == CommonConstants.GameBySinglePlayer) {
+                                    groundhog.setHitStatus(singlePlayerHitStatus);
+                                } else {
                                     // not single player
+                                    if (gameType == CommonConstants.TwoPlayerGameByHost) {
+                                        // host
+                                        groundhog.setHitStatus(hostPlayerHitStatus);
+                                    } else {
+                                        // client
+                                        groundhog.setHitStatus(clientPlayerHitStatus);
+                                    }
                                     String writeString = "";
                                     writeString += String.format("%02d", index);
                                     int status = groundhog.getStatus();
@@ -321,7 +334,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             stopThreads();
 
             timeRemaining = GameView.TimerInterval;
-            System.out.println("timeRemaining = " + timeRemaining);
 
             if (groundhogArray != null) {
                 for (Groundhog groundhog : groundhogArray) {
@@ -415,6 +427,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         return runningStatus;
     }
 
+    public void setRunningStatus(int runningStatus) {
+        this.runningStatus = runningStatus;
+    }
+
     public int getGameType() {
         return gameType;
     }
@@ -447,12 +463,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         groundhog.setNumOfTimeIntervalShown(numOfTimeIntervalShown);
 
         int hitByte = Integer.valueOf(msgString.substring(6, 7));
-        if (hitByte == 1) {
-            groundhog.setIsHit(true);
-        } else {
-            groundhog.setIsHit(false);
-        }
-
+        groundhog.setHitStatus(hitByte);
     }
 
     public boolean getOppositePlayerLeft() {

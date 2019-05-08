@@ -23,7 +23,7 @@ public class Groundhog {
     private int status;
     private int numOfTimeIntervalShown;
     private boolean isHiding;
-    private boolean isHit;
+    private int hitStatus;
     private int numOfAnimationsShown;
     private int halfOfAnimationTimes;
 
@@ -69,7 +69,7 @@ public class Groundhog {
 
     public void setNumOfTimeIntervalShown(int numTimeInterval) {
         if (numTimeInterval < GameView.NumTimeIntervalShown[status]) {
-            if (isHit) {
+            if (hitStatus != 0) {
                 // when it is hit, then it start hiding
                 --numOfAnimationsShown;
             } else {
@@ -102,18 +102,18 @@ public class Groundhog {
     public void setIsHiding(boolean isHiding) {
         this.isHiding = isHiding;
         if (this.isHiding) {
-            setIsHit(false);        // disable hit
+            setHitStatus(0);        // disable hit
             numOfTimeIntervalShown = 0;
             numOfAnimationsShown = 0;
         }
     }
 
-    public boolean getIsHit() {
-        return isHit;
+    public int getHitStatus() {
+        return hitStatus;
     }
 
-    public void setIsHit(boolean isHit) {
-        this.isHit = isHit;
+    public void setHitStatus(int hitStatus) {
+        this.hitStatus = hitStatus;
     }
 
     public RectF getDrawArea() {
@@ -123,7 +123,7 @@ public class Groundhog {
     public void draw(Canvas canvas) {
 
         if (!isHiding) {
-            if (isHit) {
+            if (hitStatus != 0) {
                 // groundhog is hit
                 canvas.drawBitmap(GameView.GroundhogHitBitmaps[status], null, drawArea, null);
                 // the following is displaying score image
