@@ -69,7 +69,7 @@ public class Groundhog {
 
     public void setNumOfTimeIntervalShown(int numTimeInterval) {
         if (numTimeInterval < GameView.NumTimeIntervalShown[status]) {
-            if (hitStatus != 0) {
+            if (hitStatus > 0) {
                 // when it is hit, then it start hiding
                 --numOfAnimationsShown;
             } else {
@@ -123,11 +123,11 @@ public class Groundhog {
     public void draw(Canvas canvas) {
 
         if (!isHiding) {
-            if (hitStatus != 0) {
+            if (hitStatus > 0) {
                 // groundhog is hit
                 canvas.drawBitmap(GameView.GroundhogHitBitmaps[status], null, drawArea, null);
                 // the following is displaying score image
-                Bitmap tempBm = FontAndBitmapUtil.getBitmapFromBitmapWithText(GameView.score_board, String.valueOf(GameView.hitScores[status]), Color.BLACK);
+                Bitmap tempBm = FontAndBitmapUtil.getBitmapFromBitmapWithText(GameView.score_board[hitStatus-1], String.valueOf(GameView.hitScores[status]), Color.BLACK);
                 canvas.drawBitmap(tempBm, null, scoreArea, null);
             } else {
                 // not hit

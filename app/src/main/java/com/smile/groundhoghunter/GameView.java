@@ -93,7 +93,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public static final Bitmap[] GroundhogBitmaps;
     public static final Bitmap[] GroundhogHitBitmaps;
     public static final int[] hitScores;
-    public static final Bitmap score_board;
+    public static final Bitmap[] score_board;
 
     static {
         DrawingInterval = 80;
@@ -119,7 +119,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         hitScores[1] = 30;
         hitScores[2] = 20;
         hitScores[3] = 10;
-        score_board = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.score_board);
+        score_board = new Bitmap[2];
+        score_board[0] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.red_score_board);
+        score_board[1] = BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.yellow_score_board);
     }
 
     public GameView(Context context, int gameType, int gWidth, int gHeight,IoFunctionThread ioFunctionThread) {
@@ -226,6 +228,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         int hitStatus = groundhog.getHitStatus();
                         if (hitStatus == 0) {
                             // not hit
+                            int newHitStatus;
                             if (groundhog.getDrawArea().contains(x, y)) {
                                 // hit
                                 if (hasSound) {
@@ -234,15 +237,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                 }
 
                                 if (gameType == CommonConstants.GameBySinglePlayer) {
-                                    groundhog.setHitStatus(singlePlayerHitStatus);
+                                    newHitStatus = singlePlayerHitStatus;
                                 } else {
                                     // not single player
                                     if (gameType == CommonConstants.TwoPlayerGameByHost) {
                                         // host
-                                        groundhog.setHitStatus(hostPlayerHitStatus);
+                                        newHitStatus = hostPlayerHitStatus;
                                     } else {
                                         // client
-                                        groundhog.setHitStatus(clientPlayerHitStatus);
+                                        newHitStatus = clientPlayerHitStatus;
                                     }
                                     String writeString = "";
                                     writeString += String.format("%02d", index);
@@ -256,9 +259,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                     }
                                     int numOfTimeIntervalShown = groundhog.getNumOfTimeIntervalShown();
                                     writeString += String.format("%02d", numOfTimeIntervalShown);
-                                    writeString += "1"; // is hit
+                                    writeString += newHitStatus; // hit status
                                     selectedIoFunctionThread.write(CommonConstants.TwoPlayerGameGroundhogHit, writeString);
                                 }
+                                groundhog.setHitStatus(newHitStatus);
                                 ++numOfHits;
                                 currentScore += hitScores[groundhog.getStatus()];
                                 startDrawingScreen();   // added on 2018-10-29 for testing
