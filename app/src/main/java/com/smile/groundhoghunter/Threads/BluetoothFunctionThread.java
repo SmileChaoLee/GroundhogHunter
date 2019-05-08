@@ -125,6 +125,10 @@ public class BluetoothFunctionThread extends IoFunctionThread {
                         readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerGameGroundhogHit);
                         data.putString("GroundhogHitData", mBuffer);
                         break;
+                    case CommonConstants.TwoPlayerGameScoreReceived:
+                        readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerGameScoreReceived);
+                        data.putString("OppositeCurrentScore", mBuffer);
+                        break;
                     default:
                         readMsg = mHandler.obtainMessage(CommonConstants.TwoPlayerDefaultReading);
                         break;

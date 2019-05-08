@@ -46,15 +46,14 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:divider="@drawable/layout_horizontal_divider"
-                android:showDividers="beginning|end"
-                android:background="@color/yellow"
+                android:background="@drawable/two_player_result_host_layout_border"
                 android:layout_weight="4"
                 android:weightSum="2">
                 <TextView
                     android:id="@+id/gameCreatorTitle"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:textColor="@color/blue"
                     android:gravity="center"
                     android:text="@string/gameCreatorString"
                     android:layout_weight="1">
@@ -88,7 +87,7 @@
                             android:layout_toRightOf="@+id/hostGameScoreTitle"
                             android:layout_alignTop="@+id/hostGameScoreTitle"
                             android:textColor="@color/darkRed"
-                            android:text="1000">
+                            android:text="">
                         </TextView>
                     </RelativeLayout>
                     <RelativeLayout
@@ -113,7 +112,7 @@
                             android:layout_toRightOf="@+id/hostGameHitNumTitle"
                             android:layout_alignTop="@+id/hostGameHitNumTitle"
                             android:textColor="@color/darkRed"
-                            android:text="1000">
+                            android:text="">
                         </TextView>
                     </RelativeLayout>
                 </LinearLayout>
@@ -124,17 +123,16 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:divider="@drawable/layout_horizontal_divider"
-                android:showDividers="beginning|end"
-                android:background="@color/yellow2"
+                android:background="@drawable/two_player_result_client_layout_border"
                 android:layout_weight="4"
                 android:weightSum="2">
                 <TextView
                     android:id="@+id/gameJoinerTitle"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:text="@string/gameJoinerString"
+                    android:textColor="@color/blue"
                     android:gravity="center"
+                    android:text="@string/gameJoinerString"
                     android:layout_weight="1">
                 </TextView>
                 <LinearLayout
@@ -166,7 +164,7 @@
                             android:layout_toRightOf="@+id/clientGameScoreTitle"
                             android:layout_alignTop="@+id/clientGameScoreTitle"
                             android:textColor="@color/darkRed"
-                            android:text="1000">
+                            android:text="">
                         </TextView>
                     </RelativeLayout>
                     <RelativeLayout
@@ -191,7 +189,7 @@
                             android:layout_toRightOf="@+id/clientGameHitNumTitle"
                             android:layout_alignTop="@+id/clientGameHitNumTitle"
                             android:textColor="@color/darkRed"
-                            android:text="1000">
+                            android:text="">
                         </TextView>
                     </RelativeLayout>
                 </LinearLayout>
@@ -202,7 +200,7 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:background="@color/yellow3"
+                android:background="@drawable/two_player_result_button_layout_border"
                 android:layout_weight="2">
                 <Button
                     android:id="@+id/messageArea_OK_button"

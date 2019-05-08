@@ -10,8 +10,10 @@ import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
@@ -68,7 +70,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean hasSound;
 
     private IoFunctionThread selectedIoFunctionThread;
-    private GameView thisGameView;
 
     // default properties (package modifier)
     public Groundhog[] groundhogArray;
@@ -153,6 +154,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         currentScore = 0;
         numOfHits = 0;
         isOppositePlayerLeft = false;
+        isReceivedScoreFromOpposite = false;
 
         surfaceViewCreated = false; // surfaceView has not been created yet
         runningStatus = 0;  // game is not running
@@ -166,11 +168,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         // start to initialize groundhogArray array
         createGroundhogs();
-
-        thisGameView = this;
-        synchronized (thisGameView) {
-            isReceivedScoreFromOpposite = false;
-        }
     }
 
     @Override
@@ -466,11 +463,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         this.isOppositePlayerLeft = isOppositePlayerLeft;
     }
 
+    public void setOppositeCurrentScore(int oppositeCurrentScore) {
+        this.oppositeCurrentScore = oppositeCurrentScore;
+    }
+
+    public void setOppositeNumOfHits(int oppositeNumOfHits) {
+        this.oppositeNumOfHits = oppositeNumOfHits;
+    }
+
     public void setReceivedScoreFromOpposite(boolean isReceivedScoreFromOpposite) {
-        synchronized (thisGameView) {
-            this.isReceivedScoreFromOpposite = isReceivedScoreFromOpposite;
-            thisGameView.notify();
-        }
+        this.isReceivedScoreFromOpposite = isReceivedScoreFromOpposite;
     }
 
     // private methods
@@ -556,36 +558,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
         } else {
             // display the competition result
-            /*
+
+            String scoreString = String.format("%04d", currentScore);
+            scoreString += String.format("%04d", numOfHits);
+            selectedIoFunctionThread.write(CommonConstants.TwoPlayerGameScoreReceived, scoreString);
+
             groundhogActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    groundhogActivity.displayTwoPlayerResult(currentScore, numOfHits, currentScore, numOfHits);
+                    AsyncTask displayResultAsyncTask = new DisplayResultAsyncTask();
+                    displayResultAsyncTask.execute();
                 }
             });
-            */
-            if (isOppositePlayerLeft) {
-                // opposite player has left game then show result
-                oppositeCurrentScore = 0;
-                oppositeNumOfHits = 0;
-            } else {
-                // waiting until received the scores from opposite player
-                synchronized (thisGameView) {
-                    while (!isReceivedScoreFromOpposite) {
-                        try {
-                            thisGameView.wait(3000);    // only wait for 3 seconds
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-            }
-            if (gameType == CommonConstants.TwoPlayerGameByHost) {
-                groundhogActivity.displayTwoPlayerResult(currentScore, numOfHits, oppositeCurrentScore, oppositeNumOfHits);
-            } else {
-                // TwoPlayerGameByClient
-                groundhogActivity.displayTwoPlayerResult(oppositeCurrentScore, oppositeNumOfHits, currentScore, numOfHits);
-            }
+
         }
     }
 
@@ -680,5 +665,46 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         pBtn.setTypeface(Typeface.DEFAULT_BOLD);
         pBtn.setTextColor(Color.rgb(0x00,0x64,0x00));
         pBtn.setLayoutParams(layoutParams);
+    }
+
+    private class DisplayResultAsyncTask extends AsyncTask {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            groundhogActivity.disableAllButtons();
+        }
+        @Override
+        protected Object doInBackground(Object[] objects) {
+
+            if (isOppositePlayerLeft) {
+                // opposite player has left game then show result
+                oppositeCurrentScore = 0;
+                oppositeNumOfHits = 0;
+            } else {
+                // waiting until received the scores from opposite player (only wait 6 seconds)
+                int maxLoop = 30, i = 0;
+                while ( (!isReceivedScoreFromOpposite) && (i<maxLoop) ) {
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                    i++;
+                }
+                Log.d(TAG, "Number of loop (i) = " + i);
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            if (gameType == CommonConstants.TwoPlayerGameByHost) {
+                groundhogActivity.displayTwoPlayerResult(currentScore, numOfHits, oppositeCurrentScore, oppositeNumOfHits);
+            } else {
+                // TwoPlayerGameByClient
+                groundhogActivity.displayTwoPlayerResult(oppositeCurrentScore, oppositeNumOfHits, currentScore, numOfHits);
+            }
+            groundhogActivity.disableAllButtons();
+        }
     }
 }

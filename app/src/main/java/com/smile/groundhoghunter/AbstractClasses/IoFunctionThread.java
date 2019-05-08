@@ -33,10 +33,12 @@ public abstract class IoFunctionThread extends Thread {
             int dataLength = data.length();
             byte[] byteWrite = new byte[dataLength + 3];
             byteWrite[0] = (byte)headByte;
+            Log.d(TAG, "write()->byteWrite[0] = " + byteWrite[0]);
             byteWrite[1] = (byte)dataLength;
+            Log.d(TAG, "write()->byteWrite[1] = " + byteWrite[1]);
             System.arraycopy(data.getBytes(), 0, byteWrite, 2, dataLength);
             byteWrite[byteWrite.length - 1] = '\n';
-            Log.d(TAG, "byteWrite = " + new String(byteWrite));
+            Log.d(TAG, "write()->data = " + data);
 
             outputStream.write(byteWrite);
 

@@ -529,18 +529,21 @@ public class GroundhogActivity extends AppCompatActivity {
                             , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
                         @Override
                         public void executeAfterDismissAds(int endPoint) {
-                            Intent returnIntent = new Intent(); // used to bundle data
-                            setResult(Activity.RESULT_OK, returnIntent);
-                            finish();
+                            returnToPrevious();
                         }
                     });
             showAdAsyncTask.execute();
         } else {
-            Intent returnIntent = new Intent(); // used to bundle data
-            setResult(Activity.RESULT_OK, returnIntent);
-            finish();
+            returnToPrevious();
         }
     }
+
+    private void returnToPrevious() {
+        Intent returnIntent = new Intent(); // used to bundle data
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
+    }
+
     private void getLocalTop10ScoreList() {
         // showing loading message
         showLoadingMessage();
@@ -560,7 +563,7 @@ public class GroundhogActivity extends AppCompatActivity {
         startService(serviceIntent);
     }
 
-    private void disableAllButtons() {
+    public void disableAllButtons() {
         startGameButton.setEnabled(false);
         pauseGameButton.setEnabled(false);
         resumeGameButton.setEnabled(false);
@@ -570,7 +573,7 @@ public class GroundhogActivity extends AppCompatActivity {
         top10Button.setEnabled(false);
         globalTop10Button.setEnabled(false);
     }
-    private void enableAllButtons() {
+    public void enableAllButtons() {
         startGameButton.setEnabled(true);
         pauseGameButton.setEnabled(true);
         resumeGameButton.setEnabled(true);

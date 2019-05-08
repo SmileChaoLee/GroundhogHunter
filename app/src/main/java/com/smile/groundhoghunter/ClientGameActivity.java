@@ -159,6 +159,11 @@ public class ClientGameActivity extends GroundhogActivity {
                     selectedIoFunctionThread.setStartRead(true);
                     break;
                 case CommonConstants.TwoPlayerGameScoreReceived:
+                    msgString = data.getString("OppositeCurrentScore", "0");
+                    int oppScore = Integer.valueOf(msgString.substring(0, 4));
+                    gameView.setOppositeCurrentScore(oppScore);
+                    int oppNumOfHits = Integer.valueOf(msgString.substring(4, 8));
+                    gameView.setOppositeNumOfHits(oppNumOfHits);
                     gameView.setReceivedScoreFromOpposite(true);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
