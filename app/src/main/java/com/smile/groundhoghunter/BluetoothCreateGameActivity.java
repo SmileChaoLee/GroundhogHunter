@@ -241,6 +241,9 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
                     oppositePlayerNameMap.clear();
                     oppositePlayerNameMap = null;
                     //
+                    // remove all messages from createGameHandler, // added on 2019-05-14
+                    createGameHandler.removeCallbacksAndMessages(null);
+                    //
                     selectedBtFunctionThread.write(CommonConstants.TwoPlayerHostStartGame, "");
                     Intent gameIntent = new Intent(getApplicationContext(), BtHostGameActivity.class);
                     gameIntent.putExtra("GameType", CommonConstants.TwoPlayerGameByHost);
@@ -361,14 +364,15 @@ public class BluetoothCreateGameActivity extends AppCompatActivity {
 
         hostLeavingNotification();
 
-        oppositePlayerNameMap.clear();
-
         stopBluetoothAcceptThread();
 
         ArrayList<BluetoothFunctionThread> threadList = new ArrayList<>(btMacFunctionThreadMap.values());
         BluetoothUtil.stopBluetoothFunctionThreads(threadList);
         btMacFunctionThreadMap.clear();
 
+        createGameHandler.removeCallbacksAndMessages(null); // added on 2019-05-14
+
+        oppositePlayerNameMap.clear();
         twoPlayerListAdapter.clear();
         twoPlayerListAdapter.notifyDataSetChanged();
 

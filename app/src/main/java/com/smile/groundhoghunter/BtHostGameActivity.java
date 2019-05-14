@@ -5,20 +5,18 @@ import android.os.Looper;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
 import com.smile.groundhoghunter.Utilities.BluetoothUtil;
-import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class BtHostGameActivity extends HostGameActivity {
 
     private final static String TAG = "BtHostGameActivity";
     private BluetoothFunctionThread selectedBtFunctionThread;
+    private BtHostGameHandler btHostGameHandler;
 
     public BtHostGameActivity() {
-        BtHostGameHandler btHostGameHandler = new BtHostGameHandler(Looper.getMainLooper(), this);
+        btHostGameHandler = new BtHostGameHandler(Looper.getMainLooper(), this);
         selectedBtFunctionThread = (BluetoothFunctionThread)super.selectedIoFunctionThread;
         selectedBtFunctionThread.setHandler(btHostGameHandler);
         selectedBtFunctionThread.setStartRead(true);    // start reading data
@@ -33,6 +31,10 @@ public class BtHostGameActivity extends HostGameActivity {
     public void onDestroy() {
         BluetoothUtil.stopBluetoothFunctionThread(selectedBtFunctionThread);
         selectedBtFunctionThread = null;
+        if (btHostGameHandler != null) {
+            btHostGameHandler.removeCallbacks(null);
+            btHostGameHandler = null;
+        }
         super.onDestroy();
     }
 

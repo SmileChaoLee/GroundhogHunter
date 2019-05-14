@@ -12,9 +12,10 @@ public class BtClientGameActivity extends ClientGameActivity {
 
     private final static String TAG = "BtClientGameActivity";
     private BluetoothFunctionThread selectedBtFunctionThread;
+    private BtClientGameHandler btClientGameHandler;
 
     public BtClientGameActivity() {
-        BtClientGameHandler btClientGameHandler = new BtClientGameHandler(Looper.getMainLooper(), this);
+        btClientGameHandler = new BtClientGameHandler(Looper.getMainLooper(), this);
         selectedBtFunctionThread = (BluetoothFunctionThread) super.selectedIoFunctionThread;
         selectedBtFunctionThread.setHandler(btClientGameHandler);
         selectedBtFunctionThread.setStartRead(true);    // start reading data
@@ -29,6 +30,10 @@ public class BtClientGameActivity extends ClientGameActivity {
     public void onDestroy() {
         BluetoothUtil.stopBluetoothFunctionThread(selectedBtFunctionThread);
         selectedBtFunctionThread = null;
+        if (btClientGameHandler != null) {
+            btClientGameHandler.removeCallbacks(null);
+            btClientGameHandler = null;
+        }
         super.onDestroy();
     }
 
