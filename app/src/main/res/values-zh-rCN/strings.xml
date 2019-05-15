@@ -47,7 +47,7 @@
     <string name="exitAppString">离开游戏</string>
 
     <string name="bluetoothString">蓝芽</string>
-    <string name="wifiString">区域无线网络</string>
+    <string name="wifiString">无线网络直接互联</string>
     <string name="internetString">网际网络</string>
     <string name="createString">创立</string>
     <string name="joinString">加入</string>
@@ -61,6 +61,7 @@
     <string name="bluetoothAlreadyOnString">蓝芽已经开启.</string>
     <string name="bluetoothCannotBeTurnedOnString">蓝芽无法被开启.</string>
     <string name="bluetoothNotSupportedString">本机没有支援蓝芽.</string>
+    <string name="wifiDirectNotSupportedString">没有支援无线网絡互联</string>
     <string name="deviceNameCannotBeEmptyString">设备名称不可以是空白.</string>
     <string name="playerNameCannotBeEmptyString">玩家名称不可以是空白.</string>
     <string name="bluetoothVisibilityForPeriodString">蓝芽在短时间内可被侦测</string>

@@ -18,8 +18,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
 
-        versionCode 160
-        versionName "1.60"
+        versionCode 162
+        versionName "1.62"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
@@ -44,7 +44,7 @@ android {
     buildTypes {
         release {
             debuggable false
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }

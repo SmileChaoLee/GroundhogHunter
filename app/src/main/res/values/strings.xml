@@ -45,7 +45,7 @@
     <string name="exitAppString">Exit Game</string>
 
     <string name="bluetoothString">Bluetooth</string>
-    <string name="wifiString">Local Wifi</string>
+    <string name="wifiString">Wifi-Direct</string>
     <string name="internetString">Internet</string>
     <string name="createString">Create</string>
     <string name="joinString">Join</string>
@@ -58,7 +58,8 @@
 
     <string name="bluetoothAlreadyOnString">Bluetooth has been on already.</string>
     <string name="bluetoothCannotBeTurnedOnString">Bluetooth cannot be turned on.</string>
-    <string name="bluetoothNotSupportedString">Bluetooth is not supported on device.</string>
+    <string name="bluetoothNotSupportedString">Bluetooth is not supported.</string>
+    <string name="wifiDirectNotSupportedString">Wifi-Direct is not supported.</string>
     <string name="deviceNameCannotBeEmptyString">Device name cannot be empty.</string>
     <string name="playerNameCannotBeEmptyString">Player name cannot be empty.</string>
     <string name="bluetoothVisibilityForPeriodString">Bluetooth will is visible for</string>

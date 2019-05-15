@@ -13,7 +13,6 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
@@ -32,7 +31,7 @@ import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.groundhoghunter.Threads.GameTimerThread;
 import com.smile.groundhoghunter.Threads.GameViewDrawThread;
 import com.smile.groundhoghunter.Threads.GroundhogRandomThread;
-import com.smile.groundhoghunter.Utilities.SoundUtil;
+import com.smile.smilepublicclasseslibrary.SoundPoolUtil;
 import com.smile.smilepublicclasseslibrary.player_record_rest.PlayerRecordRest;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
@@ -73,6 +72,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean hasSound;
 
     private IoFunctionThread selectedIoFunctionThread;
+
+    private SoundPoolUtil soundPoolUtil;
 
     // default properties (package modifier)
     public Groundhog[] groundhogArray;
@@ -173,6 +174,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         // start to initialize groundhogArray array
         createGroundhogs();
+
+        // create sound pool
+        soundPoolUtil = new SoundPoolUtil(context, R.raw.ouh);
     }
 
     @Override
@@ -233,7 +237,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                 // hit
                                 if (hasSound) {
                                     // needs to play sound for hitting
-                                    SoundUtil.playSound(groundhogActivity, R.raw.ouh);
+                                    // SoundUtil.playSound(groundhogActivity, R.raw.ouh);
+                                    soundPoolUtil.playSound();
                                 }
 
                                 if (gameType == CommonConstants.GameBySinglePlayer) {
@@ -281,7 +286,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         Log.i(TAG, "surfaceDestroyed() is called");
-        SoundUtil.releaseMediaPlayer();
+        soundPoolUtil.release();
     }
 
     public boolean getHasSound() {

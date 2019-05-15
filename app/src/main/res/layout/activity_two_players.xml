@@ -28,8 +28,7 @@
         android:divider="@drawable/layout_horizontal_divider"
         android:showDividers="beginning|end"
         app:layout_constraintHeight_percent="0.2"
-        app:layout_constraintTop_toBottomOf="@id/twoPlayerSettingTitleTextView"
-        android:layout_weight="3">
+        app:layout_constraintTop_toBottomOf="@id/twoPlayerSettingTitleTextView">
         <RadioGroup
             android:id="@+id/networkMediaTypeRadioGroup"
             android:layout_width="match_parent"
@@ -55,18 +54,7 @@
                 android:textAllCaps="false"
                 android:textStyle="normal"
                 android:text="@string/wifiString"
-                android:enabled="false" >
-            </android.support.v7.widget.AppCompatRadioButton>
-            <android.support.v7.widget.AppCompatRadioButton
-                android:id="@+id/internetRadioButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:buttonTint="@color/darkRed"
-                android:textColor="@color/blue"
-                android:textAllCaps="false"
-                android:textStyle="normal"
-                android:text="@string/internetString"
-                android:enabled="false" >
+                android:enabled="true" >
             </android.support.v7.widget.AppCompatRadioButton>
         </RadioGroup>
     </LinearLayout>
