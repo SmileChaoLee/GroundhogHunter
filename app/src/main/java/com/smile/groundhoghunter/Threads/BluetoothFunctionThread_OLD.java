@@ -4,23 +4,20 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcel;
 import android.util.Log;
 
 import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.groundhoghunter.Constants.CommonConstants;
-import com.smile.groundhoghunter.Interfaces.ConnectDevice;
-import com.smile.groundhoghunter.Models.BtConnectDevice;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class BluetoothFunctionThread extends IoFunctionThread {
+public class BluetoothFunctionThread_OLD extends IoFunctionThread {
     private final String TAG = new String(".Threads.BluetoothFunctionThread");
     private final BluetoothSocket mBluetoothSocket;
     private final IoFunctionThread ioFunctionThread;
 
-    public BluetoothFunctionThread(Handler handler, BluetoothSocket bluetoothSocket) {
+    public BluetoothFunctionThread_OLD(Handler handler, BluetoothSocket bluetoothSocket) {
         super(handler);
         mBluetoothSocket = bluetoothSocket;
         InputStream inpStream = null;
@@ -57,8 +54,7 @@ public class BluetoothFunctionThread extends IoFunctionThread {
 
         Message readMsg;
         Bundle data = new Bundle();
-        BtConnectDevice btConnectDevice = new BtConnectDevice(mBluetoothSocket.getRemoteDevice());
-        data.putParcelable("ConnectDevice", btConnectDevice);
+        data.putParcelable("BluetoothDevice", mBluetoothSocket.getRemoteDevice());
 
         while (keepRunning) {
 

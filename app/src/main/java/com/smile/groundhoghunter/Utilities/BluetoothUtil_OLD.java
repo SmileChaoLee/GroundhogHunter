@@ -4,12 +4,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
-
-import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
-
+import com.smile.groundhoghunter.Threads.BluetoothFunctionThread_OLD;
 import java.util.ArrayList;
 
-public class BluetoothUtil {
+public class BluetoothUtil_OLD {
 
     private static final String TAG = new String(".Utilities.BluetoothUtil");
 
@@ -57,13 +55,13 @@ public class BluetoothUtil {
         }
     }
 
-    public static void stopBluetoothFunctionThreads(ArrayList<BluetoothFunctionThread> btFunctionThreadList) {
-        for (BluetoothFunctionThread btFunctionThread : btFunctionThreadList) {
+    public static void stopBluetoothFunctionThreads(ArrayList<BluetoothFunctionThread_OLD> btFunctionThreadList) {
+        for (BluetoothFunctionThread_OLD btFunctionThread : btFunctionThreadList) {
             stopBluetoothFunctionThread(btFunctionThread);
         }
     }
 
-    public static void stopBluetoothFunctionThread(BluetoothFunctionThread btFunctionThread) {
+    public static void stopBluetoothFunctionThread(BluetoothFunctionThread_OLD btFunctionThread) {
         if (btFunctionThread != null) {
             synchronized (btFunctionThread) {
                 btFunctionThread.setKeepRunning(false);

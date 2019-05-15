@@ -8,7 +8,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.smile.groundhoghunter.Constants.CommonConstants;
-import com.smile.groundhoghunter.Utilities.BluetoothUtil;
+import com.smile.groundhoghunter.Utilities.BluetoothUtil_OLD;
 
 public class BluetoothConnectToThread extends Thread {
 
@@ -18,7 +18,7 @@ public class BluetoothConnectToThread extends Thread {
     private final java.util.UUID mAppUUID;
 
     private final BluetoothSocket mBluetoothSocket;
-    private BluetoothFunctionThread btFunctionThread;
+    private BluetoothFunctionThread_OLD btFunctionThread;
 
     public BluetoothConnectToThread(Handler handler, BluetoothDevice bluetoothDevice, java.util.UUID appUUID) {
         mHandler = handler;
@@ -39,7 +39,7 @@ public class BluetoothConnectToThread extends Thread {
 
         mBluetoothSocket = temp;
         if (mBluetoothSocket.isConnected()) {
-            BluetoothUtil.closeBluetoothSocket(mBluetoothSocket);
+            BluetoothUtil_OLD.closeBluetoothSocket(mBluetoothSocket);
         }
     }
 
@@ -57,7 +57,7 @@ public class BluetoothConnectToThread extends Thread {
             return;
         }
 
-        String deviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothDevice);
+        String deviceName = BluetoothUtil_OLD.getBluetoothDeviceName(mBluetoothDevice);
         if ( (deviceName == null) || (deviceName.isEmpty()) ) {
             msg = mHandler.obtainMessage(CommonConstants.BluetoothConnectToThreadFailedToConnect);
             msg.setData(data);
@@ -73,7 +73,7 @@ public class BluetoothConnectToThread extends Thread {
             Log.e(TAG, "Connected to server socket.");
 
             // start reading the opposite player's name
-            btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
+            btFunctionThread = new BluetoothFunctionThread_OLD(mHandler, mBluetoothSocket);
             btFunctionThread.start();   // default is not reading input stream (startRead = false)
 
             msg = mHandler.obtainMessage(CommonConstants.BluetoothConnectToThreadConnected);
@@ -107,7 +107,7 @@ public class BluetoothConnectToThread extends Thread {
         }
     }
 
-    public BluetoothFunctionThread getBtFunctionThread() {
+    public BluetoothFunctionThread_OLD getBtFunctionThread() {
         return btFunctionThread;
     }
 }

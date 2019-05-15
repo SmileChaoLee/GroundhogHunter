@@ -83,7 +83,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     // public static final properties
     public static final Handler GameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
     public static final int BluetoothMediaType = 0;
-    public static final int wifiMediaType = 1;
+    public static final int WifiMediaType = 1;
     public static final int InternetMediaType = 2;
     public static final int NoneMediaType = -1;
     public static final int TimerInterval = 60; // 60 seconds

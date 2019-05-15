@@ -1,6 +1,7 @@
 package com.smile.groundhoghunter.Threads;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
@@ -8,29 +9,32 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
-import com.smile.groundhoghunter.AbstractClasses.ServerAcceptThread;
 import com.smile.groundhoghunter.Constants.CommonConstants;
-import com.smile.groundhoghunter.Interfaces.ConnectDevice;
-import com.smile.groundhoghunter.Models.BtConnectDevice;
 
 import java.util.HashMap;
 
-public class BluetoothAcceptThread extends ServerAcceptThread {
+public class BluetoothAcceptThread_OLD extends Thread {
 
     private static final String TAG = new String(".Threads.BluetoothAcceptThread");
     private static final int MaxConnectedBluetoothDevices = 5;
+    // private final int acceptThreadId;
+    private final Handler mHandler;
     private final String mPlayerName;
     private final java.util.UUID mAppUUID;
     private final BluetoothAdapter mBluetoothAdapter;
     private final BluetoothServerSocket mServerSocket;
 
     private BluetoothSocket mBluetoothSocket;
-    private HashMap<BtConnectDevice, BluetoothFunctionThread> btFunctionThreadMap;
+    // private BluetoothFunctionThread btFunctionThread;
+    private HashMap<BluetoothDevice, BluetoothFunctionThread_OLD> btFunctionThreadMap;
     private int numOfConnections;
+    private boolean keepRunning;
 
-    public BluetoothAcceptThread(Handler handler, BluetoothAdapter bluetoothAdapter, String playerName, java.util.UUID appUUID) {
-        super(handler);
+    // public BluetoothAcceptThread(int threadId, Handler handler, BluetoothAdapter bluetoothAdapter, String playerName, java.util.UUID appUUID) {
+    public BluetoothAcceptThread_OLD(Handler handler, BluetoothAdapter bluetoothAdapter, String playerName, java.util.UUID appUUID) {
+
+        // acceptThreadId = threadId;
+        mHandler = handler;
         mBluetoothAdapter = bluetoothAdapter;
         mBluetoothSocket = null;
         mPlayerName = playerName;
@@ -62,7 +66,7 @@ public class BluetoothAcceptThread extends ServerAcceptThread {
 
         if (mServerSocket == null) {
             // cannot create Server Socket
-            msg = mHandler.obtainMessage(CommonConstants.ServerAcceptThreadNoServerSocket);
+            msg = mHandler.obtainMessage(CommonConstants.BluetoothAcceptThreadNoServerSocket);
             msg.sendToTarget();
             return;
         }
@@ -82,16 +86,17 @@ public class BluetoothAcceptThread extends ServerAcceptThread {
                         isConnected = true;
                         // mServerSocket.close();
 
-                        BluetoothFunctionThread btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
+                        BluetoothFunctionThread_OLD btFunctionThread = new BluetoothFunctionThread_OLD(mHandler, mBluetoothSocket);
                         btFunctionThread.start();
                         btFunctionThread.write(CommonConstants.OppositePlayerNameHasBeenRead, mPlayerName);
 
-                        BtConnectDevice btConnectDevice = new BtConnectDevice(mBluetoothSocket.getRemoteDevice());
-                        btFunctionThreadMap.put(btConnectDevice, btFunctionThread);
+                        BluetoothDevice btDevice = mBluetoothSocket.getRemoteDevice();
 
-                        msg = mHandler.obtainMessage(CommonConstants.ServerAcceptThreadConnected);
+                        btFunctionThreadMap.put(btDevice, btFunctionThread);
+
+                        msg = mHandler.obtainMessage(CommonConstants.BluetoothAcceptThreadConnected);
                         data = new Bundle();
-                        data.putParcelable("ConnectDevice", btConnectDevice);
+                        data.putParcelable("BluetoothDevice", btDevice);
                         msg.setData(data);
                         msg.sendToTarget();
                     }
@@ -102,7 +107,7 @@ public class BluetoothAcceptThread extends ServerAcceptThread {
                     Log.e(TAG, "BluetoothSocket's accept() method failed", ex);
 
                     // listening is stopped (means BluetoothServerSocket closed or exception occurred)
-                    msg = mHandler.obtainMessage(CommonConstants.ServerAcceptThreadStopped);
+                    msg = mHandler.obtainMessage(CommonConstants.BluetoothAcceptThreadStopped);
                     msg.sendToTarget();
                 }
             }
@@ -110,12 +115,11 @@ public class BluetoothAcceptThread extends ServerAcceptThread {
     }
 
     // Closes the connect socket and causes the thread to finish.
-    @Override
     public void closeServerSocket() {
 
-        Log.e(TAG, "Closing the server socket");
         if (mServerSocket != null) {
             try {
+                Log.e(TAG, "Closing the server socket");
                 mServerSocket.close();
                 Log.e(TAG, "server socket closed.");
             } catch (Exception ex) {
@@ -124,9 +128,10 @@ public class BluetoothAcceptThread extends ServerAcceptThread {
         }
     }
 
-    @Override
-    public IoFunctionThread getIoFunctionThread(ConnectDevice btDevice) {
-    // public BluetoothFunctionThread getIoFunctionThread(ConnectDevice btDevice) {
+    public BluetoothFunctionThread_OLD getBtFunctionThread(BluetoothDevice btDevice) {
         return btFunctionThreadMap.get(btDevice);
+    }
+    public void setKeepRunning(boolean keepRunning) {
+        this.keepRunning = keepRunning;
     }
 }

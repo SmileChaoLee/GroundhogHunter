@@ -10,13 +10,13 @@ import com.smile.groundhoghunter.Utilities.BluetoothUtil;
 
 public class BtClientGameActivity extends ClientGameActivity {
 
-    private final static String TAG = "BtClientGameActivity";
+    private final static String TAG = ".BtClientGameActivity";
     private BluetoothFunctionThread selectedBtFunctionThread;
     private BtClientGameHandler btClientGameHandler;
 
     public BtClientGameActivity() {
         btClientGameHandler = new BtClientGameHandler(Looper.getMainLooper(), this);
-        selectedBtFunctionThread = (BluetoothFunctionThread) super.selectedIoFunctionThread;
+        selectedBtFunctionThread = (BluetoothFunctionThread) selectedIoFunctionThread;
         selectedBtFunctionThread.setHandler(btClientGameHandler);
         selectedBtFunctionThread.setStartRead(true);    // start reading data
     }

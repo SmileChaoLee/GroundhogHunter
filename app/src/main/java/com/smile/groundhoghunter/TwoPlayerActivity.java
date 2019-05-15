@@ -5,8 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.FeatureInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -24,9 +22,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.smile.groundhoghunter.Models.SmileImageButton;
-import com.smile.groundhoghunter.Utilities.BluetoothUtil;
+import com.smile.groundhoghunter.Utilities.BluetoothUtil_OLD;
 import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
+import com.smile.groundhoghunter.Utilities.*;
 
 public class TwoPlayerActivity extends AppCompatActivity {
 
@@ -96,7 +95,6 @@ public class TwoPlayerActivity extends AppCompatActivity {
             public void onClick(View view) {
                 mediaType = GameView.BluetoothMediaType;
                 thisDeviceName = btDeviceName;
-                Log.d(TAG, "btDeviceName = " + btDeviceName);
                 setPlayerName();
             }
         });
@@ -107,14 +105,13 @@ public class TwoPlayerActivity extends AppCompatActivity {
         wifiRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mediaType = GameView.wifiMediaType;
+                mediaType = GameView.WifiMediaType;
                 thisDeviceName = wifiDeviceName;
-                Log.d(TAG, "wifiDeviceName = " + wifiDeviceName);
                 setPlayerName();
             }
         });
 
-        boolean isWifiDirectSupported = isWifiDirectSupported(this);
+        boolean isWifiDirectSupported = WifiDirectUtil.isWifiDirectSupported(this);
         // device detecting
         wifiRadioButton.setEnabled(false);
         if (isWifiDirectSupported) {
@@ -137,12 +134,12 @@ public class TwoPlayerActivity extends AppCompatActivity {
             bluetoothRadioButton.setChecked(false);
             bluetoothRadioButton.setEnabled(false);
             if (wifiRadioButton.isEnabled()) {
-                mediaType = GameView.wifiMediaType;
+                mediaType = GameView.WifiMediaType;
             } else {
                 mediaType = GameView.NoneMediaType;
             }
         } else {
-            btDeviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothAdapter);
+            btDeviceName = BluetoothUtil_OLD.getBluetoothDeviceName(mBluetoothAdapter);
             mediaType = GameView.BluetoothMediaType;
             bluetoothRadioButton.setEnabled(true);
             if (mBluetoothAdapter.isDiscovering()) {
@@ -156,7 +153,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
                 bluetoothRadioButton.setChecked(true);
                 thisDeviceName = btDeviceName;
                 break;
-            case GameView.wifiMediaType:
+            case GameView.WifiMediaType:
                 explainProblemTextView.setText(explainProblemForWifiString);
                 wifiRadioButton.setChecked(true);
                 // device name from Wifi-Direct
@@ -226,6 +223,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
                         gameIntent.putExtra("PlayerName", playerName);
                         startActivity(gameIntent);
                         break;
+                    case GameView.WifiMediaType:
+                        break;
                 }
             }
         });
@@ -251,6 +250,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
                         gameIntent = new Intent(TwoPlayerActivity.this, BluetoothJoinGameActivity.class);
                         gameIntent.putExtra("PlayerName", playerName);
                         startActivity(gameIntent);
+                        break;
+                    case GameView.WifiMediaType:
                         break;
                 }
             }
@@ -315,17 +316,6 @@ public class TwoPlayerActivity extends AppCompatActivity {
         playerNameEditText.setText(playerName);
     }
 
-    private boolean isWifiDirectSupported(Context ctx) {
-        PackageManager pm = ctx.getPackageManager();
-        FeatureInfo[] features = pm.getSystemAvailableFeatures();
-        for (FeatureInfo info : features) {
-            if (info != null && info.name != null && info.name.equalsIgnoreCase("android.hardware.wifi.direct")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private class WifiDirectReceiver extends BroadcastReceiver {
 
         @Override
@@ -334,7 +324,6 @@ public class TwoPlayerActivity extends AppCompatActivity {
             if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
                 WifiP2pDevice wifiDevice =(WifiP2pDevice)intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
                 wifiDeviceName = wifiDevice.deviceName;
-                Log.d(TAG, "Wifi Direct: My Device = " + wifiDeviceName);
                 if (wifiRadioButton.isChecked()) {
                     thisDeviceName = wifiDeviceName;
                     setPlayerName();
