@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.BtConnectDevice;
 import com.smile.groundhoghunter.Threads.BluetoothConnectToThread;
 import com.smile.groundhoghunter.Utilities.BluetoothUtil;
@@ -119,10 +120,19 @@ public class BluetoothJoinGameActivity extends JoinGameActivity {
         }
     }
 
+    @Override
     protected void startDiscovery() {
         super.startDiscovery();
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBtIntent, Request_Enable_Bluetooth_For_Discovering);
+    }
+
+    @Override
+    protected void startClientGame() {
+        super.startClientGame();
+        Intent gameIntent = new Intent(this, BtClientGameActivity.class);
+        gameIntent.putExtra("GameType", CommonConstants.TwoPlayerGameByClient);
+        startActivityForResult(gameIntent, CommonConstants.TwoPlayerGameByClient);
     }
 
     private class BluetoothJoinGameBroadcastReceiver extends BroadcastReceiver {
