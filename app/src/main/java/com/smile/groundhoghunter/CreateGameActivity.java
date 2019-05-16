@@ -66,6 +66,12 @@ public class CreateGameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        Intent callingIntent = getIntent();
+        playerName = callingIntent.getStringExtra("PlayerName");
+        if (playerName == null) {
+            playerName = "";
+        }
+
         createGameHandler = new CreateGameHandler(Looper.getMainLooper());
         ioFunctionThreadMap = new HashMap<>();
         mServerAcceptThread = null;
@@ -92,12 +98,6 @@ public class CreateGameActivity extends AppCompatActivity {
         int colorDarkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
         int colorBlue = Color.BLUE;
 
-        Intent callingIntent = getIntent();
-        playerName = callingIntent.getStringExtra("PlayerName");
-        if (playerName == null) {
-            playerName = "";
-        }
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_create_game);
@@ -115,9 +115,7 @@ public class CreateGameActivity extends AppCompatActivity {
         ScreenUtil.resizeTextSize(playerNameStringTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
 
         playerNameTextView = findViewById(R.id.playerNameTextView);
-        playerNameTextView.setEnabled(true);
-        playerNameTextView.setText("");
-        playerNameTextView.append(playerName);
+        playerNameTextView.setText(playerName);
         ScreenUtil.resizeTextSize(playerNameTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
 
         oppositePlayerNameListView = findViewById(R.id.oppositePlayerNameListView);

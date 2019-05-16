@@ -9,7 +9,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.smile.groundhoghunter.Constants.CommonConstants;
-import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class HostGameActivity extends GroundhogActivity {

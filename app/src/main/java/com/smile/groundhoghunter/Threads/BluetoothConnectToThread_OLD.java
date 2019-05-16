@@ -7,23 +7,21 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.smile.groundhoghunter.AbstractClasses.ClientConnectToThread;
-import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.groundhoghunter.Constants.CommonConstants;
-import com.smile.groundhoghunter.Models.BtConnectDevice;
-import com.smile.groundhoghunter.Utilities.BluetoothUtil;
+import com.smile.groundhoghunter.Utilities.BluetoothUtil_OLD;
 
-public class BluetoothConnectToThread extends ClientConnectToThread {
+public class BluetoothConnectToThread_OLD extends Thread {
 
     private static final String TAG = new String(".Threads.BluetoothConnectToThread");
     private final BluetoothDevice mBluetoothDevice;
+    private final Handler mHandler;
     private final java.util.UUID mAppUUID;
 
     private final BluetoothSocket mBluetoothSocket;
-    private BluetoothFunctionThread btFunctionThread;
+    private BluetoothFunctionThread_OLD btFunctionThread;
 
-    public BluetoothConnectToThread(Handler handler, BluetoothDevice bluetoothDevice, java.util.UUID appUUID) {
-        super(handler);
+    public BluetoothConnectToThread_OLD(Handler handler, BluetoothDevice bluetoothDevice, java.util.UUID appUUID) {
+        mHandler = handler;
         mBluetoothDevice = bluetoothDevice;
         mAppUUID = appUUID;
 
@@ -41,7 +39,7 @@ public class BluetoothConnectToThread extends ClientConnectToThread {
 
         mBluetoothSocket = temp;
         if (mBluetoothSocket.isConnected()) {
-            BluetoothUtil.closeBluetoothSocket(mBluetoothSocket);
+            BluetoothUtil_OLD.closeBluetoothSocket(mBluetoothSocket);
         }
     }
 
@@ -49,8 +47,7 @@ public class BluetoothConnectToThread extends ClientConnectToThread {
 
         Message msg;
         Bundle data = new Bundle();
-        BtConnectDevice btConnectDevice = new BtConnectDevice(mBluetoothDevice);
-        data.putParcelable("ConnectDevice", btConnectDevice);
+        data.putParcelable("BluetoothDevice", mBluetoothDevice);
 
         if (mBluetoothSocket == null) {
             // cannot create Server Socket
@@ -60,7 +57,7 @@ public class BluetoothConnectToThread extends ClientConnectToThread {
             return;
         }
 
-        String deviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothDevice);
+        String deviceName = BluetoothUtil_OLD.getBluetoothDeviceName(mBluetoothDevice);
         if ( (deviceName == null) || (deviceName.isEmpty()) ) {
             msg = mHandler.obtainMessage(CommonConstants.ClientConnectToThreadFailedToConnect);
             msg.setData(data);
@@ -76,7 +73,7 @@ public class BluetoothConnectToThread extends ClientConnectToThread {
             Log.e(TAG, "Connected to server socket.");
 
             // start reading the opposite player's name
-            btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
+            btFunctionThread = new BluetoothFunctionThread_OLD(mHandler, mBluetoothSocket);
             btFunctionThread.start();   // default is not reading input stream (startRead = false)
 
             msg = mHandler.obtainMessage(CommonConstants.ClientConnectToThreadConnected);
@@ -99,7 +96,7 @@ public class BluetoothConnectToThread extends ClientConnectToThread {
     }
 
     // Closes the client socket and causes the thread to finish.
-    public void closeClientSocket() {
+    public void closeBluetoothSocket() {
 
         if (mBluetoothSocket != null) {
             try {
@@ -110,7 +107,7 @@ public class BluetoothConnectToThread extends ClientConnectToThread {
         }
     }
 
-    public IoFunctionThread getIoFunctionThread() {
+    public BluetoothFunctionThread_OLD getBtFunctionThread() {
         return btFunctionThread;
     }
 }

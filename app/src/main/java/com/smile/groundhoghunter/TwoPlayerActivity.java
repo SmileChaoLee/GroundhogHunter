@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.smile.groundhoghunter.Models.SmileImageButton;
-import com.smile.groundhoghunter.Utilities.BluetoothUtil_OLD;
+import com.smile.groundhoghunter.Utilities.BluetoothUtil;
 import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 import com.smile.groundhoghunter.Utilities.*;
@@ -139,7 +139,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
                 mediaType = GameView.NoneMediaType;
             }
         } else {
-            btDeviceName = BluetoothUtil_OLD.getBluetoothDeviceName(mBluetoothAdapter);
+            btDeviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothAdapter);
             mediaType = GameView.BluetoothMediaType;
             bluetoothRadioButton.setEnabled(true);
             if (mBluetoothAdapter.isDiscovering()) {

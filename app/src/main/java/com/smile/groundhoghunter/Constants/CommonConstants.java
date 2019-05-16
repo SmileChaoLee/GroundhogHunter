@@ -24,15 +24,11 @@ public final class CommonConstants {
     public static final int ServerAcceptThreadNoServerSocket = 21;
     public static final int ServerAcceptThreadStopped = 22;
     public static final int ServerAcceptThreadConnected = 23;
-
-    public static final int BluetoothAcceptThreadNoServerSocket = 41;
-    public static final int BluetoothAcceptThreadStopped = 42;
-    public static final int BluetoothAcceptThreadConnected = 43;
-    public static final int BluetoothConnectToThreadNoClientSocket = 44;
-    public static final int BluetoothConnectToThreadConnected = 45;
-    public static final int BluetoothConnectToThreadFailedToConnect = 46;
-    public static final int BluetoothDiscoveryTimerHasReached = 47;
-    public static final int BluetoothDiscoveryTimerHasBeenDismissed = 48;
+    public static final int ClientConnectToThreadNoClientSocket = 24;
+    public static final int ClientConnectToThreadConnected = 25;
+    public static final int ClientConnectToThreadFailedToConnect = 26;
+    public static final int ClientDiscoveryTimerHasReached = 27;
+    public static final int ClientDiscoveryTimerHasBeenDismissed = 48;
 
     public static final int GameBySinglePlayer = 1000;
     public static final int TwoPlayerGameByHost = 1001;

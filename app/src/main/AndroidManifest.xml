@@ -38,11 +38,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".GroundhogActivity"
+            android:name=".TwoPlayerActivity"
             android:configChanges="orientation"
+            android:label="@string/twoPlayerString"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".BluetoothCreateGameActivity_OLD"
+            android:name=".SettingActivity"
+            android:label="@string/settingString"
+            android:theme="@style/AppSettingTransparent" />
+        <activity
+            android:name=".GroundhogActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
@@ -58,19 +63,14 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".JoinGameActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".Top10ScoreActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeForTop10" />
-        <activity
-            android:name=".SettingActivity"
-            android:label="@string/settingString"
-            android:theme="@style/AppSettingTransparent" />
-        <activity
-            android:name=".TwoPlayerActivity"
-            android:configChanges="orientation"
-            android:label="@string/twoPlayerString"
-            android:screenOrientation="portrait" />
         <activity
             android:name=".HostGameActivity"
             android:configChanges="orientation"

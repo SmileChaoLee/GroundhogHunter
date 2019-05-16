@@ -126,7 +126,6 @@ public class BluetoothAcceptThread extends ServerAcceptThread {
 
     @Override
     public IoFunctionThread getIoFunctionThread(ConnectDevice btDevice) {
-    // public BluetoothFunctionThread getIoFunctionThread(ConnectDevice btDevice) {
         return btFunctionThreadMap.get(btDevice);
     }
 }

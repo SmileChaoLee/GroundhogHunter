@@ -1,5 +1,6 @@
 package com.smile.groundhoghunter.Models;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,20 +9,61 @@ import com.smile.groundhoghunter.Interfaces.ConnectDevice;
 
 public class BtConnectDevice implements ConnectDevice {
 
+    private BluetoothAdapter bluetoothAdapter;
     private BluetoothDevice bluetoothDevice;
 
+    public BtConnectDevice(BluetoothAdapter btAdapter) {
+        bluetoothAdapter = btAdapter;
+        bluetoothDevice = bluetoothAdapter.getRemoteDevice(bluetoothAdapter.getAddress());
+
+    }
     public BtConnectDevice(BluetoothDevice btDevice) {
+        bluetoothAdapter = null;
         bluetoothDevice = btDevice;
     }
 
     @Override
     public String getName() {
-        return bluetoothDevice.getName();
+        String name;
+        if (bluetoothAdapter != null) {
+            name = bluetoothAdapter.getName();
+        } else {
+            name = bluetoothDevice.getName();
+        }
+        return name;
     }
 
     @Override
     public String getAddress() {
-        return bluetoothDevice.getAddress();
+        String address;
+        if (bluetoothAdapter != null) {
+            address = bluetoothAdapter.getAddress();
+        } else {
+            address = bluetoothDevice.getAddress();
+        }
+        return address;
+    }
+
+    @Override
+    public boolean isDiscovering() {
+        boolean yn;
+        if (bluetoothAdapter != null) {
+            yn = bluetoothAdapter.isDiscovering();
+        } else {
+            yn = false;
+        }
+        return yn;
+    }
+
+    @Override
+    public boolean cancelDiscovery() {
+        boolean yn;
+        if (bluetoothAdapter != null) {
+            yn = bluetoothAdapter.cancelDiscovery();
+        } else {
+            yn = false;
+        }
+        return yn;
     }
 
     @Override

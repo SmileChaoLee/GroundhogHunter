@@ -478,10 +478,10 @@ public class BluetoothCreateGameActivity_OLD extends AppCompatActivity {
                     btFunctionThread.setStartRead(true);    // start reading data
 
                     break;
-                case CommonConstants.BluetoothAcceptThreadNoServerSocket:
+                case CommonConstants.ServerAcceptThreadNoServerSocket:
                     showMessage.showMessageInTextView(cannotCreateServerSocketString, MessageDuration);
                     break;
-                case CommonConstants.BluetoothAcceptThreadConnected:
+                case CommonConstants.ServerAcceptThreadConnected:
                     btDevice = data.getParcelable("BluetoothDevice");
                     deviceName = BluetoothUtil_OLD.getBluetoothDeviceName(btDevice);
                     remoteMacAddress = btDevice.getAddress();
@@ -498,7 +498,7 @@ public class BluetoothCreateGameActivity_OLD extends AppCompatActivity {
                     }
 
                     break;
-                case CommonConstants.BluetoothAcceptThreadStopped:
+                case CommonConstants.ServerAcceptThreadStopped:
                     showMessage.showMessageInTextView(waitingStoppedCancelledString, MessageDuration);
                     break;
                 case CommonConstants.TwoPlayerClientExitCode:

@@ -13,8 +13,6 @@ import android.util.Log;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Threads.BluetoothAcceptThread;
 
-import java.util.HashMap;
-
 public class BluetoothCreateGameActivity extends CreateGameActivity {
 
     private static final String TAG = new String(".BluetoothCreateGameActivity");
@@ -35,9 +33,17 @@ public class BluetoothCreateGameActivity extends CreateGameActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // ioFunctionThreadMap = new HashMap<>();
-        // mServerAcceptThread = null;
-        // selectedIoFunctionThread = null;
+        // BroadcastReceiver and register it
+        btCreateGameReceiver = new BluetoothCreateGameBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        registerReceiver(btCreateGameReceiver, intentFilter);
+
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        isDefaultBluetoothEnabled = mBluetoothAdapter.isEnabled();
+        if (mBluetoothAdapter.isDiscovering()) {
+            mBluetoothAdapter.cancelDiscovery();
+        }
 
         bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
         bluetoothVisibilityIsDisabledString = getString(R.string.bluetoothVisibilityIsDisabledString);
@@ -47,25 +53,6 @@ public class BluetoothCreateGameActivity extends CreateGameActivity {
         bluetoothCannotBeVisibleString = getString(R.string.bluetoothCannotBeVisibleString);
 
         super.onCreate(savedInstanceState);
-
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            // this device does not support Bluetooth
-            showMessage.showMessageInTextView(bluetoothNotSupportedString, MessageDuration);
-            // ScreenUtil.showToast(BluetoothCreateGameActivity.this, bluetoothNotSupportedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-            returnToPrevious();
-        }
-
-        isDefaultBluetoothEnabled = mBluetoothAdapter.isEnabled();
-        if (mBluetoothAdapter.isDiscovering()) {
-            mBluetoothAdapter.cancelDiscovery();
-        }
-
-        // BroadcastReceiver and register it
-        btCreateGameReceiver = new BluetoothCreateGameBroadcastReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-        registerReceiver(btCreateGameReceiver, intentFilter);
     }
 
     @Override
