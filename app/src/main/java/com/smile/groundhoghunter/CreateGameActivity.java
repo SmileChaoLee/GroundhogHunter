@@ -165,7 +165,39 @@ public class CreateGameActivity extends AppCompatActivity {
         startCreateGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startHostGame();
+                if (playerName.isEmpty()) {
+                    // ScreenUtil.showToast(BluetoothCreateGameActivity.this, playerNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);    // removed on 2019-04-11
+                    showMessage.showMessageInTextView(playerNameCannotBeEmptyString, MessageDuration);
+                    return;
+                }
+                if (oppositePlayerName.isEmpty()) {
+                    showMessage.showMessageInTextView(noOppositePlayerString, MessageDuration);
+                    return;
+                }
+                // Notify client to start game
+                if (selectedIoFunctionThread != null) {
+                    GroundhogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
+                    stopServerAcceptThread();
+                    for (String remoteMacAddress : ioFunctionThreadMap.keySet()) {
+                        IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
+                        if (ioFunctionThread != selectedIoFunctionThread) {
+                            ioFunctionThread.write(CommonConstants.TwoPlayerHostExitCode, "");
+                            ConnectDeviceUtil.stopIoFunctionThread(ioFunctionThread);
+                        }
+                    }
+                    // clear HashMaps
+                    ioFunctionThreadMap.clear();
+                    ioFunctionThreadMap = null;
+                    oppositePlayerNameMap.clear();
+                    oppositePlayerNameMap = null;
+                    //
+                    // remove all messages from createGameHandler, // added on 2019-05-14
+                    createGameHandler.removeCallbacksAndMessages(null);
+                    //
+                    selectedIoFunctionThread.write(CommonConstants.TwoPlayerHostStartGame, "");
+                    
+                    startHostGame();
+                }
             }
         });
 
@@ -258,37 +290,7 @@ public class CreateGameActivity extends AppCompatActivity {
     }
 
     protected void startHostGame() {
-        if (playerName.isEmpty()) {
-            // ScreenUtil.showToast(BluetoothCreateGameActivity.this, playerNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);    // removed on 2019-04-11
-            showMessage.showMessageInTextView(playerNameCannotBeEmptyString, MessageDuration);
-            return;
-        }
-        if (oppositePlayerName.isEmpty()) {
-            showMessage.showMessageInTextView(noOppositePlayerString, MessageDuration);
-            return;
-        }
-        // Notify client to start game
-        if (selectedIoFunctionThread != null) {
-            GroundhogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
-            stopServerAcceptThread();
-            for (String remoteMacAddress : ioFunctionThreadMap.keySet()) {
-                IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                if (ioFunctionThread != selectedIoFunctionThread) {
-                    ioFunctionThread.write(CommonConstants.TwoPlayerHostExitCode, "");
-                    ConnectDeviceUtil.stopIoFunctionThread(ioFunctionThread);
-                }
-            }
-            // clear HashMaps
-            ioFunctionThreadMap.clear();
-            ioFunctionThreadMap = null;
-            oppositePlayerNameMap.clear();
-            oppositePlayerNameMap = null;
-            //
-            // remove all messages from createGameHandler, // added on 2019-05-14
-            createGameHandler.removeCallbacksAndMessages(null);
-            //
-            selectedIoFunctionThread.write(CommonConstants.TwoPlayerHostStartGame, "");
-        }
+
     }
 
     private void hostLeavingNotification() {

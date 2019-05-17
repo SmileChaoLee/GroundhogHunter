@@ -238,17 +238,21 @@ public class GroundhogActivity extends AppCompatActivity {
 
         bannerLinearLayout = findViewById(R.id.linearlayout_for_ads_in_myActivity);
         if (!GroundhogHunterApp.googleAdMobBannerID.isEmpty()) {
-            bannerAdView = new AdView(this);
-            // LinearLayout.LayoutParams bannerLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-            // bannerLp.gravity = Gravity.CENTER;
-            // bannerAdView.setLayoutParams(bannerLp);
-            // bannerAdView.setAdSize(AdSize.BANNER);
-            AdSize adSize = new AdSize(AdSize.FULL_WIDTH, AdSize.AUTO_HEIGHT);
-            bannerAdView.setAdSize(adSize);
-            bannerAdView.setAdUnitId(GroundhogHunterApp.googleAdMobBannerID);
-            bannerLinearLayout.addView(bannerAdView);
-            AdRequest adRequest = new AdRequest.Builder().build();
-            bannerAdView.loadAd(adRequest);
+            try {
+                bannerAdView = new AdView(this);
+                // LinearLayout.LayoutParams bannerLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                // bannerLp.gravity = Gravity.CENTER;
+                // bannerAdView.setLayoutParams(bannerLp);
+                // bannerAdView.setAdSize(AdSize.BANNER);
+                AdSize adSize = new AdSize(AdSize.FULL_WIDTH, AdSize.AUTO_HEIGHT);
+                bannerAdView.setAdSize(adSize);
+                bannerAdView.setAdUnitId(GroundhogHunterApp.googleAdMobBannerID);
+                bannerLinearLayout.addView(bannerAdView);
+                AdRequest adRequest = new AdRequest.Builder().build();
+                bannerAdView.loadAd(adRequest);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         } else {
             ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams)bannerLinearLayout.getLayoutParams();
             float tempPercent = lp.matchConstraintPercentHeight;

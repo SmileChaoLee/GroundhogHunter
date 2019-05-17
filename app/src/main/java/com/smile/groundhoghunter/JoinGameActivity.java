@@ -259,32 +259,6 @@ public class JoinGameActivity extends AppCompatActivity {
     }
 
     protected void startClientGame() {
-        if (selectedIoFunctionThread != null) {
-            GroundhogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
-            for (String remoteMac : ioFunctionThreadMap.keySet()) {
-                IoFunctionThread ioFuncThread = ioFunctionThreadMap.get(remoteMac);
-                ClientConnectToThread connectToThread = discoveredDeviceMap.get(remoteMac);
-                if (ioFuncThread != selectedIoFunctionThread) {
-                    ioFuncThread.write(CommonConstants.TwoPlayerClientExitCode, "");
-                    ConnectDeviceUtil.stopIoFunctionThread(ioFuncThread);
-                    stopClientConnectToThread(connectToThread, true);
-                } else {
-                    stopClientConnectToThread(connectToThread, false);
-                }
-            }
-
-            // clear HashMaps
-            discoveredDeviceMap = null;
-            ioFunctionThreadMap.clear();
-            ioFunctionThreadMap = null;
-            oppositePlayerNameMap.clear();
-            oppositePlayerNameMap = null;
-            //
-            // remove all message from joinGameHandler, // added on 2019-05-14
-            joinGameHandler.removeCallbacksAndMessages(null);
-            //
-            // start game by different medias
-        }
     }
 
     private void clientLeavingNotification() {
@@ -467,7 +441,34 @@ public class JoinGameActivity extends AppCompatActivity {
 
                     break;
                 case CommonConstants.TwoPlayerHostStartGame:
-                    startClientGame();
+                    if (selectedIoFunctionThread != null) {
+                        GroundhogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
+                        for (String remoteMac : ioFunctionThreadMap.keySet()) {
+                            IoFunctionThread ioFuncThread = ioFunctionThreadMap.get(remoteMac);
+                            connectToThread = discoveredDeviceMap.get(remoteMac);
+                            if (ioFuncThread != selectedIoFunctionThread) {
+                                ioFuncThread.write(CommonConstants.TwoPlayerClientExitCode, "");
+                                ConnectDeviceUtil.stopIoFunctionThread(ioFuncThread);
+                                stopClientConnectToThread(connectToThread, true);
+                            } else {
+                                stopClientConnectToThread(connectToThread, false);
+                            }
+                        }
+
+                        // clear HashMaps
+                        discoveredDeviceMap = null;
+                        ioFunctionThreadMap.clear();
+                        ioFunctionThreadMap = null;
+                        oppositePlayerNameMap.clear();
+                        oppositePlayerNameMap = null;
+                        //
+                        // remove all message from joinGameHandler, // added on 2019-05-14
+                        joinGameHandler.removeCallbacksAndMessages(null);
+                        //
+
+                        // start game by different medias
+                        startClientGame();
+                    }
                     break;
                 case CommonConstants.TwoPlayerDefaultReading:
                     Log.d(TAG, "Default reading.");

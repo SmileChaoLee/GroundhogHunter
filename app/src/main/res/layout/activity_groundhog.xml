@@ -124,9 +124,9 @@
                 android:clickable="true"
                 android:visibility="visible"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginBottom="0dp"
+                android:layout_marginBottom="5dp"
                 android:background="@android:color/transparent">
             </com.smile.groundhoghunter.Models.SmileImageButton>
 
@@ -139,9 +139,9 @@
                 android:clickable="false"
                 android:visibility="gone"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginBottom="0dp"
+                android:layout_marginBottom="5dp"
                 android:background="@android:color/transparent">
             </com.smile.groundhoghunter.Models.SmileImageButton>
 
@@ -154,9 +154,9 @@
                 android:clickable="false"
                 android:visibility="gone"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginBottom="0dp"
+                android:layout_marginBottom="5dp"
                 android:background="@android:color/transparent">
             </com.smile.groundhoghunter.Models.SmileImageButton>
 
@@ -170,9 +170,9 @@
             android:layout_gravity="center"
             android:scaleType="fitXY"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="0dp"
+            android:layout_marginBottom="5dp"
             android:background="@android:color/transparent">
         </com.smile.groundhoghunter.Models.SmileImageButton>
 
@@ -184,9 +184,9 @@
             android:layout_gravity="center"
             android:scaleType="fitXY"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="0dp"
+            android:layout_marginBottom="5dp"
             android:background="@android:color/transparent">
         </com.smile.groundhoghunter.Models.SmileImageButton>
 

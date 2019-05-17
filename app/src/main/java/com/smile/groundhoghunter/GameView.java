@@ -31,9 +31,9 @@ import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.groundhoghunter.Threads.GameTimerThread;
 import com.smile.groundhoghunter.Threads.GameViewDrawThread;
 import com.smile.groundhoghunter.Threads.GroundhogRandomThread;
-import com.smile.smilepublicclasseslibrary.SoundPoolUtil;
-import com.smile.smilepublicclasseslibrary.player_record_rest.PlayerRecordRest;
+import com.smile.smilepublicclasseslibrary.utilities.SoundPoolUtil;
 import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
+import com.smile.smilepublicclasseslibrary.player_record_rest.PlayerRecordRest;
 
 import org.json.JSONObject;
 
@@ -189,16 +189,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         Log.i(TAG, "surfaceCreated() is called");
-        // gameViewWidth = getWidth();
-        // gameViewHeight = getHeight();
-        Log.i(TAG, "The width of GameView (SurfaceView) = " + getWidth());
-        Log.i(TAG, "The height of GameView (SurfaceView) = " + getHeight());
-
-        /*
-        if (groundhogArray == null) {
-            createGroundhogs();
-        }
-        */
 
         surfaceViewCreated = true;  // surfaceView has been created
         startDrawingScreen();       // draw screen
@@ -286,7 +276,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         Log.i(TAG, "surfaceDestroyed() is called");
-        soundPoolUtil.release();
     }
 
     public boolean getHasSound() {
@@ -430,6 +419,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void releaseResources() {
         Log.d(TAG, "releaseResources() is called.\n");
+        soundPoolUtil.release();    // release SoundPool
     }
 
     public int getRunningStatus() {
