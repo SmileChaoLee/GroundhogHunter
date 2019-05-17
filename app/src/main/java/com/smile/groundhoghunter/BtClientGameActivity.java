@@ -1,10 +1,6 @@
 package com.smile.groundhoghunter;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.os.Looper;
-import android.os.Message;
-import android.util.Log;
 import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
 import com.smile.groundhoghunter.Utilities.BluetoothUtil;
 
@@ -12,44 +8,20 @@ public class BtClientGameActivity extends ClientGameActivity {
 
     private final static String TAG = ".BtClientGameActivity";
     private BluetoothFunctionThread selectedBtFunctionThread;
-    private BtClientGameHandler btClientGameHandler;
-
-    public BtClientGameActivity() {
-        btClientGameHandler = new BtClientGameHandler(Looper.getMainLooper(), this);
-        selectedBtFunctionThread = (BluetoothFunctionThread) selectedIoFunctionThread;
-        selectedBtFunctionThread.setHandler(btClientGameHandler);
-        selectedBtFunctionThread.setStartRead(true);    // start reading data
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        selectedBtFunctionThread = (BluetoothFunctionThread) selectedIoFunctionThread;
+        selectedBtFunctionThread.setStartRead(true);    // start reading data
     }
 
     @Override
     public void onDestroy() {
         BluetoothUtil.stopBluetoothFunctionThread(selectedBtFunctionThread);
         selectedBtFunctionThread = null;
-        if (btClientGameHandler != null) {
-            btClientGameHandler.removeCallbacks(null);
-            btClientGameHandler = null;
-        }
         super.onDestroy();
-    }
-
-    private class BtClientGameHandler extends ClientGameHandler {
-
-        public BtClientGameHandler(Looper looper, Context context) {
-            super(looper, context);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-
-            Log.d(TAG, "Message received: " + msg.what);
-            switch (msg.what) {
-            }
-        }
     }
 }

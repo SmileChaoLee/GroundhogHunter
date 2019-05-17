@@ -16,10 +16,12 @@ import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class ClientGameActivity extends GroundhogActivity {
 
-    private final static String TAG = "ClientGameActivity";
+    private final static String TAG = ".ClientGameActivity";
+    private ClientGameHandler clientGameHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         startGameButton.setVisibility(View.INVISIBLE);
@@ -28,6 +30,19 @@ public class ClientGameActivity extends GroundhogActivity {
         // resumeGameButton.setEnabled(false);
         newGameButton.setVisibility(View.INVISIBLE);
         newGameButton.setEnabled(false);
+
+        clientGameHandler = new ClientGameHandler(Looper.getMainLooper(), this);
+        selectedIoFunctionThread.setHandler(clientGameHandler);
+    }
+
+    @Override
+    public void onDestroy() {
+
+        if (clientGameHandler != null) {
+            clientGameHandler.removeCallbacksAndMessages(null);
+            clientGameHandler = null;
+        }
+        super.onDestroy();
     }
 
     @Override

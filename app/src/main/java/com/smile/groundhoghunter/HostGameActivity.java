@@ -13,11 +13,26 @@ import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
 
 public class HostGameActivity extends GroundhogActivity {
 
-    private final static String TAG = "HostGameActivity";
+    private final static String TAG = ".HostGameActivity";
+    private HostGameHandler hostGameHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        hostGameHandler = new HostGameHandler(Looper.getMainLooper(), this);
+        selectedIoFunctionThread.setHandler(hostGameHandler);
+    }
+
+    @Override
+    public void onDestroy() {
+
+        if (hostGameHandler != null) {
+            hostGameHandler.removeCallbacksAndMessages(null);
+            hostGameHandler = null;
+        }
+        super.onDestroy();
     }
 
     @Override

@@ -20,7 +20,6 @@ public class BluetoothCreateGameActivity extends CreateGameActivity {
     private static final int Request_Enable_Bluetooth_Discoverability = 3;
     private static final int DurationForBluetoothVisible = 120;  // 120 seconds
 
-    private String bluetoothNotSupportedString;
     private String bluetoothVisibilityIsDisabledString;
     private String bluetoothCannotBeTurnedOnString;
     private String bluetoothVisibilityForPeriodString;
@@ -45,7 +44,6 @@ public class BluetoothCreateGameActivity extends CreateGameActivity {
             mBluetoothAdapter.cancelDiscovery();
         }
 
-        bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
         bluetoothVisibilityIsDisabledString = getString(R.string.bluetoothVisibilityIsDisabledString);
         bluetoothCannotBeTurnedOnString = getString(R.string.bluetoothCannotBeTurnedOnString);
         bluetoothVisibilityForPeriodString = getString(R.string.bluetoothVisibilityForPeriodString)
