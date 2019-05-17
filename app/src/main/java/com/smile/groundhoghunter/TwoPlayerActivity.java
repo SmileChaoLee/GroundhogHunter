@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -40,18 +38,17 @@ public class TwoPlayerActivity extends AppCompatActivity {
     private EditText playerNameEditText;
     private String playerName;
     private String bluetoothNotSupportedString;
-    private String wifiDirectNotSupportedString;
+    // private String wifiDirectNotSupportedString;
     private String playerNameCannotBeEmptyString;
     private String explainProblemForBluetoothString;
     private String explainProblemForWifiString;
-    private String explainProblemForInternetString;
 
     private String btDeviceName;
     private String wifiDeviceName;
     private AppCompatRadioButton wifiRadioButton;
     private AppCompatRadioButton bluetoothRadioButton;
     private String thisDeviceName;
-    private WifiDirectReceiver wifiDirectReceiver;
+    // private WifiDirectReceiver wifiDirectReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,18 +59,17 @@ public class TwoPlayerActivity extends AppCompatActivity {
         toastTextSize = textFontSize * 0.8f;
 
         bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
-        wifiDirectNotSupportedString = getString(R.string.wifiDirectNotSupportedString);
+        // wifiDirectNotSupportedString = getString(R.string.wifiDirectNotSupportedString);
         playerNameCannotBeEmptyString = getString(R.string.playerNameCannotBeEmptyString);
         explainProblemForBluetoothString = getString(R.string.explainProblemForBluetoothString);
         explainProblemForWifiString = getString(R.string.explainProblemForWifiString);
-        explainProblemForInternetString = getString(R.string.explainProblemForInternetString);
 
         // int colorDarkOrange = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkOrange);
         // int colorRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.red);
         int colorDarkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed);
         int colorDarkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
 
-        wifiDeviceName = "";
+        // wifiDeviceName = "";
         btDeviceName = "";
         mediaType = GameView.BluetoothMediaType;
 
@@ -99,6 +95,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
             }
         });
 
+        /*
         wifiRadioButton = findViewById(R.id.lanRadioButton);
         ScreenUtil.resizeTextSize(wifiRadioButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         wifiRadioButton.setChecked(false);
@@ -126,6 +123,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
         } else {
             ScreenUtil.showToast(this, wifiDirectNotSupportedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
         }
+        */
+
         // Bluetooth
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -133,11 +132,14 @@ public class TwoPlayerActivity extends AppCompatActivity {
             ScreenUtil.showToast(this, bluetoothNotSupportedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
             bluetoothRadioButton.setChecked(false);
             bluetoothRadioButton.setEnabled(false);
+            mediaType = GameView.NoneMediaType; // added because removed the followings
+            /*
             if (wifiRadioButton.isEnabled()) {
                 mediaType = GameView.WifiMediaType;
             } else {
                 mediaType = GameView.NoneMediaType;
             }
+            */
         } else {
             btDeviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothAdapter);
             mediaType = GameView.BluetoothMediaType;
@@ -153,17 +155,19 @@ public class TwoPlayerActivity extends AppCompatActivity {
                 bluetoothRadioButton.setChecked(true);
                 thisDeviceName = btDeviceName;
                 break;
+                /*
             case GameView.WifiMediaType:
                 explainProblemTextView.setText(explainProblemForWifiString);
                 wifiRadioButton.setChecked(true);
                 // device name from Wifi-Direct
                 thisDeviceName = wifiDeviceName;
                 break;
+                */
             default:
                 // no media supported
                 explainProblemTextView.setText("");
                 bluetoothRadioButton.setChecked(false);
-                wifiRadioButton.setChecked(false);
+                // wifiRadioButton.setChecked(false);
                 thisDeviceName = "";
                 returnToPrevious();
 
@@ -223,8 +227,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
                         gameIntent.putExtra("PlayerName", playerName);
                         startActivity(gameIntent);
                         break;
-                    case GameView.WifiMediaType:
-                        break;
+                    // case GameView.WifiMediaType:
+                    //     break;
                 }
             }
         });
@@ -251,8 +255,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
                         gameIntent.putExtra("PlayerName", playerName);
                         startActivity(gameIntent);
                         break;
-                    case GameView.WifiMediaType:
-                        break;
+                    // case GameView.WifiMediaType:
+                    //     break;
                 }
             }
         });
@@ -272,13 +276,12 @@ public class TwoPlayerActivity extends AppCompatActivity {
             }
         });
 
+        /*
         wifiDirectReceiver = new WifiDirectReceiver();
-        IntentFilter mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        registerReceiver(wifiDirectReceiver, mIntentFilter);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        registerReceiver(wifiDirectReceiver, intentFilter);
+        */
     }
 
     @Override
@@ -294,9 +297,11 @@ public class TwoPlayerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        /*
         if (wifiDirectReceiver != null) {
             unregisterReceiver(wifiDirectReceiver);
         }
+        */
     }
 
     @Override
@@ -316,6 +321,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
         playerNameEditText.setText(playerName);
     }
 
+    /*
     private class WifiDirectReceiver extends BroadcastReceiver {
 
         @Override
@@ -331,4 +337,5 @@ public class TwoPlayerActivity extends AppCompatActivity {
             }
         }
     }
+    */
 }
