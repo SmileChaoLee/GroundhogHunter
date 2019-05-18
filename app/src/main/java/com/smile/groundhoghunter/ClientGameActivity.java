@@ -32,43 +32,47 @@ public class ClientGameActivity extends GroundhogActivity {
         newGameButton.setEnabled(false);
 
         clientGameHandler = new ClientGameHandler(Looper.getMainLooper(), this);
-        selectedIoFunctionThread.setHandler(clientGameHandler);
+        if (selectedIoFunctionThread != null) {
+            selectedIoFunctionThread.setHandler(clientGameHandler);
+        } else {
+            // selectedIoFunctionThread is null then return to previous
+            finish();
+        }
     }
 
     @Override
     public void onDestroy() {
-
+        super.onDestroy();
         if (clientGameHandler != null) {
             clientGameHandler.removeCallbacksAndMessages(null);
             clientGameHandler = null;
         }
-        super.onDestroy();
     }
 
     @Override
     protected void pauseGame() {
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerPauseGameButton, "");
         gameView.pauseGame();
         pauseGameButton.setEnabled(false);
         pauseGameButton.setVisibility(View.INVISIBLE);
         resumeGameButton.setEnabled(true);
         resumeGameButton.setVisibility(View.VISIBLE);
+        selectedIoFunctionThread.write(CommonConstants.TwoPlayerPauseGameButton, "");
     }
 
     @Override
     protected void resumeGame() {
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerResumeGameButton, "");
         gameView.resumeGame();
         pauseGameButton.setEnabled(true);
         pauseGameButton.setVisibility(View.VISIBLE);
         resumeGameButton.setEnabled(false);
         resumeGameButton.setVisibility(View.INVISIBLE);
+        selectedIoFunctionThread.write(CommonConstants.TwoPlayerResumeGameButton, "");
     }
 
     @Override
     protected void quitGame() {
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerOppositeLeftGame, "");
         super.quitGame();
+        selectedIoFunctionThread.write(CommonConstants.TwoPlayerOppositeLeftGame, "");
     }
 
     protected class ClientGameHandler extends Handler {

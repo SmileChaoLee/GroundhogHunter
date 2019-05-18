@@ -54,7 +54,8 @@
                 android:textAllCaps="false"
                 android:textStyle="normal"
                 android:text="@string/wifiString"
-                android:enabled="true" >
+                android:enabled="false"
+                android:visibility="gone">
             </android.support.v7.widget.AppCompatRadioButton>
         </RadioGroup>
     </LinearLayout>

@@ -34,12 +34,17 @@ public class GroundhogHunterApp extends MultiDexApplication {
     public static ShowingInterstitialAdsUtil InterstitialAd;
     public static String googleAdMobBannerID = "";
 
+    public static boolean isFirstStartApp;
+
     private static FacebookInterstitialAds facebookAds;
     private static GoogleAdMobInterstitial googleInterstitialAd;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        isFirstStartApp = true;
+
         AppResources = getResources();
         AppContext = getApplicationContext();
         ScoreSQLiteDB = new ScoreSQLite(GroundhogHunterApp.AppContext);

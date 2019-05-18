@@ -11,17 +11,20 @@ public class BtClientGameActivity extends ClientGameActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
-        selectedBtFunctionThread = (BluetoothFunctionThread) selectedIoFunctionThread;
-        selectedBtFunctionThread.setStartRead(true);    // start reading data
+        if (selectedIoFunctionThread != null) {
+            selectedBtFunctionThread = (BluetoothFunctionThread) selectedIoFunctionThread;
+            selectedBtFunctionThread.setStartRead(true);    // start reading data
+        } else {
+            // selectedIoFunctionThread is null then return to previous
+            finish();
+        }
     }
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         BluetoothUtil.stopBluetoothFunctionThread(selectedBtFunctionThread);
         selectedBtFunctionThread = null;
-        super.onDestroy();
     }
 }

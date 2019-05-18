@@ -19,7 +19,6 @@ import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -48,8 +47,7 @@ public class GroundhogActivity extends AppCompatActivity {
     private final int LocalTop10RequestCode = 1;
     private final int GlobalTop10RequestCode = 2;
     private final int TwoPlayerResultRequestCode = 3;
-    private final String showingAdsString;
-    private final String loadingString;
+    private String loadingString;
 
     private int rowNum;
     private int colNum;
@@ -88,16 +86,27 @@ public class GroundhogActivity extends AppCompatActivity {
     // public static final properties
     public static final Handler ActivityHandler = new Handler();
 
-    public GroundhogActivity() {
-        highestScore = GroundhogHunterApp.ScoreSQLiteDB.readHighestScore();
-        showingAdsString = GroundhogHunterApp.AppResources.getString(R.string.showingAdsString);
-        loadingString = GroundhogHunterApp.AppResources.getString(R.string.loadingString);
-
-        selectedIoFunctionThread = GroundhogHunterApp.selectedIoFuncThread;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Log.d(TAG, "onCreate() is called.");
+
+        if (GroundhogHunterApp.isFirstStartApp) {
+            // first time entering this activity
+            GroundhogHunterApp.isFirstStartApp = false;
+            Log.d(TAG, "onCreate() --> First time entering.");
+        } else {
+            Log.d(TAG, "onCreate() --> not First time entering.");
+        }
+
+        selectedIoFunctionThread = GroundhogHunterApp.selectedIoFuncThread;
+        if (selectedIoFunctionThread == null) {
+            Log.d(TAG, "selectedIoFunctionThread is null.");
+        }
+
+        highestScore = GroundhogHunterApp.ScoreSQLiteDB.readHighestScore();
+
+        loadingString = getString(R.string.loadingString);
 
         float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
         textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
@@ -438,6 +447,12 @@ public class GroundhogActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        Log.d(TAG, "onNewIntent() is called.");
+        super.onNewIntent(intent);
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         System.out.println("MainActivity.onStop() is called.");
@@ -446,6 +461,9 @@ public class GroundhogActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
 
+        Log.d(TAG, "onDestroy() is called.");
+
+        super.onDestroy();
         // release and destroy threads and resources before destroy activity
         if (isFinishing()) {
             if (GroundhogHunterApp.ScoreSQLiteDB != null) {
@@ -457,15 +475,12 @@ public class GroundhogActivity extends AppCompatActivity {
         localBroadcastManager.unregisterReceiver(bReceiver);
 
         finishApplication();
-
-        super.onDestroy();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean("IsShowingLoadingMessage", isShowingLoadingMessage);
         super.onSaveInstanceState(outState);
-        System.out.println("MainActivity.onSaveInstanceState() is called.");
     }
 
     @Override

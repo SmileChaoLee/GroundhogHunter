@@ -26,6 +26,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleTop"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -35,6 +36,11 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".GroundhogActivity"
+            android:alwaysRetainTaskState="true"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".TwoPlayerActivity"
             android:configChanges="orientation"
             android:label="@string/twoPlayerString"
@@ -43,10 +49,6 @@
             android:name=".SettingActivity"
             android:label="@string/settingString"
             android:theme="@style/AppSettingTransparent" />
-        <activity
-            android:name=".GroundhogActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait" />
         <activity
             android:name=".BluetoothCreateGameActivity"
             android:configChanges="orientation"

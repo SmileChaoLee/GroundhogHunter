@@ -18,51 +18,55 @@ public class HostGameActivity extends GroundhogActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        Log.d(TAG, "onCreate() is called.");
         super.onCreate(savedInstanceState);
-
         hostGameHandler = new HostGameHandler(Looper.getMainLooper(), this);
-        selectedIoFunctionThread.setHandler(hostGameHandler);
+        if (selectedIoFunctionThread != null) {
+            selectedIoFunctionThread.setHandler(hostGameHandler);
+        } else {
+            // selectedIoFunctionThread is null then return to previous
+            finish();
+        }
     }
 
     @Override
     public void onDestroy() {
-
+        Log.d(TAG, "onDestroy() is called.");
+        super.onDestroy();
         if (hostGameHandler != null) {
             hostGameHandler.removeCallbacksAndMessages(null);
             hostGameHandler = null;
         }
-        super.onDestroy();
     }
 
     @Override
     protected void startGame() {
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerStartGameButton, "");
         super.startGame();
+        selectedIoFunctionThread.write(CommonConstants.TwoPlayerStartGameButton, "");
     }
 
     @Override
     protected void pauseGame() {
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerPauseGameButton, "");
         super.pauseGame();
+        selectedIoFunctionThread.write(CommonConstants.TwoPlayerPauseGameButton, "");
     }
 
     @Override
     protected void resumeGame() {
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerResumeGameButton, "");
         super.resumeGame();
+        selectedIoFunctionThread.write(CommonConstants.TwoPlayerResumeGameButton, "");
     }
 
     @Override
     protected void newGame() {
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerNewGameButton, "");
         super.newGame();
+        selectedIoFunctionThread.write(CommonConstants.TwoPlayerNewGameButton, "");
     }
 
     @Override
     protected void quitGame() {
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerOppositeLeftGame, "");
         super.quitGame();
+        selectedIoFunctionThread.write(CommonConstants.TwoPlayerOppositeLeftGame, "");
     }
 
     protected class HostGameHandler extends Handler {
