@@ -99,6 +99,12 @@ public class GroundhogActivity extends AppCompatActivity {
             Log.d(TAG, "onCreate() --> not First time entering.");
         }
 
+        if (savedInstanceState != null) {
+            Log.d(TAG, "onCreate() --> savedInstanceState is not null.");
+        } else {
+            Log.d(TAG, "onCreate() --> savedInstanceState is null.");
+        }
+
         selectedIoFunctionThread = GroundhogHunterApp.selectedIoFuncThread;
         if (selectedIoFunctionThread == null) {
             Log.d(TAG, "selectedIoFunctionThread is null.");
