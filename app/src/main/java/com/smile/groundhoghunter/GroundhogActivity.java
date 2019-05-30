@@ -32,6 +32,7 @@ import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Services.LocalTop10IntentService;
+import com.smile.smilepublicclasseslibrary.services.MusicBoundService;
 import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
 import com.smile.smilepublicclasseslibrary.alertdialogfragment.AlertDialogFragment;
 import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
@@ -68,6 +69,9 @@ public class GroundhogActivity extends AppCompatActivity {
     private AlertDialogFragment loadingDialog;
     private BroadcastReceiver bReceiver;
     private int gameType;
+
+    private MusicBoundService.MusicServiceConnection musicServiceConnection;
+    private boolean isServiceConnected;
 
     protected GameView gameView;
     protected float textFontSize;
@@ -367,13 +371,23 @@ public class GroundhogActivity extends AppCompatActivity {
             }
         });
 
-        bReceiver = new GroundhogHunterBroadcastReceiver();
+        TextView musicWebsiteAddressTextView = findViewById(R.id.musicWebsiteAddressTextView);
+        ScreenUtil.resizeTextSize(musicWebsiteAddressTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
 
+        bReceiver = new GroundhogHunterBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(LocalTop10IntentService.Action_Name);
         intentFilter.addAction(GlobalTop10IntentService.Action_Name);
+        intentFilter.addAction(MusicBoundService.ActionName);
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.registerReceiver(bReceiver, intentFilter);
+
+        musicServiceConnection = new MusicBoundService.MusicServiceConnection();
+
+        Intent serviceIntent = new Intent(this, MusicBoundService.class);
+        serviceIntent.putExtra("MusicResourceId", R.raw.background_music);
+        serviceIntent.putExtra("SoundVolume", 30);
+        isServiceConnected = bindService(serviceIntent, musicServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -388,6 +402,14 @@ public class GroundhogActivity extends AppCompatActivity {
                     Bundle extras = data.getExtras();
                     if (extras != null) {
                         boolean hasSound = extras.getBoolean("HasSound");
+                        MusicBoundService musicBoundService = musicServiceConnection.getMusicBoundService();
+                        if (musicBoundService != null) {
+                            if (hasSound) {
+                                musicBoundService.playMusic();
+                            } else {
+                                musicBoundService.pauseMusic();
+                            }
+                        }
                         gameView.setHasSound(hasSound);
                     }
                 } else {
@@ -439,6 +461,19 @@ public class GroundhogActivity extends AppCompatActivity {
             GamePause = false;
             ActivityHandler.notifyAll();
         }
+
+        boolean hasSound = true;
+        if (gameView != null) {
+            // gameView has been created
+            hasSound = gameView.getHasSound();
+        }
+        if (hasSound) {
+            MusicBoundService musicBoundService = musicServiceConnection.getMusicBoundService();
+            if (musicBoundService != null) {
+                musicBoundService.playMusic();
+                Log.d(TAG, "musicBoundService.playMusic() is called");
+            }
+        }
     }
 
     @Override
@@ -449,7 +484,12 @@ public class GroundhogActivity extends AppCompatActivity {
         synchronized (ActivityHandler) {
             GamePause = true;
         }
-        // super.onPause();
+
+        MusicBoundService musicBoundService = musicServiceConnection.getMusicBoundService();
+        if (musicBoundService != null) {
+            musicBoundService.pauseMusic();
+            Log.d(TAG, "musicBoundService.pauseMusic() is called");
+        }
     }
 
     @Override
@@ -476,6 +516,18 @@ public class GroundhogActivity extends AppCompatActivity {
                 GroundhogHunterApp.ScoreSQLiteDB.close();
             }
         }
+        if (musicServiceConnection != null) {
+            if (musicServiceConnection.isServiceConnected()) {
+                unbindService(musicServiceConnection);
+            }
+        }
+
+        MusicBoundService musicBoundService = musicServiceConnection.getMusicBoundService();
+        Log.d(TAG, "MyActivity.musicBoundService() = " + musicBoundService);
+        if (musicBoundService != null) {
+            Log.d(TAG, "MyActivity->stopping service");
+            musicBoundService.terminateService();
+        }
 
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.unregisterReceiver(bReceiver);
@@ -499,12 +551,18 @@ public class GroundhogActivity extends AppCompatActivity {
     // private methods
     private void finishApplication() {
         // release resources and threads
+        if (gameView == null) {
+            return;
+        }
         gameView.releaseSynchronizations();
         gameView.stopThreads();
         gameView.releaseResources();
     }
 
     protected void startGame() {
+        if (gameView == null) {
+            return;
+        }
         gameView.startGame();
         startGameButton.setEnabled(false);
         startGameButton.setVisibility(View.INVISIBLE);
@@ -515,6 +573,9 @@ public class GroundhogActivity extends AppCompatActivity {
     }
 
     protected void pauseGame() {
+        if (gameView == null) {
+            return;
+        }
         gameView.pauseGame();
         startGameButton.setEnabled(false);
         startGameButton.setVisibility(View.INVISIBLE);
@@ -525,6 +586,9 @@ public class GroundhogActivity extends AppCompatActivity {
     }
 
     protected void resumeGame() {
+        if (gameView == null) {
+            return;
+        }
         gameView.resumeGame();
         startGameButton.setEnabled(false);
         startGameButton.setVisibility(View.INVISIBLE);
@@ -535,6 +599,9 @@ public class GroundhogActivity extends AppCompatActivity {
     }
 
     protected void newGame() {
+        if (gameView == null) {
+            return;
+        }
         gameView.newGame();
         startGameButton.setEnabled(true);
         startGameButton.setVisibility(View.VISIBLE);
@@ -545,6 +612,9 @@ public class GroundhogActivity extends AppCompatActivity {
     }
 
     protected void quitGame() {
+        if (gameView == null) {
+            return;
+        }
         // close the socket (BluetoothSocket, Wifi socket, or internet socket)
         gameView.newGame(); // set to new game (refresh the UI and stop threads) before quiting game
         if (GroundhogHunterApp.InterstitialAd != null) {

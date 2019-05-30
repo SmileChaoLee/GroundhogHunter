@@ -100,6 +100,7 @@
 
     <string name="companyNameString">微笑資訊有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>
+    <string name="musicWebsiteAddressString">音樂: www.bensound.com</string>
 
     <string name="google_AdMobAppID">ca-app-pub-8354869049759576~9932277958</string>
 </resources>
