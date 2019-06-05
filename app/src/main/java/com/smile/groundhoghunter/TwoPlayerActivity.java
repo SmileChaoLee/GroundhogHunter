@@ -19,11 +19,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Utilities.BluetoothUtil;
-import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
-import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
-import com.smile.groundhoghunter.Utilities.*;
+import com.smile.smilelibraries.customized_button.SmileImageButton;
+import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
+import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class TwoPlayerActivity extends AppCompatActivity {
 

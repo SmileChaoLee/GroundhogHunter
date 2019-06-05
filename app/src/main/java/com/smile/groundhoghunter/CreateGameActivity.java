@@ -22,11 +22,11 @@ import com.smile.groundhoghunter.AbstractClasses.ServerAcceptThread;
 import com.smile.groundhoghunter.ArrayAdatpers.TwoPlayerListAdapter;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Interfaces.ConnectDevice;
-import com.smile.groundhoghunter.Models.SmileImageButton;
 import com.smile.groundhoghunter.Utilities.ConnectDeviceUtil;
 import com.smile.groundhoghunter.Utilities.MessageShowingUtil;
-import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
-import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
+import com.smile.smilelibraries.customized_button.SmileImageButton;
+import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
+import com.smile.smilelibraries.utilities.ScreenUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -12,11 +12,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.smile.groundhoghunter.Constants.CommonConstants;
-import com.smile.groundhoghunter.Models.SmileImageButton;
-import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
-import com.smile.smilepublicclasseslibrary.privacy_policy.PrivacyPolicyUtil;
-import com.smile.smilepublicclasseslibrary.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
-import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
+import com.smile.smilelibraries.customized_button.SmileImageButton;
+import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
+import com.smile.smilelibraries.privacy_policy.PrivacyPolicyUtil;
+import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
         String singlePlayerString = getString(R.string.singlePlayerString);
         String twoPlayerString = getString(R.string.twoPlayerString);
-        String privacyPolicyString = getString(com.smile.smilepublicclasseslibrary.R.string.privacyPolicyString);
+        String privacyPolicyString = getString(com.smile.smilelibraries.R.string.privacyPolicyString);
         String exitAppString = getString(R.string.exitAppString);
 
         // int colorDarkOrange = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkOrange);

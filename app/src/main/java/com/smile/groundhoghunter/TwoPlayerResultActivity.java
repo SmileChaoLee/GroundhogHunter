@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
+import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class TwoPlayerResultActivity extends AppCompatActivity {
 

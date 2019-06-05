@@ -44,7 +44,8 @@ android {
     buildTypes {
         release {
             debuggable false
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }
@@ -84,5 +85,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-ads:17.2.0'
     implementation 'com.android.support:multidex:1.0.3'
 
-    implementation(name: 'smilepublicclasseslibrary-release', ext: 'aar')
+    implementation(name: 'smilelibraries-release', ext: 'aar')
 }

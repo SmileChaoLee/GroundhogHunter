@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
+import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class SettingActivity extends AppCompatActivity {
 

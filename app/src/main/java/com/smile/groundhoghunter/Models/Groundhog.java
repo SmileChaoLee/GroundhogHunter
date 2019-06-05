@@ -6,7 +6,7 @@ import android.graphics.Color;
 import android.graphics.RectF;
 
 import com.smile.groundhoghunter.GameView;
-import com.smile.smilepublicclasseslibrary.utilities.FontAndBitmapUtil;
+import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.groundhoghunter.Utilities.MathUtil;
 
 public class Groundhog {

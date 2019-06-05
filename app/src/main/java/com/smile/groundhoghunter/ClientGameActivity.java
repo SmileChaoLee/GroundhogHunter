@@ -12,7 +12,7 @@ import android.widget.Toast;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.groundhoghunter.Threads.GameTimerThread;
-import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
+import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class ClientGameActivity extends GroundhogActivity {
 

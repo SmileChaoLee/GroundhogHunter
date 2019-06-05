@@ -31,9 +31,9 @@ import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.groundhoghunter.Threads.GameTimerThread;
 import com.smile.groundhoghunter.Threads.GameViewDrawThread;
 import com.smile.groundhoghunter.Threads.GroundhogRandomThread;
-import com.smile.smilepublicclasseslibrary.utilities.SoundPoolUtil;
-import com.smile.smilepublicclasseslibrary.utilities.ScreenUtil;
-import com.smile.smilepublicclasseslibrary.player_record_rest.PlayerRecordRest;
+import com.smile.smilelibraries.utilities.SoundPoolUtil;
+import com.smile.smilelibraries.utilities.ScreenUtil;
+import com.smile.smilelibraries.player_record_rest.PlayerRecordRest;
 
 import org.json.JSONObject;
 
