@@ -24,7 +24,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="0dp">
-            <com.smile.groundhoghunter.Models.SmileImageButton
+            <com.smile.smilelibraries.customized_button.SmileImageButton
                 android:id="@+id/settingButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -34,8 +34,8 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:background="@android:color/transparent">
-            </com.smile.groundhoghunter.Models.SmileImageButton>
-            <com.smile.groundhoghunter.Models.SmileImageButton
+            </com.smile.smilelibraries.customized_button.SmileImageButton>
+            <com.smile.smilelibraries.customized_button.SmileImageButton
                 android:id="@+id/top10Button"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -45,8 +45,8 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:background="@android:color/transparent">
-            </com.smile.groundhoghunter.Models.SmileImageButton>
-            <com.smile.groundhoghunter.Models.SmileImageButton
+            </com.smile.smilelibraries.customized_button.SmileImageButton>
+            <com.smile.smilelibraries.customized_button.SmileImageButton
                 android:id="@+id/globalTop10Button"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -56,7 +56,7 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:background="@android:color/transparent">
-            </com.smile.groundhoghunter.Models.SmileImageButton>
+            </com.smile.smilelibraries.customized_button.SmileImageButton>
         </LinearLayout>
 
     </LinearLayout>
@@ -115,7 +115,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <com.smile.groundhoghunter.Models.SmileImageButton
+            <com.smile.smilelibraries.customized_button.SmileImageButton
                 android:id="@+id/startGameButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -128,9 +128,9 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="5dp"
                 android:background="@android:color/transparent">
-            </com.smile.groundhoghunter.Models.SmileImageButton>
+            </com.smile.smilelibraries.customized_button.SmileImageButton>
 
-            <com.smile.groundhoghunter.Models.SmileImageButton
+            <com.smile.smilelibraries.customized_button.SmileImageButton
                 android:id="@+id/pauseGameButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -143,9 +143,9 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="5dp"
                 android:background="@android:color/transparent">
-            </com.smile.groundhoghunter.Models.SmileImageButton>
+            </com.smile.smilelibraries.customized_button.SmileImageButton>
 
-            <com.smile.groundhoghunter.Models.SmileImageButton
+            <com.smile.smilelibraries.customized_button.SmileImageButton
                 android:id="@+id/resumeGameButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -158,11 +158,11 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="5dp"
                 android:background="@android:color/transparent">
-            </com.smile.groundhoghunter.Models.SmileImageButton>
+            </com.smile.smilelibraries.customized_button.SmileImageButton>
 
         </FrameLayout>
 
-        <com.smile.groundhoghunter.Models.SmileImageButton
+        <com.smile.smilelibraries.customized_button.SmileImageButton
             android:id="@+id/newGameButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -174,9 +174,9 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="5dp"
             android:background="@android:color/transparent">
-        </com.smile.groundhoghunter.Models.SmileImageButton>
+        </com.smile.smilelibraries.customized_button.SmileImageButton>
 
-        <com.smile.groundhoghunter.Models.SmileImageButton
+        <com.smile.smilelibraries.customized_button.SmileImageButton
             android:id="@+id/quitGameButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -188,7 +188,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="5dp"
             android:background="@android:color/transparent">
-        </com.smile.groundhoghunter.Models.SmileImageButton>
+        </com.smile.smilelibraries.customized_button.SmileImageButton>
 
     </LinearLayout>
 

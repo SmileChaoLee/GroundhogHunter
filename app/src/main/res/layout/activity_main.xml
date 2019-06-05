@@ -56,7 +56,7 @@
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:layout_weight="1">
-        </com.smile.smilelibraries.customized_button.SmileImageButton>>
+        </com.smile.smilelibraries.customized_button.SmileImageButton>
 
         <com.smile.smilelibraries.customized_button.SmileImageButton
             android:id="@+id/privacyPolicyButton"
@@ -68,7 +68,7 @@
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:layout_weight="1">
-        </com.smile.smilelibraries.customized_button.SmileImageButton>>
+        </com.smile.smilelibraries.customized_button.SmileImageButton>
 
         <com.smile.smilelibraries.customized_button.SmileImageButton
             android:id="@+id/exitAppButton"
@@ -80,7 +80,7 @@
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:layout_weight="1">
-        </com.smile.smilelibraries.customized_button.SmileImageButton>>
+        </com.smile.smilelibraries.customized_button.SmileImageButton>
     </LinearLayout>
 
     <TextView

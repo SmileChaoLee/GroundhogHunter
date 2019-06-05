@@ -58,7 +58,7 @@
         app:layout_constraintHeight_percent="0.2"
         app:layout_constraintBottom_toBottomOf="parent"
         android:weightSum="2">
-        <com.smile.groundhoghunter.Models.SmileImageButton
+        <com.smile.smilelibraries.customized_button.SmileImageButton
             android:id="@+id/refreshJoinGameButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -72,8 +72,8 @@
             android:scaleType="fitCenter"
             android:background="@android:color/transparent"
             android:layout_weight="1" >
-        </com.smile.groundhoghunter.Models.SmileImageButton>
-        <com.smile.groundhoghunter.Models.SmileImageButton
+        </com.smile.smilelibraries.customized_button.SmileImageButton>
+        <com.smile.smilelibraries.customized_button.SmileImageButton
             android:id="@+id/cancelJoinGameButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -87,7 +87,7 @@
             android:scaleType="fitCenter"
             android:background="@android:color/transparent"
             android:layout_weight="1" >
-        </com.smile.groundhoghunter.Models.SmileImageButton>
+        </com.smile.smilelibraries.customized_button.SmileImageButton>
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
