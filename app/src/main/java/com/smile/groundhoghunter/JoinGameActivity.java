@@ -131,23 +131,25 @@ public class JoinGameActivity extends AppCompatActivity {
         oppositePlayerNameListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long rowId) {
+                String temp;
                 if (adapterView != null) {
                     Object item = adapterView.getItemAtPosition(position);
                     if (item != null) {
-                        String temp = item.toString();
+                        temp = item.toString();
                         oppositePlayerName = temp;
                         String oppName;
                         // get remote mac address of remote device
                         for (String remoteMacAddress : oppositePlayerNameMap.keySet()) {
-                            oppName = oppositePlayerNameMap.get(remoteMacAddress);
-                            if (oppName.equals(oppositePlayerName)) {
-                                IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                                if (ioFunctionThread != null) {
+                            IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
+                            if (ioFunctionThread != null) {
+                                oppName = oppositePlayerNameMap.get(remoteMacAddress);
+                                if (oppName.equals(oppositePlayerName)) {
                                     selectedIoFunctionThread = ioFunctionThread;
                                     selectedIoFunctionThread.write(CommonConstants.OppositePlayerNameHasBeenRead, playerName);
                                     view.setSelected(true);
+                                } else {
+                                    ioFunctionThread.write(CommonConstants.TwoPlayerClientExitCode, remoteMacAddress);
                                 }
-                                return;
                             }
                         }
                     }
@@ -426,11 +428,9 @@ public class JoinGameActivity extends AppCompatActivity {
                     connectDevice = data.getParcelable("ConnectDevice");
                     remoteMacAddress = connectDevice.getAddress();
                     showMessage.showMessageInTextView(hostLeftGameString, MessageDuration);
-                    ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                    ioFunctionThreadMap.remove(remoteMacAddress);
 
-                    // release btFunctionThread (stop communicating)
-                    ConnectDeviceUtil.stopIoFunctionThread(ioFunctionThread);
+                    ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
+                    ioFunctionThread.setStartRead(true);    // start reading data
 
                     // remove the remote connected device from oppositePlayerNameList
                     oppositePlayerNameMap.remove(remoteMacAddress);

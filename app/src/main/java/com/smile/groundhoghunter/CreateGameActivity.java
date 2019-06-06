@@ -133,11 +133,11 @@ public class CreateGameActivity extends AppCompatActivity {
                         Log.d(TAG, "adapterView.getItemAtPosition(position) = " + temp);
                         oppositePlayerName = temp;
                         for (String remoteMacAddress : oppositePlayerNameMap.keySet()) {
-                            String oppName = oppositePlayerNameMap.get(remoteMacAddress);
-                            if (oppName.equals(oppositePlayerName)) {
-                                // found
-                                IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                                if (ioFunctionThread != null) {
+                            IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
+                            if (ioFunctionThread != null) {
+                                String oppName = oppositePlayerNameMap.get(remoteMacAddress);
+                                if (oppName.equals(oppositePlayerName)) {
+                                    // found
                                     selectedIoFunctionThread = ioFunctionThread;
                                     view.setSelected(true);
                                 }
@@ -395,10 +395,9 @@ public class CreateGameActivity extends AppCompatActivity {
                 case CommonConstants.TwoPlayerClientExitCode:
                     connectDevice = data.getParcelable("ConnectDevice");
                     remoteMacAddress = connectDevice.getAddress();
+
                     ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                    ioFunctionThreadMap.remove(remoteMacAddress);
-                    // release ioFunctionThread (stop communicating)
-                    ConnectDeviceUtil.stopIoFunctionThread(ioFunctionThread);
+                    ioFunctionThread.setStartRead(true);    // start reading data
 
                     // remove the remote connected device from oppositePlayerNameList
                     if (oppositePlayerNameMap.containsKey(remoteMacAddress)) {

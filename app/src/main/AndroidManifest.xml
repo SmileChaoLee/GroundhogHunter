@@ -10,12 +10,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".GroundhogHunterApp"
-        android:allowBackup="true"
-        android:icon="@drawable/groundhog_icon"
-        android:label="${appName}${appNameSuffix}"
-        android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
+    android:name=".GroundhogHunterApp"
+    android:allowBackup="true"
+    android:icon="@drawable/groundhog_icon"
+    android:label="${appName}${appNameSuffix}"
+    android:theme="@style/AppTheme"
+    android:usesCleartextTraffic="true">
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
