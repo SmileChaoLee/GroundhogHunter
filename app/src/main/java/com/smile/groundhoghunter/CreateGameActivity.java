@@ -402,6 +402,14 @@ public class CreateGameActivity extends AppCompatActivity {
                     // remove the remote connected device from oppositePlayerNameList
                     if (oppositePlayerNameMap.containsKey(remoteMacAddress)) {
                         showMessage.showMessageInTextView(clientLeftGameString, MessageDuration);
+                        // added on 2019-06-08 to fix bugs
+                        String removedOppName = oppositePlayerNameMap.get(remoteMacAddress);
+                        if (removedOppName.equals(oppositePlayerName)) {
+                            // selected client has been removed, then changed to no selection
+                            oppositePlayerName = "";
+                            selectedIoFunctionThread = null;
+                        }
+                        //
                         oppositePlayerNameMap.remove(remoteMacAddress);
                     }
 
