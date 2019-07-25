@@ -3,7 +3,7 @@ package com.smile.groundhoghunter.Services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.smile.groundhoghunter.GroundhogHunterApp;
 import com.smile.smilelibraries.player_record_rest.PlayerRecordRest;
 

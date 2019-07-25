@@ -2,7 +2,7 @@ package com.smile.groundhoghunter;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.multidex.MultiDexApplication;
+import androidx.multidex.MultiDexApplication;
 
 import com.google.android.gms.ads.MobileAds;
 import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;

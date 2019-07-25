@@ -8,9 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import com.smile.groundhoghunter.AbstractClasses.ClientConnectToThread;
 import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
-import com.smile.groundhoghunter.ArrayAdatpers.TwoPlayerListAdapter;
+import com.smile.groundhoghunter.ArrayAdapters.TwoPlayerListAdapter;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Interfaces.ConnectDevice;
 import com.smile.groundhoghunter.Threads.ClientDiscoveryTimerThread;
@@ -396,7 +396,7 @@ public class JoinGameActivity extends AppCompatActivity {
                     connectDevice = data.getParcelable("ConnectDevice");
                     remoteMacAddress = connectDevice.getAddress();
                     String oppositeName = data.getString("OppositePlayerName");
-                    megString = oppositeName + hasBeenReadString + ".";
+                    megString = oppositeName + " " + hasBeenReadString + ".";
                     showMessage.showMessageInTextView(megString , MessageDuration);
                     Log.d(TAG, megString);
                     if (oppositeName != null) {

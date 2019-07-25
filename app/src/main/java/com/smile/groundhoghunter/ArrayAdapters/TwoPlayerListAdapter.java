@@ -1,16 +1,14 @@
-package com.smile.groundhoghunter.ArrayAdatpers;
+package com.smile.groundhoghunter.ArrayAdapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.smile.groundhoghunter.GroundhogHunterApp;
 import com.smile.smilelibraries.utilities.ScreenUtil;
-
 import java.util.List;
 
 public class TwoPlayerListAdapter extends ArrayAdapter {

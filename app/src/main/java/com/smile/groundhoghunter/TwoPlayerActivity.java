@@ -1,15 +1,12 @@
 package com.smile.groundhoghunter;
 
 import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatRadioButton;
+import androidx.appcompat.widget.AppCompatRadioButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
