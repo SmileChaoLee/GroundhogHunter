@@ -39,6 +39,7 @@
     <string name="exitString">離開</string>
     <string name="settingString">設定</string>
     <string name="soundString">聲音</string>
+    <string name="musicString">音樂</string>
     <string name="onString">開</string>
     <string name="offString">關</string>
     <string name="numPlayersString">遊戲人數</string>

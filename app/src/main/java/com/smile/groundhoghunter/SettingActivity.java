@@ -17,9 +17,9 @@ public class SettingActivity extends AppCompatActivity {
     private float textFontSize;
     private float fontScale;
     private ToggleButton soundSwitch;
-    private ToggleButton multiPlayerSwitch;
+    private ToggleButton musicSwitch;
     private boolean hasSound;
-    private boolean isSinglePlayer;
+    private boolean hasMusic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +29,12 @@ public class SettingActivity extends AppCompatActivity {
         fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
 
         hasSound = true;
-        isSinglePlayer = true;
+        hasMusic = true;
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             hasSound = extras.getBoolean("HasSound");
-            isSinglePlayer = extras.getBoolean("IsSinglePlayer");
+            hasMusic = extras.getBoolean("HasMusic");
         }
 
         super.onCreate(savedInstanceState);
@@ -50,6 +50,7 @@ public class SettingActivity extends AppCompatActivity {
         ScreenUtil.resizeTextSize(settingTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         TextView soundSettingTitle = findViewById(R.id.soundSettingTitle);
         ScreenUtil.resizeTextSize(soundSettingTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+
         soundSwitch = findViewById(R.id.soundSwitch);
         ScreenUtil.resizeTextSize(soundSwitch, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         soundSwitch.setChecked(hasSound);
@@ -57,6 +58,16 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 hasSound = ((ToggleButton)view).isChecked();
+            }
+        });
+
+        musicSwitch = findViewById(R.id.musicSwitch);
+        ScreenUtil.resizeTextSize(musicSwitch, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        musicSwitch.setChecked(hasMusic);
+        musicSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hasMusic = ((ToggleButton)view).isChecked();
             }
         });
 
@@ -90,7 +101,7 @@ public class SettingActivity extends AppCompatActivity {
         Intent returnIntent = new Intent();
         Bundle extras = new Bundle();
         extras.putBoolean("HasSound", hasSound);
-        extras.putBoolean("IsSinglePlayer", isSinglePlayer);
+        extras.putBoolean("HasMusic", hasMusic);
         returnIntent.putExtras(extras);
 
         int resultYn = Activity.RESULT_OK;

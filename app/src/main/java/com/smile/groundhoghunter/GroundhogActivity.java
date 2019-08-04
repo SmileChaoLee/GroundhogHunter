@@ -54,6 +54,7 @@ public class GroundhogActivity extends AppCompatActivity {
     private int colNum;
     private int highestScore;
     private ImageView soundOnOffImageView;
+    private ImageView musicOnOffImageView;
     private TextView highScoreTextView;
     private TextView scoreTextView;
     private TextView timerTextView;
@@ -72,6 +73,7 @@ public class GroundhogActivity extends AppCompatActivity {
 
     private MusicBoundService.MusicServiceConnection musicServiceConnection;
     private boolean isServiceConnected;
+    private boolean hasMusic;
 
     protected GameView gameView;
     protected float textFontSize;
@@ -153,10 +155,12 @@ public class GroundhogActivity extends AppCompatActivity {
                 if (gameView != null) {
                     if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
                         // client is not playing game or not pause status
+                        Log.i(TAG, "settingButton --> hasMusic = " + hasMusic);
                         disableAllButtons();
                         Intent intent = new Intent(GroundhogActivity.this, SettingActivity.class);
                         Bundle extras = new Bundle();
                         extras.putBoolean("HasSound", gameView.getHasSound());
+                        extras.putBoolean("HasMusic", hasMusic);
                         intent.putExtras(extras);
                         startActivityForResult(intent, SettingRequestCode);
                     }
@@ -205,6 +209,7 @@ public class GroundhogActivity extends AppCompatActivity {
         TextView gameStatusTitleTextView = findViewById(R.id.gameStatusTitle);
         ScreenUtil.resizeTextSize(gameStatusTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
         soundOnOffImageView = findViewById(R.id.soundOnOffImageView);
+        musicOnOffImageView = findViewById(R.id.musicOnOffImageView);
 
         TextView highScoreTitleTextView = findViewById(R.id.highestScoreTitle);
         ScreenUtil.resizeTextSize(highScoreTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
@@ -299,6 +304,7 @@ public class GroundhogActivity extends AppCompatActivity {
                 Log.i(TAG, "gameView created.");
                 gameFrameLayout.addView(gameView);
                 soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
+                musicOnOffImageView.setImageResource(R.drawable.music_on_image);
             }
         });
 
@@ -388,6 +394,8 @@ public class GroundhogActivity extends AppCompatActivity {
         serviceIntent.putExtra("MusicResourceId", R.raw.background_music);
         serviceIntent.putExtra("SoundVolume", 30);
         isServiceConnected = bindService(serviceIntent, musicServiceConnection, Context.BIND_AUTO_CREATE);
+
+        hasMusic = true;    // default to have music
     }
 
     @Override
@@ -402,25 +410,33 @@ public class GroundhogActivity extends AppCompatActivity {
                     Bundle extras = data.getExtras();
                     if (extras != null) {
                         boolean hasSound = extras.getBoolean("HasSound");
+                        gameView.setHasSound(hasSound);
+                        hasMusic = extras.getBoolean("HasMusic");
+                        Log.i(TAG, "onActivityResult --> hasMusic = " + hasMusic);
                         MusicBoundService musicBoundService = musicServiceConnection.getMusicBoundService();
                         if (musicBoundService != null) {
-                            if (hasSound) {
+                            if (hasMusic) {
                                 musicBoundService.playMusic();
                             } else {
                                 musicBoundService.pauseMusic();
                             }
                         }
-                        gameView.setHasSound(hasSound);
+
                     }
                 } else {
                     Log.i(TAG, "SettingActivity returned cancel.");
                 }
 
-                // update Main UI
+                // update Main UI for sound
                 if (gameView.getHasSound()) {
                     soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
                 } else {
                     soundOnOffImageView.setImageResource(R.drawable.sound_off_image);
+                }
+                if (hasMusic) {
+                    musicOnOffImageView.setImageResource(R.drawable.music_on_image);
+                } else {
+                    musicOnOffImageView.setImageResource(R.drawable.music_off_image);
                 }
                 break;
             case LocalTop10RequestCode:
@@ -462,12 +478,14 @@ public class GroundhogActivity extends AppCompatActivity {
             ActivityHandler.notifyAll();
         }
 
+        /*
         boolean hasSound = true;
         if (gameView != null) {
             // gameView has been created
             hasSound = gameView.getHasSound();
         }
-        if (hasSound) {
+        */
+        if (hasMusic) {
             MusicBoundService musicBoundService = musicServiceConnection.getMusicBoundService();
             if (musicBoundService != null) {
                 musicBoundService.playMusic();

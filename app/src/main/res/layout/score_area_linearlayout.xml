@@ -31,6 +31,15 @@
             android:layout_toRightOf="@+id/gameStatusTitle"
             android:layout_marginLeft="10dp">
         </ImageView>
+        <ImageView
+            android:id="@+id/musicOnOffImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            android:layout_toRightOf="@+id/soundOnOffImageView"
+            android:layout_marginLeft="10dp">
+        </ImageView>
     </RelativeLayout>
 
     <LinearLayout

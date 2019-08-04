@@ -39,6 +39,7 @@
     <string name="exitString">离开</string>
     <string name="settingString">设定</string>
     <string name="soundString">声音</string>
+    <string name="musicString">音乐</string>
     <string name="onString">开</string>
     <string name="offString">关</string>
     <string name="numPlayersString">游戏人数</string>

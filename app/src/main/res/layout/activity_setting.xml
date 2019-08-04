@@ -93,7 +93,36 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="2">
+                    android:layout_weight="1">
+                    <TextView
+                        android:id="@+id/musicSettingTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left|center_vertical"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="10dp"
+                        android:textColor="#ffffff00"
+                        android:text="@string/musicString">
+                    </TextView>
+                    <ToggleButton
+                        android:id="@+id/musicSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right|center_vertical"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/transparent"
+                        android:textColor="@color/white"
+                        android:textAllCaps="false"
+                        android:textOn="@string/onString"
+                        android:textOff="@string/offString">
+                    </ToggleButton>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
                 </RelativeLayout>
 
             </LinearLayout>
