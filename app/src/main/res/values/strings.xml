@@ -37,7 +37,6 @@
     <string name="exitString">Exit</string>
     <string name="settingString">Settings</string>
     <string name="soundString">Sound</string>
-    <string name="musicString">Music</string>
     <string name="onString">On</string>
     <string name="offString">Off</string>
     <string name="numPlayersString">#Players</string>
@@ -99,7 +98,6 @@
 
     <string name="companyNameString">Smile Information Inc.</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>
-    <string name="musicWebsiteAddressString">Music: www.bensound.com</string>
 
     <string name="google_AdMobAppID">ca-app-pub-8354869049759576~9932277958</string>
 

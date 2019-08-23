@@ -39,7 +39,6 @@
     <string name="exitString">離開</string>
     <string name="settingString">設定</string>
     <string name="soundString">聲音</string>
-    <string name="musicString">音樂</string>
     <string name="onString">開</string>
     <string name="offString">關</string>
     <string name="numPlayersString">遊戲人數</string>
@@ -101,7 +100,6 @@
 
     <string name="companyNameString">微笑資訊有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>
-    <string name="musicWebsiteAddressString">音樂: www.bensound.com</string>
 
     <string name="google_AdMobAppID">ca-app-pub-8354869049759576~9932277958</string>
 </resources>

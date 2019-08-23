@@ -79,7 +79,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@drawable/grass"
-        app:layout_constraintHeight_percent="0.48"
+        app:layout_constraintHeight_percent="0.53"
         app:layout_constraintTop_toBottomOf="@id/scoreLayout"
         android:weightSum="5" >
 
@@ -192,24 +192,6 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/musicCreditLinearLayout"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.05"
-        app:layout_constraintTop_toBottomOf="@id/buttonLinearLayout">
-        <TextView
-            android:id="@+id/musicWebsiteAddressTextView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textStyle="normal"
-            android:textColor="@android:color/black"
-            android:gravity="center"
-            android:text="@string/musicWebsiteAddressString">
-        </TextView>
-    </LinearLayout>
-
     <!-- the banner ads showing area -->
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/linearlayout_for_ads_in_myActivity"
@@ -218,7 +200,7 @@
         android:layout_height="0dp"
         android:gravity="bottom"
         app:layout_constraintHeight_percent="0.1"
-        app:layout_constraintTop_toBottomOf="@id/musicCreditLinearLayout">
+        app:layout_constraintTop_toBottomOf="@id/buttonLinearLayout">
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

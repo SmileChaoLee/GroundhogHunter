@@ -17,9 +17,7 @@ public class SettingActivity extends AppCompatActivity {
     private float textFontSize;
     private float fontScale;
     private ToggleButton soundSwitch;
-    private ToggleButton musicSwitch;
     private boolean hasSound;
-    private boolean hasMusic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +27,10 @@ public class SettingActivity extends AppCompatActivity {
         fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
 
         hasSound = true;
-        hasMusic = true;
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             hasSound = extras.getBoolean("HasSound");
-            hasMusic = extras.getBoolean("HasMusic");
         }
 
         super.onCreate(savedInstanceState);
@@ -58,16 +54,6 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 hasSound = ((ToggleButton)view).isChecked();
-            }
-        });
-
-        musicSwitch = findViewById(R.id.musicSwitch);
-        ScreenUtil.resizeTextSize(musicSwitch, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-        musicSwitch.setChecked(hasMusic);
-        musicSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hasMusic = ((ToggleButton)view).isChecked();
             }
         });
 
@@ -101,7 +87,6 @@ public class SettingActivity extends AppCompatActivity {
         Intent returnIntent = new Intent();
         Bundle extras = new Bundle();
         extras.putBoolean("HasSound", hasSound);
-        extras.putBoolean("HasMusic", hasMusic);
         returnIntent.putExtras(extras);
 
         int resultYn = Activity.RESULT_OK;
