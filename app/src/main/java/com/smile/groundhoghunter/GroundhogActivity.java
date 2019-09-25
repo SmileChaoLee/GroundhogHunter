@@ -23,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -31,6 +32,7 @@ import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Services.LocalTop10IntentService;
+import com.smile.smilelibraries.Models.ExitAppTimer;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.smilelibraries.alertdialogfragment.AlertDialogFragment;
@@ -500,7 +502,13 @@ public class GroundhogActivity extends AppCompatActivity {
     public void onBackPressed() {
         // capture the event of back button when it is pressed
         // change back button behavior
-        quitGame();
+        ExitAppTimer exitAppTimer = ExitAppTimer.getInstance(1000); // singleton class
+        if (exitAppTimer.canExit()) {
+            quitGame();
+        } else {
+            exitAppTimer.start();
+            ScreenUtil.showToast(this, getString(R.string.backKeyToExitApp), toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+        }
     }
 
     // private methods
