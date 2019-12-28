@@ -409,8 +409,7 @@ public class GroundhogActivity extends AppCompatActivity {
                 if (GroundhogHunterApp.InterstitialAd != null) {
                     int entryPoint = 0; //  no used
                     ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdsAsyncTask =
-                            GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(GroundhogActivity.this
-                                    , entryPoint
+                            GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(entryPoint
                                     , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
                                 @Override
                                 public void executeAfterDismissAds(int endPoint) {
@@ -584,8 +583,7 @@ public class GroundhogActivity extends AppCompatActivity {
             // free version
             int entryPoint = 0; //  no used
             ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdAsyncTask =
-                    GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(GroundhogActivity.this
-                            , entryPoint
+                    GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(entryPoint
                             , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
                         @Override
                         public void executeAfterDismissAds(int endPoint) {

@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.smile.groundhoghunter.GroundhogHunterApp;
 import com.smile.smilelibraries.utilities.ScreenUtil;
+
+import java.util.Collection;
 import java.util.List;
 
 public class TwoPlayerListAdapter extends ArrayAdapter {
@@ -59,6 +61,7 @@ public class TwoPlayerListAdapter extends ArrayAdapter {
         return view;
     }
 
+    @SuppressWarnings("unchecked")
     public void updateData(List newData) {
         clear();
         addAll(newData);

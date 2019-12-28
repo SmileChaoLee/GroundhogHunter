@@ -574,6 +574,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             selectedIoFunctionThread.write(CommonConstants.TwoPlayerGameScoreReceived, scoreString);
 
             groundhogActivity.runOnUiThread(new Runnable() {
+                @SuppressWarnings("unchecked")
                 @Override
                 public void run() {
                     AsyncTask displayResultAsyncTask = new DisplayResultAsyncTask();
@@ -677,14 +678,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         pBtn.setLayoutParams(layoutParams);
     }
 
-    private class DisplayResultAsyncTask extends AsyncTask {
+    private class DisplayResultAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             groundhogActivity.disableAllButtons();
         }
+
+        @SuppressWarnings("unckecked")
         @Override
-        protected Object doInBackground(Object[] objects) {
+        protected Void doInBackground(Void... params) {
 
             if (isOppositePlayerLeft) {
                 // opposite player has left game then show result
@@ -705,8 +708,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
             return null;
         }
+
         @Override
-        protected void onPostExecute(Object o) {
+        protected void onPostExecute(Void o) {
             super.onPostExecute(o);
             if (gameType == CommonConstants.TwoPlayerGameByHost) {
                 groundhogActivity.displayTwoPlayerResult(currentScore, numOfHits, oppositeCurrentScore, oppositeNumOfHits);
