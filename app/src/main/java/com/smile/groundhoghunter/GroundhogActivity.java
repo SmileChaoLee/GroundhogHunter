@@ -25,15 +25,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
 import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Services.LocalTop10IntentService;
 import com.smile.smilelibraries.Models.ExitAppTimer;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
+import com.smile.smilelibraries.showing_banner_ads_utility.SetBannerAdViewForAdMobOrFacebook;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.smilelibraries.alertdialogfragment.AlertDialogFragment;
 import com.smile.smilelibraries.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
@@ -64,7 +62,7 @@ public class GroundhogActivity extends AppCompatActivity {
     private SmileImageButton top10Button;
     private SmileImageButton globalTop10Button;
     private LinearLayout bannerLinearLayout = null;
-    private AdView bannerAdView = null;
+    private SetBannerAdViewForAdMobOrFacebook myBannerAdView;
 
     private boolean isShowingLoadingMessage;
     private AlertDialogFragment loadingDialog;
@@ -92,6 +90,10 @@ public class GroundhogActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreate() is called.");
+        
+        if ( (GroundhogHunterApp.facebookAds != null) || (GroundhogHunterApp.googleInterstitialAd!= null) ) {
+            GroundhogHunterApp.InterstitialAd = new ShowingInterstitialAdsUtil(this, GroundhogHunterApp.facebookAds, GroundhogHunterApp.googleInterstitialAd);
+        }
 
         if (GroundhogHunterApp.isFirstStartApp) {
             // first time entering this activity
@@ -254,22 +256,17 @@ public class GroundhogActivity extends AppCompatActivity {
         }
 
         bannerLinearLayout = findViewById(R.id.linearlayout_for_ads_in_myActivity);
-        if (!GroundhogHunterApp.googleAdMobBannerID.isEmpty()) {
-            try {
-                bannerAdView = new AdView(this);
-                // LinearLayout.LayoutParams bannerLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-                // bannerLp.gravity = Gravity.CENTER;
-                // bannerAdView.setLayoutParams(bannerLp);
-                // bannerAdView.setAdSize(AdSize.BANNER);
-                AdSize adSize = new AdSize(AdSize.FULL_WIDTH, AdSize.AUTO_HEIGHT);
-                bannerAdView.setAdSize(adSize);
-                bannerAdView.setAdUnitId(GroundhogHunterApp.googleAdMobBannerID);
-                bannerLinearLayout.addView(bannerAdView);
-                AdRequest adRequest = new AdRequest.Builder().build();
-                bannerAdView.loadAd(adRequest);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+        if (!GroundhogHunterApp.googleAdMobBannerID.isEmpty() || !GroundhogHunterApp.facebookBannerID.isEmpty())  {
+            String testString = "";
+            // for debug mode
+            if (com.smile.groundhoghunter.BuildConfig.DEBUG) {
+                testString = "IMG_16_9_APP_INSTALL#";
             }
+            String facebookBannerID = testString + GroundhogHunterApp.facebookBannerID;
+            //
+            myBannerAdView = new SetBannerAdViewForAdMobOrFacebook(this, null, bannerLinearLayout
+                    , GroundhogHunterApp.googleAdMobBannerID, facebookBannerID);
+            myBannerAdView.showBannerAdViewFromAdMobOrFacebook(GroundhogHunterApp.AdProvider);
         } else {
             ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams)bannerLinearLayout.getLayoutParams();
             float tempPercent = lp.matchConstraintPercentHeight;
@@ -408,15 +405,16 @@ public class GroundhogActivity extends AppCompatActivity {
             case TwoPlayerResultRequestCode:
                 if (GroundhogHunterApp.InterstitialAd != null) {
                     int entryPoint = 0; //  no used
-                    ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdsAsyncTask =
-                            GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(entryPoint
+                    ShowingInterstitialAdsUtil.ShowInterstitialAdThread showInterstitialAdThread =
+                            GroundhogHunterApp.InterstitialAd.new ShowInterstitialAdThread(entryPoint
+                                    , GroundhogHunterApp.AdProvider
                                     , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
                                 @Override
                                 public void executeAfterDismissAds(int endPoint) {
                                     enableAllButtons();
                                 }
                             });
-                    showAdsAsyncTask.execute();
+                    showInterstitialAdThread.startShowAd();
                 } else {
                     enableAllButtons();
                 }
@@ -582,15 +580,16 @@ public class GroundhogActivity extends AppCompatActivity {
         if (GroundhogHunterApp.InterstitialAd != null) {
             // free version
             int entryPoint = 0; //  no used
-            ShowingInterstitialAdsUtil.ShowAdAsyncTask showAdAsyncTask =
-                    GroundhogHunterApp.InterstitialAd.new ShowAdAsyncTask(entryPoint
+            ShowingInterstitialAdsUtil.ShowInterstitialAdThread showInterstitialAdThread =
+                    GroundhogHunterApp.InterstitialAd.new ShowInterstitialAdThread(entryPoint
+                            , GroundhogHunterApp.AdProvider
                             , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
                         @Override
                         public void executeAfterDismissAds(int endPoint) {
                             returnToPrevious();
                         }
                     });
-            showAdAsyncTask.execute();
+            showInterstitialAdThread.startShowAd();
         } else {
             returnToPrevious();
         }

@@ -2,9 +2,16 @@ package com.smile.groundhoghunter;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+
 import androidx.multidex.MultiDexApplication;
 
+import com.facebook.ads.AudienceNetworkAds;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.smilelibraries.facebook_ads_util.*;
 import com.smile.smilelibraries.google_admob_ads_util.GoogleAdMobInterstitial;
@@ -32,12 +39,16 @@ public class GroundhogHunterApp extends MultiDexApplication {
     public static IoFunctionThread selectedIoFuncThread;
 
     public static ShowingInterstitialAdsUtil InterstitialAd;
+    public static String facebookBannerID = "";
     public static String googleAdMobBannerID = "";
+    public static int AdProvider = ShowingInterstitialAdsUtil.FacebookAdProvider;    // default is Facebook Ad
 
     public static boolean isFirstStartApp;
 
-    private static FacebookInterstitialAds facebookAds;
-    private static GoogleAdMobInterstitial googleInterstitialAd;
+    public static FacebookInterstitialAds facebookAds;
+    public static GoogleAdMobInterstitial googleInterstitialAd;
+
+    private static final String TAG = "GroundhogHunterApp";
 
     @Override
     public void onCreate() {
@@ -50,25 +61,50 @@ public class GroundhogHunterApp extends MultiDexApplication {
         ScoreSQLiteDB = new ScoreSQLite(GroundhogHunterApp.AppContext);
         // Facebook ads (Interstitial ads)
         if (BuildConfig.APPLICATION_ID == "com.smile.groundhoghunter") {
-            // groundhog hunter for free
-            String facebookPlacementID = new String("308861513197370_308861586530696");
-            facebookAds = new FacebookInterstitialAds(AppContext, facebookPlacementID);
-            facebookAds.loadAd();
+            // groundhog hunter contains ads
+            AudienceNetworkAds.initialize(this);
+            String facebookInterstitialID = "308861513197370_308861586530696";
+            String testString = "";
+            // for debug mode
+            if (com.smile.groundhoghunter.BuildConfig.DEBUG) {
+                testString = "IMG_16_9_APP_INSTALL#";
+            }
+            facebookInterstitialID = testString + facebookInterstitialID;
+            facebookAds = new FacebookInterstitialAds(AppContext, facebookInterstitialID);
 
             // Google AdMob
             String googleAdMobAppID = getString(R.string.google_AdMobAppID);
             String googleAdMobInterstitialID = "ca-app-pub-8354869049759576/6595392508";
-            MobileAds.initialize(AppContext, googleAdMobAppID);
+            MobileAds.initialize(AppContext, new OnInitializationCompleteListener() {
+                @Override
+                public void onInitializationComplete(InitializationStatus initializationStatus) {
+                    Log.d(TAG, "Google AdMob was initialized successfully.");
+                }
+            });
+
             googleInterstitialAd = new GoogleAdMobInterstitial(AppContext, googleAdMobInterstitialID);
             googleInterstitialAd.loadAd(); // load first ad
             googleAdMobBannerID = "ca-app-pub-8354869049759576/7169443235";
 
-            InterstitialAd = new ShowingInterstitialAdsUtil(facebookAds, googleInterstitialAd);
+            final Handler adHandler = new Handler(Looper.getMainLooper());
+            final Runnable adRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    adHandler.removeCallbacksAndMessages(null);
+                    if (googleInterstitialAd != null) {
+                        googleInterstitialAd.loadAd(); // load first google ad
+                    }
+                    if (facebookAds != null) {
+                        facebookAds.loadAd();   // load first facebook ad
+                    }
+                }
+            };
+            adHandler.postDelayed(adRunnable, 1000);
+
         } else {
             // null stands for this is professional version (needs to be paid for it)
             facebookAds = null;
             googleInterstitialAd = null;
-            InterstitialAd = null;
             googleAdMobBannerID = "";
         }
     }
