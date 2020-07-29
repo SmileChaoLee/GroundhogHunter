@@ -90,7 +90,7 @@ public class GroundhogActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreate() is called.");
-        
+
         if ( (GroundhogHunterApp.facebookAds != null) || (GroundhogHunterApp.googleInterstitialAd!= null) ) {
             GroundhogHunterApp.InterstitialAd = new ShowingInterstitialAdsUtil(this, GroundhogHunterApp.facebookAds, GroundhogHunterApp.googleInterstitialAd);
         }
