@@ -28,7 +28,6 @@ public class GroundhogHunterApp extends MultiDexApplication {
     public static final String REST_Website = "http://ec2-13-59-195-3.us-east-2.compute.amazonaws.com/Playerscore";
     public static final int GameId = 2; // this GameId is for backend game_id in playerscore table
     public static final int FontSize_Scale_Type = ScreenUtil.FontSize_Pixel_Type;
-    public static final String PrivacyPolicyUrl = "http://ec2-13-59-195-3.us-east-2.compute.amazonaws.com/PrivacyPolicy";
     public static final String UUID_String = "b5af9bad-42e0-4d0d-8546-ebeb97e1abfa";
     public static final UUID ApplicationUUID = UUID.fromString(UUID_String);
 

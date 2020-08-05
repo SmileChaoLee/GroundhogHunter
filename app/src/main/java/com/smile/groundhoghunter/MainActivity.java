@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         privacyPolicyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PrivacyPolicyUtil.startPrivacyPolicyActivity(MainActivity.this, GroundhogHunterApp.PrivacyPolicyUrl, PrivacyPolicyActivityRequestCode);
+                PrivacyPolicyUtil.startPrivacyPolicyActivity(MainActivity.this, PrivacyPolicyActivityRequestCode);
             }
         });
 
