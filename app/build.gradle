@@ -10,8 +10,8 @@ android {
             storePassword '86637971'
         }
     }
+
     compileSdkVersion 30
-    buildToolsVersion '30.0.0'
     defaultConfig {
         applicationId "com.smile.groundhoghunter"
         minSdkVersion 16
