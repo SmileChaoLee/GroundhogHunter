@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.smile.groundhoghunter",
+  "variantName": "processGroundhoghunterReleaseResources",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "versionCode": 185,
+      "versionName": "1.85",
+      "outputFile": "app-groundhoghunter-release.apk"
+    }
+  ]
+}
