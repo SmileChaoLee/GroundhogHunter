@@ -31,9 +31,9 @@ import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.groundhoghunter.Threads.GameTimerThread;
 import com.smile.groundhoghunter.Threads.GameViewDrawThread;
 import com.smile.groundhoghunter.Threads.GroundhogRandomThread;
+import com.smile.smilelibraries.player_record_rest.httpUrl.PlayerRecordRest;
 import com.smile.smilelibraries.utilities.SoundPoolUtil;
 import com.smile.smilelibraries.utilities.ScreenUtil;
-import com.smile.smilelibraries.player_record_rest.PlayerRecordRest;
 
 import org.json.JSONObject;
 
@@ -135,9 +135,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         this.groundhogActivity = (GroundhogActivity)context;
         this.gameType = gameType;
 
-        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(groundhogActivity, GroundhogHunterApp.FontSize_Scale_Type, null);
-        textFontSize = ScreenUtil.suitableFontSize(groundhogActivity, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
-        fontScale = ScreenUtil.suitableFontScale(groundhogActivity, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(groundhogActivity);
+        fontScale = ScreenUtil.getPxFontScale(groundhogActivity);
 
         rowNum = groundhogActivity.getRowNum();
         colNum = groundhogActivity.getColNum();
@@ -619,15 +618,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                             @Override
                             public void run() {
                                 try {
-                                    String webUrl = new String(GroundhogHunterApp.REST_Website + "/AddOneRecordREST");   // ASP.NET Cor
                                     JSONObject jsonObject = new JSONObject();
                                     jsonObject.put("PlayerName", et.getText().toString());
                                     jsonObject.put("Score", score);
                                     jsonObject.put("GameId", GroundhogHunterApp.GameId);
-                                    PlayerRecordRest.addOneRecord(webUrl, jsonObject);
+                                    PlayerRecordRest.addOneRecord(jsonObject);
                                 } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                    Log.d(TAG, "Failed to add one record to Playerscore table.");
+                                    Log.e(TAG, "Failed to add one record to Playerscore table.", ex);
                                 }
                             }
                         };

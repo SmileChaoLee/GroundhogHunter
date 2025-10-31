@@ -27,9 +27,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
-        textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
-        fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
+        fontScale = ScreenUtil.getPxFontScale(this);
 
         String singlePlayerString = getString(R.string.singlePlayerString);
         String twoPlayerString = getString(R.string.twoPlayerString);
@@ -43,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        int buttonLeftMargin = ScreenUtil.dpToPixel(this, 60);
-        int buttonTopMargin = ScreenUtil.dpToPixel(this, 10);
+        int buttonLeftMargin = (int)ScreenUtil.dpToPixel(60.0f);
+        int buttonTopMargin = (int)ScreenUtil.dpToPixel(10.0f);
         int buttonRightMargin = buttonLeftMargin;
         int buttonBottomMargin = buttonTopMargin;
         LinearLayout.LayoutParams buttonLp;
@@ -129,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         exitGame();
     }
 

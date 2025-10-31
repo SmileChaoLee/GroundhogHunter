@@ -36,9 +36,8 @@ public class Top10ScoreActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
-        textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
-        fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
+        fontScale = ScreenUtil.getPxFontScale(this);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -87,6 +86,7 @@ public class Top10ScoreActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         returnToPrevious();
     }
 

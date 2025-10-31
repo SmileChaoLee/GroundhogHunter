@@ -1,8 +1,12 @@
 package com.smile.groundhoghunter;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -49,9 +53,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
-        textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
-        fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
+        fontScale = ScreenUtil.getPxFontScale(this);
         toastTextSize = textFontSize * 0.8f;
 
         bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
@@ -140,6 +143,16 @@ public class TwoPlayerActivity extends AppCompatActivity {
             btDeviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothAdapter);
             mediaType = GameView.BluetoothMediaType;
             bluetoothRadioButton.setEnabled(true);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                // Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             if (mBluetoothAdapter.isDiscovering()) {
                 mBluetoothAdapter.cancelDiscovery();
             }
@@ -194,8 +207,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
             }
         });
 
-        int buttonLeftMargin = ScreenUtil.dpToPixel(this, 100);
-        int buttonTopMargin = ScreenUtil.dpToPixel(this, 10);
+        int buttonLeftMargin = (int)ScreenUtil.dpToPixel(100);
+        int buttonTopMargin = (int)ScreenUtil.dpToPixel(10);
         int buttonRightMargin = buttonLeftMargin;
         int buttonBottomMargin = buttonTopMargin;
         LinearLayout.LayoutParams buttonLp;
@@ -302,6 +315,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         returnToPrevious();
     }
 

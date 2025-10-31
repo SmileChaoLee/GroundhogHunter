@@ -29,12 +29,13 @@ import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.groundhoghunter.Constants.CommonConstants;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Services.LocalTop10IntentService;
-import com.smile.smilelibraries.Models.ExitAppTimer;
+import com.smile.smilelibraries.interfaces.DismissFunction;
+import com.smile.smilelibraries.models.ExitAppTimer;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
-import com.smile.smilelibraries.showing_banner_ads_utility.SetBannerAdViewForAdMobOrFacebook;
+import com.smile.smilelibraries.show_banner_ads.*;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.smilelibraries.alertdialogfragment.AlertDialogFragment;
-import com.smile.smilelibraries.showing_instertitial_ads_utility.ShowingInterstitialAdsUtil;
+import com.smile.smilelibraries.show_interstitial_ads.*;
 import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class GroundhogActivity extends AppCompatActivity {
@@ -62,7 +63,7 @@ public class GroundhogActivity extends AppCompatActivity {
     private SmileImageButton top10Button;
     private SmileImageButton globalTop10Button;
     private LinearLayout bannerLinearLayout = null;
-    private SetBannerAdViewForAdMobOrFacebook myBannerAdView;
+    private SetBannerAdView myBannerAdView;
 
     private boolean isShowingLoadingMessage;
     private AlertDialogFragment loadingDialog;
@@ -92,7 +93,7 @@ public class GroundhogActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate() is called.");
 
         if ( (GroundhogHunterApp.facebookAds != null) || (GroundhogHunterApp.googleInterstitialAd!= null) ) {
-            GroundhogHunterApp.InterstitialAd = new ShowingInterstitialAdsUtil(this, GroundhogHunterApp.facebookAds, GroundhogHunterApp.googleInterstitialAd);
+            GroundhogHunterApp.InterstitialAd = new ShowInterstitial(this, GroundhogHunterApp.facebookAds, GroundhogHunterApp.googleInterstitialAd);
         }
 
         if (GroundhogHunterApp.isFirstStartApp) {
@@ -118,9 +119,8 @@ public class GroundhogActivity extends AppCompatActivity {
 
         loadingString = getString(R.string.loadingString);
 
-        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
-        textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
-        fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
+        fontScale = ScreenUtil.getPxFontScale(this);
         toastTextSize = textFontSize * 0.8f;
 
         isShowingLoadingMessage = false;
@@ -264,9 +264,9 @@ public class GroundhogActivity extends AppCompatActivity {
             }
             String facebookBannerID = testString + GroundhogHunterApp.facebookBannerID;
             //
-            myBannerAdView = new SetBannerAdViewForAdMobOrFacebook(this, null, bannerLinearLayout
+            myBannerAdView = new SetBannerAdView(this, null, bannerLinearLayout
                     , GroundhogHunterApp.googleAdMobBannerID, facebookBannerID);
-            myBannerAdView.showBannerAdViewFromAdMobOrFacebook(GroundhogHunterApp.AdProvider);
+            myBannerAdView.showBannerAdView(GroundhogHunterApp.AdProvider);
         } else {
             ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams)bannerLinearLayout.getLayoutParams();
             float tempPercent = lp.matchConstraintPercentHeight;
@@ -405,16 +405,25 @@ public class GroundhogActivity extends AppCompatActivity {
             case TwoPlayerResultRequestCode:
                 if (GroundhogHunterApp.InterstitialAd != null) {
                     int entryPoint = 0; //  no used
-                    ShowingInterstitialAdsUtil.ShowInterstitialAdThread showInterstitialAdThread =
-                            GroundhogHunterApp.InterstitialAd.new ShowInterstitialAdThread(entryPoint
-                                    , GroundhogHunterApp.AdProvider
-                                    , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
-                                @Override
-                                public void executeAfterDismissAds(int endPoint) {
-                                    enableAllButtons();
-                                }
-                            });
-                    showInterstitialAdThread.startShowAd();
+                    ShowInterstitial.ShowAdThread showInterstitialAdThread =
+                            GroundhogHunterApp.InterstitialAd.new ShowAdThread(
+                                    new DismissFunction() {
+                                        @Override
+                                        public void backgroundWork() {
+                                            // do nothing
+                                        }
+
+                                        @Override
+                                        public void executeDismiss() {
+                                            enableAllButtons();
+                                        }
+
+                                        @Override
+                                        public void afterFinished(boolean isAdShown) {
+                                            if (!isAdShown) enableAllButtons();
+                                        }
+                                    });
+                    showInterstitialAdThread.startShowAd(GroundhogHunterApp.AdProvider);
                 } else {
                     enableAllButtons();
                 }
@@ -499,6 +508,7 @@ public class GroundhogActivity extends AppCompatActivity {
     public void onBackPressed() {
         // capture the event of back button when it is pressed
         // change back button behavior
+        super.onBackPressed();
         ExitAppTimer exitAppTimer = ExitAppTimer.getInstance(1000); // singleton class
         if (exitAppTimer.canExit()) {
             quitGame();
@@ -580,16 +590,25 @@ public class GroundhogActivity extends AppCompatActivity {
         if (GroundhogHunterApp.InterstitialAd != null) {
             // free version
             int entryPoint = 0; //  no used
-            ShowingInterstitialAdsUtil.ShowInterstitialAdThread showInterstitialAdThread =
-                    GroundhogHunterApp.InterstitialAd.new ShowInterstitialAdThread(entryPoint
-                            , GroundhogHunterApp.AdProvider
-                            , new ShowingInterstitialAdsUtil.AfterDismissFunctionOfShowAd() {
-                        @Override
-                        public void executeAfterDismissAds(int endPoint) {
-                            returnToPrevious();
-                        }
-                    });
-            showInterstitialAdThread.startShowAd();
+            ShowInterstitial.ShowAdThread showInterstitialAdThread =
+                    GroundhogHunterApp.InterstitialAd.new ShowAdThread(
+                            new DismissFunction() {
+                                @Override
+                                public void backgroundWork() {
+
+                                }
+
+                                @Override
+                                public void executeDismiss() {
+                                    returnToPrevious();
+                                }
+
+                                @Override
+                                public void afterFinished(boolean isAdShown) {
+                                    if (!isAdShown) returnToPrevious();
+                                }
+                            });
+            showInterstitialAdThread.startShowAd(GroundhogHunterApp.AdProvider);
         } else {
             returnToPrevious();
         }
@@ -613,10 +632,8 @@ public class GroundhogActivity extends AppCompatActivity {
         // showing loading message
         showLoadingMessage();
 
-        Intent serviceIntent = new Intent(GroundhogHunterApp.AppContext, GlobalTop10IntentService.class);
-        String webUrl = GroundhogHunterApp.REST_Website + "/GetTop10PlayerscoresREST";  // ASP.NET Core
-        webUrl += "?gameId=" + GroundhogHunterApp.GameId;   // parameters
-        serviceIntent.putExtra("WebUrl", webUrl);
+        Intent serviceIntent = new Intent(GroundhogHunterApp.AppContext,
+                GlobalTop10IntentService.class);
         startService(serviceIntent);
     }
 

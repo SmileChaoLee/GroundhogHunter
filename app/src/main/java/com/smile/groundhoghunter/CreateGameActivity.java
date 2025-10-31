@@ -80,9 +80,8 @@ public class CreateGameActivity extends AppCompatActivity {
         oppositePlayerName = "";    // empty
         oppositePlayerNameMap = new LinkedHashMap<>();
 
-        float defaultTextFontSize = ScreenUtil.getDefaultTextSizeFromTheme(this, GroundhogHunterApp.FontSize_Scale_Type, null);
-        textFontSize = ScreenUtil.suitableFontSize(this, defaultTextFontSize, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
-        fontScale = ScreenUtil.suitableFontScale(this, GroundhogHunterApp.FontSize_Scale_Type, 0.0f);
+        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
+        fontScale = ScreenUtil.getPxFontScale(this);
         toastTextSize = textFontSize * 0.8f;
 
         playerNameCannotBeEmptyString = getString(R.string.playerNameCannotBeEmptyString);

@@ -92,7 +92,7 @@ public class HostGameActivity extends GroundhogActivity {
                 case CommonConstants.TwoPlayerOppositeLeftGame:
                     // received by host and client sides
                     msgString = mContext.getString(R.string.oppositePlayerLeftGameString);
-                    ScreenUtil.showToast(mContext, msgString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+                    Toast.makeText(mContext, msgString, Toast.LENGTH_SHORT).show();
                     gameView.setOppositePlayerLeft(true);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
