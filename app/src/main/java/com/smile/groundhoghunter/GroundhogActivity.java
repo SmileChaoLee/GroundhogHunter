@@ -259,7 +259,7 @@ public class GroundhogActivity extends AppCompatActivity {
         if (!GroundhogHunterApp.googleAdMobBannerID.isEmpty() || !GroundhogHunterApp.facebookBannerID.isEmpty())  {
             String testString = "";
             // for debug mode
-            if (com.smile.groundhoghunter.BuildConfig.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 testString = "IMG_16_9_APP_INSTALL#";
             }
             String facebookBannerID = testString + GroundhogHunterApp.facebookBannerID;

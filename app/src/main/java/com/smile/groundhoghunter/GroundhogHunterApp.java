@@ -59,52 +59,44 @@ public class GroundhogHunterApp extends MultiDexApplication {
         AppContext = getApplicationContext();
         ScoreSQLiteDB = new ScoreSQLite(GroundhogHunterApp.AppContext);
         // Facebook ads (Interstitial ads)
-        if (BuildConfig.APPLICATION_ID == "com.smile.groundhoghunter") {
-            // groundhog hunter contains ads
-            AudienceNetworkAds.initialize(this);
-            String facebookInterstitialID = "308861513197370_308861586530696";
-            String testString = "";
-            // for debug mode
-            if (com.smile.groundhoghunter.BuildConfig.DEBUG) {
-                testString = "IMG_16_9_APP_INSTALL#";
-            }
-            facebookInterstitialID = testString + facebookInterstitialID;
-            facebookAds = new FacebookInterstitialAds(AppContext, facebookInterstitialID);
-
-            // Google AdMob
-            String googleAdMobAppID = getString(R.string.google_AdMobAppID);
-            String googleAdMobInterstitialID = "ca-app-pub-8354869049759576/6595392508";
-            MobileAds.initialize(AppContext, new OnInitializationCompleteListener() {
-                @Override
-                public void onInitializationComplete(InitializationStatus initializationStatus) {
-                    Log.d(TAG, "Google AdMob was initialized successfully.");
-                }
-            });
-
-            googleInterstitialAd = new GoogleAdMobInterstitial(AppContext, googleAdMobInterstitialID);
-            googleInterstitialAd.loadAd(); // load first ad
-            googleAdMobBannerID = "ca-app-pub-8354869049759576/7169443235";
-
-            final Handler adHandler = new Handler(Looper.getMainLooper());
-            final Runnable adRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    adHandler.removeCallbacksAndMessages(null);
-                    if (googleInterstitialAd != null) {
-                        googleInterstitialAd.loadAd(); // load first google ad
-                    }
-                    if (facebookAds != null) {
-                        facebookAds.loadAd();   // load first facebook ad
-                    }
-                }
-            };
-            adHandler.postDelayed(adRunnable, 1000);
-
-        } else {
-            // null stands for this is professional version (needs to be paid for it)
-            facebookAds = null;
-            googleInterstitialAd = null;
-            googleAdMobBannerID = "";
+        // groundhog hunter contains ads
+        AudienceNetworkAds.initialize(this);
+        String facebookInterstitialID = "308861513197370_308861586530696";
+        String testString = "";
+        // for debug mode
+        if (BuildConfig.DEBUG) {
+            testString = "IMG_16_9_APP_INSTALL#";
         }
+        facebookInterstitialID = testString + facebookInterstitialID;
+        facebookAds = new FacebookInterstitialAds(AppContext, facebookInterstitialID);
+
+        // Google AdMob
+        String googleAdMobAppID = getString(R.string.google_AdMobAppID);
+        String googleAdMobInterstitialID = "ca-app-pub-8354869049759576/6595392508";
+        MobileAds.initialize(AppContext, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+                Log.d(TAG, "Google AdMob was initialized successfully.");
+            }
+        });
+
+        googleInterstitialAd = new GoogleAdMobInterstitial(AppContext, googleAdMobInterstitialID);
+        googleInterstitialAd.loadAd(); // load first ad
+        googleAdMobBannerID = "ca-app-pub-8354869049759576/7169443235";
+
+        final Handler adHandler = new Handler(Looper.getMainLooper());
+        final Runnable adRunnable = new Runnable() {
+            @Override
+            public void run() {
+                adHandler.removeCallbacksAndMessages(null);
+                if (googleInterstitialAd != null) {
+                    googleInterstitialAd.loadAd(); // load first google ad
+                }
+                if (facebookAds != null) {
+                    facebookAds.loadAd();   // load first facebook ad
+                }
+            }
+        };
+        adHandler.postDelayed(adRunnable, 1000);
     }
 }
