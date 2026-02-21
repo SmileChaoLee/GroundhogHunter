@@ -33,8 +33,8 @@ public class JoinGameActivity extends AppCompatActivity {
 
     // private properties
     private static final String TAG = "JoinGameAct";
-    // 60 seconds one time
-    private static final int DurationForBluetoothDiscovery = 60000;
+    // 20 seconds one time
+    private static final int DurationForBluetoothDiscovery = 20000;
     private String oppositePlayerName;
     private LinkedHashMap<String, String> oppositePlayerNameMap;
     private String cannotCreateClientSocketString;
