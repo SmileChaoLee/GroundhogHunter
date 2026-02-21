@@ -2,13 +2,12 @@ package com.smile.groundhoghunter;
 
 import android.os.Bundle;
 import android.util.Log;
-
 import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
 import com.smile.groundhoghunter.Utilities.BluetoothUtil;
 
 public class BtHostGameActivity extends HostGameActivity {
 
-    private final static String TAG = ".BtHostGameActivity";
+    private final static String TAG = "BTHostGameAct";
     private BluetoothFunctionThread selectedBtFunctionThread;
 
     @Override

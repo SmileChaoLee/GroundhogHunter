@@ -1,9 +1,12 @@
 package com.smile.groundhoghunter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -19,6 +22,7 @@ public class SettingActivity extends AppCompatActivity {
     private ToggleButton soundSwitch;
     private boolean hasSound;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -42,44 +46,30 @@ public class SettingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_setting);
 
         TextView settingTitle = findViewById(R.id.settingTitle);
-        ScreenUtil.resizeTextSize(settingTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(settingTitle, textFontSize);
         TextView soundSettingTitle = findViewById(R.id.soundSettingTitle);
-        ScreenUtil.resizeTextSize(soundSettingTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(soundSettingTitle, textFontSize);
 
         soundSwitch = findViewById(R.id.soundSwitch);
-        ScreenUtil.resizeTextSize(soundSwitch, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(soundSwitch, textFontSize);
         soundSwitch.setChecked(hasSound);
-        soundSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hasSound = ((ToggleButton)view).isChecked();
-            }
-        });
+        soundSwitch.setOnClickListener(view -> hasSound = ((ToggleButton)view).isChecked());
 
         Button confirmButton = findViewById(R.id.confirmSettingButton);
-        ScreenUtil.resizeTextSize(confirmButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-        confirmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                returnToPrevious(true);
-            }
-        });
+        ScreenUtil.resizeTextSize(confirmButton, textFontSize);
+        confirmButton.setOnClickListener(view -> returnToPrevious(true));
 
         Button cancelButton = findViewById(R.id.cancelSettingButton);
-        ScreenUtil.resizeTextSize(cancelButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                returnToPrevious(false);
-            }
-        });
+        ScreenUtil.resizeTextSize(cancelButton, textFontSize);
+        cancelButton.setOnClickListener(view -> returnToPrevious(false));
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        returnToPrevious(false);
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        returnToPrevious(false);
+                    }
+                });
     }
 
     private void returnToPrevious(boolean confirmed) {

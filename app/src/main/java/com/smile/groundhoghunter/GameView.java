@@ -1,5 +1,6 @@
 package com.smile.groundhoghunter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
@@ -13,6 +14,8 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
@@ -24,9 +27,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
 import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
-import com.smile.groundhoghunter.Constants.CommonConstants;
+import com.smile.groundhoghunter.constants.CommonConstants;
 import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.groundhoghunter.Threads.GameTimerThread;
 import com.smile.groundhoghunter.Threads.GameViewDrawThread;
@@ -34,9 +36,11 @@ import com.smile.groundhoghunter.Threads.GroundhogRandomThread;
 import com.smile.smilelibraries.player_record_rest.httpUrl.PlayerRecordRest;
 import com.smile.smilelibraries.utilities.SoundPoolUtil;
 import com.smile.smilelibraries.utilities.ScreenUtil;
-
 import org.json.JSONObject;
 
+import java.util.Locale;
+
+@SuppressLint("ViewConstructor")
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = "GameView";
@@ -44,9 +48,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private static final int hostPlayerHitStatus = 1;
     private static final int clientPlayerHitStatus = 2;
     private final int gameType;
-
-    private float textFontSize;
-    private float fontScale;
+    private final float textFontSize;
     private final SurfaceHolder surfaceHolder;
     private final GroundhogActivity groundhogActivity;
     private final int rowNum;
@@ -70,21 +72,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean surfaceViewCreated;
     private int runningStatus;
     private boolean hasSound;
-
-    private IoFunctionThread selectedIoFunctionThread;
-
-    private SoundPoolUtil soundPoolUtil;
-
-    // default properties (package modifier)
+    private final IoFunctionThread selectedIoFunctionThread;
+    private final SoundPoolUtil soundPoolUtil;
     public Groundhog[] groundhogArray;
-    // public static properties
     public static boolean GameViewPause = false;    // for synchronizing
-
-    // public static final properties
     public static final Handler GameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
     public static final int BluetoothMediaType = 0;
-    public static final int WifiMediaType = 1;
-    public static final int InternetMediaType = 2;
     public static final int NoneMediaType = -1;
     public static final int TimerInterval = 60; // 60 seconds
     public static final int DrawingInterval;
@@ -134,10 +127,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         this.groundhogActivity = (GroundhogActivity)context;
         this.gameType = gameType;
-
         textFontSize = ScreenUtil.getPxTextFontSizeNeeded(groundhogActivity);
-        fontScale = ScreenUtil.getPxFontScale(groundhogActivity);
-
         rowNum = groundhogActivity.getRowNum();
         colNum = groundhogActivity.getColNum();
 
@@ -179,14 +169,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
         Log.i(TAG, "onDraw() is called");
         // doDraw(canvas);
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+    public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
         Log.i(TAG, "surfaceCreated() is called");
 
         surfaceViewCreated = true;  // surfaceView has been created
@@ -194,10 +184,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+    public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         Log.i(TAG, "surfaceChanged() is called");
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
@@ -242,9 +233,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                         newHitStatus = clientPlayerHitStatus;
                                     }
                                     String writeString = "";
-                                    writeString += String.format("%02d", index);
+                                    writeString += String.format(Locale.ENGLISH, "%02d", index);
                                     int status = groundhog.getStatus();
-                                    writeString += String.format("%01d", status);
+                                    writeString += String.format(Locale.ENGLISH, "%01d", status);
                                     boolean isHiding = groundhog.getIsHiding();
                                     if (isHiding) {
                                         writeString += "1";
@@ -252,7 +243,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                         writeString += "0";
                                     }
                                     int numOfTimeIntervalShown = groundhog.getNumOfTimeIntervalShown();
-                                    writeString += String.format("%02d", numOfTimeIntervalShown);
+                                    writeString += String.format(Locale.ENGLISH, "%02d", numOfTimeIntervalShown);
                                     writeString += newHitStatus; // hit status
                                     selectedIoFunctionThread.write(CommonConstants.TwoPlayerGameGroundhogHit, writeString);
                                 }
@@ -273,7 +264,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+    public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
         Log.i(TAG, "surfaceDestroyed() is called");
     }
 
@@ -343,7 +334,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void drawGameScreen() {
-        Canvas canvas = null;
+        // Canvas canvas = null;
         timeRemaining = gameTimerThread.getTimeRemaining();
         startDrawingScreen();
         if ( (timeRemaining <=0 ) && (runningStatus == 1) ) {
@@ -372,17 +363,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void stopThreads() {
 
-        boolean retry = true;
+        boolean retry;
         if (groundhogRandomThread != null) {
             groundhogRandomThread.setKeepRunning(false);
             retry = true;
             while (retry) {
                 try {
                     groundhogRandomThread.join();
-                    Log.d(TAG, "groundhogRandomThread.Join()........\n");
+                    Log.d(TAG, "stopThreads.groundhogRandomThread.Join()");
                     retry = false;
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    Log.e(TAG, "stopThreads.Exception: ", ex);
                 }// continue processing until the thread ends
             }
         }
@@ -393,10 +384,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             while (retry) {
                 try {
                     gameViewDrawThread.join();
-                    Log.d(TAG, "gameViewDrawThread.Join()........\n");
+                    Log.d(TAG, "stopThreads.gameViewDrawThread.Join()");
                     retry = false;
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    Log.e(TAG, "stopThreads.Exception: ", ex);
                 }// continue processing until the thread ends
             }
         }
@@ -407,17 +398,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             while (retry) {
                 try {
                     gameTimerThread.join();
-                    Log.d(TAG, "gameTimerThread.Join()........\n");
+                    Log.d(TAG, "gameTimerThread.Join()");
                     retry = false;
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    Log.e(TAG, "stopThreads.Exception: ", ex);
                 }// continue processing until the thread ends
             }
         }
     }
 
     public void releaseResources() {
-        Log.d(TAG, "releaseResources() is called.\n");
+        Log.d(TAG, "releaseResources() is called.");
         soundPoolUtil.release();    // release SoundPool
     }
 
@@ -444,23 +435,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void setGroundhogByMsgString(String msgString) {
         int numOfTimeIntervalShown;
 
-        int index = Integer.valueOf(msgString.substring(0, 2));
+        int index = Integer.parseInt(msgString.substring(0, 2));
         Groundhog groundhog = groundhogArray[index];
 
-        int status = Integer.valueOf(msgString.substring(2, 3));
+        int status = Integer.parseInt(msgString.substring(2, 3));
         groundhog.setStatus(status);
 
-        int hideByte = Integer.valueOf(msgString.substring(3, 4));
-        if (hideByte == 1) {
-            groundhog.setIsHiding(true);
-        } else {
-            groundhog.setIsHiding(false);
-        }
+        int hideByte = Integer.parseInt(msgString.substring(3, 4));
+        groundhog.setIsHiding(hideByte == 1);
 
-        numOfTimeIntervalShown = Integer.valueOf(msgString.substring(4, 6));
+        numOfTimeIntervalShown = Integer.parseInt(msgString.substring(4, 6));
         groundhog.setNumOfTimeIntervalShown(numOfTimeIntervalShown);
 
-        int hitByte = Integer.valueOf(msgString.substring(6, 7));
+        int hitByte = Integer.parseInt(msgString.substring(6, 7));
         groundhog.setHitStatus(hitByte);
     }
 
@@ -520,7 +507,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 doDraw(canvas);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Log.e(TAG, "startDrawingScreen.Exception: ", ex);
         } finally {
             if (canvas != null) {
                 surfaceHolder.unlockCanvasAndPost(canvas);
@@ -530,14 +517,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void doDraw(Canvas canvas) {
 
-        groundhogActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                groundhogActivity.setTextForHighScoreTextView(String.valueOf(highestScore));
-                groundhogActivity.setTextForScoreTextView(String.valueOf(currentScore));
-                groundhogActivity.setTextForTimerTextView(String.valueOf(timeRemaining));
-                groundhogActivity.setTextForHitNumTextView(String.valueOf(numOfHits));
-            }
+        groundhogActivity.runOnUiThread(() -> {
+            groundhogActivity.setTextForHighScoreTextView(String.valueOf(highestScore));
+            groundhogActivity.setTextForScoreTextView(String.valueOf(currentScore));
+            groundhogActivity.setTextForTimerTextView(String.valueOf(timeRemaining));
+            groundhogActivity.setTextForHitNumTextView(String.valueOf(numOfHits));
         });
 
         if (canvas != null) {
@@ -556,7 +540,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         gameViewDrawThread.setKeepRunning(false);
         groundhogRandomThread.setKeepRunning(false);
         gameTimerThread.setKeepRunning(false);
-
         runningStatus = 2;
         if (gameType == CommonConstants.GameBySinglePlayer) {
             // single player then record the score
@@ -567,18 +550,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
         } else {
             // display the competition result
-
-            String scoreString = String.format("%04d", currentScore);
-            scoreString += String.format("%04d", numOfHits);
+            String scoreString = String.format(Locale.ENGLISH, "%04d", currentScore);
+            scoreString += String.format(Locale.ENGLISH, "%04d", numOfHits);
             selectedIoFunctionThread.write(CommonConstants.TwoPlayerGameScoreReceived, scoreString);
-
-            groundhogActivity.runOnUiThread(new Runnable() {
-                @SuppressWarnings("unchecked")
-                @Override
-                public void run() {
-                    AsyncTask displayResultAsyncTask = new DisplayResultAsyncTask();
-                    displayResultAsyncTask.execute();
-                }
+            groundhogActivity.runOnUiThread(() -> {
+                AsyncTask<Void, Void, Void> displayResultAsyncTask = new DisplayResultAsyncTask();
+                displayResultAsyncTask.execute();
             });
 
         }
@@ -586,90 +563,69 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void recordScore(final int score) {
         //    record currentScore as a score in database
-        groundhogActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                final EditText et = new EditText(groundhogActivity);
-                ScreenUtil.resizeTextSize(et, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-                // et.setHeight(200);
-                et.setTextColor(Color.BLUE);
-                // et.setBackground(new ColorDrawable(Color.TRANSPARENT));
-                // et.setBackgroundColor(Color.TRANSPARENT);
-                et.setHint(getResources().getString(R.string.nameString));
-                et.setGravity(Gravity.CENTER);
-                AlertDialog alertD = new AlertDialog.Builder(groundhogActivity).create();
-                alertD.setTitle(null);
-                alertD.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                alertD.setCancelable(false);
-                alertD.setView(et);
-                alertD.setButton(DialogInterface.BUTTON_NEGATIVE, getResources().getString(R.string.cancelString), new DialogInterface.OnClickListener() {
+        groundhogActivity.runOnUiThread(() -> {
+            final EditText et = new EditText(groundhogActivity);
+            ScreenUtil.resizeTextSize(et, textFontSize);
+            et.setTextColor(Color.BLUE);
+            et.setHint(getResources().getString(R.string.nameString));
+            et.setGravity(Gravity.CENTER);
+            AlertDialog alertD = new AlertDialog.Builder(groundhogActivity).create();
+            alertD.setTitle(null);
+            alertD.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            alertD.setCancelable(false);
+            alertD.setView(et);
+            alertD.setButton(DialogInterface.BUTTON_NEGATIVE, getResources().getString(R.string.cancelString),
+                    (dialog, which) -> dialog.dismiss());
+            alertD.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.submitString),
+                    (dialog, which) -> {
+                dialog.dismiss();
+                // use thread to add a record to database (remote database on AWS-EC2)
+                Thread restThread = new Thread() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                alertD.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.submitString), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-                        // use thread to add a record to database (remote database on AWS-EC2)
-                        Thread restThread = new Thread() {
-                            @Override
-                            public void run() {
-                                try {
-                                    JSONObject jsonObject = new JSONObject();
-                                    jsonObject.put("PlayerName", et.getText().toString());
-                                    jsonObject.put("Score", score);
-                                    jsonObject.put("GameId", GroundhogHunterApp.GameId);
-                                    PlayerRecordRest.addOneRecord(jsonObject);
-                                } catch (Exception ex) {
-                                    Log.e(TAG, "Failed to add one record to Playerscore table.", ex);
-                                }
-                            }
-                        };
-                        restThread.start();
-
-                        GroundhogHunterApp.ScoreSQLiteDB.addScore(et.getText().toString(), score);
-                        GroundhogHunterApp.ScoreSQLiteDB.deleteAllAfterTop10();  // only keep the top 10
-                        if (currentScore > highestScore) {
-                            highestScore = currentScore;
-                            groundhogActivity.setHighestScore(highestScore);
-                            groundhogActivity.setTextForHighScoreTextView(String.valueOf(highestScore));
+                    public void run() {
+                        try {
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("PlayerName", et.getText().toString());
+                            jsonObject.put("Score", score);
+                            jsonObject.put("GameId", GroundhogHunterApp.GameId);
+                            PlayerRecordRest.addOneRecord(jsonObject);
+                        } catch (Exception ex) {
+                            Log.e(TAG, "Failed to add one record to Playerscore table.", ex);
                         }
                     }
-                });
-                alertD.setOnShowListener(new DialogInterface.OnShowListener() {
-                    @Override
-                    public void onShow(DialogInterface dialog) {
-                        setDialogStyle(dialog);
-                    }
-                });
-                alertD.show();
-            }
+                };
+                restThread.start();
+
+                GroundhogHunterApp.ScoreSQLiteDB.addScore(et.getText().toString(), score);
+                GroundhogHunterApp.ScoreSQLiteDB.deleteAllAfterTop10();  // only keep the top 10
+                if (currentScore > highestScore) {
+                    highestScore = currentScore;
+                    groundhogActivity.setHighestScore(highestScore);
+                    groundhogActivity.setTextForHighScoreTextView(String.valueOf(highestScore));
+                }
+            });
+            alertD.setOnShowListener(this::setDialogStyle);
+            alertD.show();
         });
     }
 
     private void setDialogStyle(DialogInterface dialog) {
         AlertDialog dlg = (AlertDialog)dialog;
-
-        dlg.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        dlg.getWindow().setDimAmount(0.0f); // no dim for background screen
-
-        dlg.getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
-        dlg.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background_image);
-
+        Window win = dlg.getWindow();
+        if (win == null) return;
+        win.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        win.setDimAmount(0.0f); // no dim for background screen
+        win.setLayout(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
+        win.setBackgroundDrawableResource(R.drawable.dialog_background_image);
         Button nBtn = dlg.getButton(DialogInterface.BUTTON_NEGATIVE);
-        ScreenUtil.resizeTextSize(nBtn, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(nBtn, textFontSize);
         nBtn.setTypeface(Typeface.DEFAULT_BOLD);
         nBtn.setTextColor(Color.RED);
-
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)nBtn.getLayoutParams();
         layoutParams.weight = 10;
         nBtn.setLayoutParams(layoutParams);
-
         Button pBtn = dlg.getButton(DialogInterface.BUTTON_POSITIVE);
-        ScreenUtil.resizeTextSize(pBtn, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(pBtn, textFontSize);
         pBtn.setTypeface(Typeface.DEFAULT_BOLD);
         pBtn.setTextColor(Color.rgb(0x00,0x64,0x00));
         pBtn.setLayoutParams(layoutParams);
@@ -685,7 +641,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         @SuppressWarnings("unckecked")
         @Override
         protected Void doInBackground(Void... params) {
-
             if (isOppositePlayerLeft) {
                 // opposite player has left game then show result
                 oppositeCurrentScore = 0;
@@ -697,11 +652,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     try {
                         Thread.sleep(200);
                     } catch (InterruptedException ex) {
-                        ex.printStackTrace();
+                        Log.e(TAG, "doInBackground.Exception: ", ex);
                     }
                     i++;
                 }
-                Log.d(TAG, "Number of loop (i) = " + i);
+                Log.d(TAG, "doInBackground.Number of loop (i) = " + i);
             }
             return null;
         }

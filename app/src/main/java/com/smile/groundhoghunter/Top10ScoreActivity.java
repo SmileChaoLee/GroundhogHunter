@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +26,7 @@ import java.util.ArrayList;
 
 public class Top10ScoreActivity extends AppCompatActivity {
 
-    private static final String TAG = "Top10ScoreActivity";
+    private static final String TAG = "Top10ScoreAct";
     private String top10TitleName = "";
     private ArrayList<String> top10Players = new ArrayList<String>();
     private ArrayList<Integer> top10Scores = new ArrayList<Integer>();
@@ -51,11 +53,11 @@ public class Top10ScoreActivity extends AppCompatActivity {
         setContentView(R.layout.activity_top10_score);
 
         TextView titleTextView = findViewById(R.id.top10TitleTextView);
-        ScreenUtil.resizeTextSize(titleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(titleTextView, textFontSize);
         titleTextView.setText(top10TitleName);
 
         Button okButton = (Button)findViewById(R.id.top10OkButton);
-        ScreenUtil.resizeTextSize(okButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(okButton, textFontSize);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,12 +84,14 @@ public class Top10ScoreActivity extends AppCompatActivity {
 
             }
         });
-    }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        returnToPrevious();
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        returnToPrevious();
+                    }
+                });
     }
 
     private void returnToPrevious() {
@@ -162,9 +166,9 @@ public class Top10ScoreActivity extends AppCompatActivity {
             // view.setLayoutParams(layoutParams);  // no needed
 
             TextView pTextView = view.findViewById(R.id.playerTextView);
-            ScreenUtil.resizeTextSize(pTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+            ScreenUtil.resizeTextSize(pTextView, textFontSize);
             TextView sTextView = view.findViewById(R.id.scoreTextView);
-            ScreenUtil.resizeTextSize(sTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+            ScreenUtil.resizeTextSize(sTextView, textFontSize);
             ImageView medalImage = view.findViewById(R.id.medalImage);
 
             pTextView.setText(players.get(position));

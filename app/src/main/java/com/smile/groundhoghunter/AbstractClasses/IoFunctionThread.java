@@ -6,8 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public abstract class IoFunctionThread extends Thread {
-    private final String TAG = new String(".AbstractClasses.IoFunctionThread");
-
+    private final String TAG = "IoFunctionThread";
     protected InputStream inputStream;
     protected OutputStream outputStream;
     protected Handler mHandler;

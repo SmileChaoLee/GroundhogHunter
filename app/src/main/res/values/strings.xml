@@ -53,8 +53,8 @@
     <string name="startGameString">Start Game</string>
 
     <string name="gameStatusString">Status:</string>
-    <string name="loadingString">Loading ...</string>
-    <string name="showingAdsString">Showing Ads ...</string>
+    <string name="loadingString">Loading …</string>
+    <string name="showingAdsString">Showing Ads …</string>
 
     <string name="bluetoothAlreadyOnString">Bluetooth has been on already.</string>
     <string name="bluetoothCannotBeTurnedOnString">Bluetooth cannot be turned on.</string>

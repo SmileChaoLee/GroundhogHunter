@@ -2,73 +2,61 @@ package com.smile.groundhoghunter;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Build;
 import android.os.Bundle;
 import androidx.appcompat.widget.AppCompatRadioButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.smile.groundhoghunter.Utilities.BluetoothUtil;
+import com.smile.groundhoghunter.constants.CommonConstants;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class TwoPlayerActivity extends AppCompatActivity {
 
-    private static final String TAG = "TwoPlayerActivity";
-    // private properties
-    private float textFontSize;
-    private float fontScale;
+    private static final String TAG = "TwoPlayerAct";
+    private static final int REQUEST_BLUETOOTH_PERMISSIONS = 101;
+    private boolean isBluetoothPermitted = false;
     private float toastTextSize;
-
     private int mediaType;
-    private TextView explainProblemTextView;
     private EditText playerNameEditText;
     private String playerName;
-    private String bluetoothNotSupportedString;
-    // private String wifiDirectNotSupportedString;
     private String playerNameCannotBeEmptyString;
-    private String explainProblemForBluetoothString;
-    private String explainProblemForWifiString;
-
     private String btDeviceName;
-    private String wifiDeviceName;
-    private AppCompatRadioButton wifiRadioButton;
-    private AppCompatRadioButton bluetoothRadioButton;
     private String thisDeviceName;
-    // private WifiDirectReceiver wifiDirectReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
-        fontScale = ScreenUtil.getPxFontScale(this);
+        // private properties
+        float textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
         toastTextSize = textFontSize * 0.8f;
 
-        bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
-        // wifiDirectNotSupportedString = getString(R.string.wifiDirectNotSupportedString);
+        // String bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
         playerNameCannotBeEmptyString = getString(R.string.playerNameCannotBeEmptyString);
-        explainProblemForBluetoothString = getString(R.string.explainProblemForBluetoothString);
-        explainProblemForWifiString = getString(R.string.explainProblemForWifiString);
-
-        // int colorDarkOrange = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkOrange);
-        // int colorRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.red);
+        String explainProblemForBluetoothString = getString(R.string.explainProblemForBluetoothString);
         int colorDarkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed);
         int colorDarkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
 
-        // wifiDeviceName = "";
         btDeviceName = "";
         mediaType = GameView.BluetoothMediaType;
 
@@ -77,130 +65,44 @@ public class TwoPlayerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_two_players);
 
         TextView twoPlayerSettingTitleTextView = findViewById(R.id.twoPlayerSettingTitleTextView);
-        ScreenUtil.resizeTextSize(twoPlayerSettingTitleTextView, textFontSize * 1.2f, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(twoPlayerSettingTitleTextView, textFontSize * 1.2f);
 
-        explainProblemTextView = findViewById(R.id.explainProblemTextView);
-        ScreenUtil.resizeTextSize(explainProblemTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        TextView explainProblemTextView = findViewById(R.id.explainProblemTextView);
+        ScreenUtil.resizeTextSize(explainProblemTextView, textFontSize);
 
-        bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
-        ScreenUtil.resizeTextSize(bluetoothRadioButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        AppCompatRadioButton bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
+        ScreenUtil.resizeTextSize(bluetoothRadioButton, textFontSize);
         bluetoothRadioButton.setChecked(false);
-        bluetoothRadioButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mediaType = GameView.BluetoothMediaType;
-                thisDeviceName = btDeviceName;
-                setPlayerName();
-            }
-        });
-
-        /*
-        wifiRadioButton = findViewById(R.id.lanRadioButton);
-        ScreenUtil.resizeTextSize(wifiRadioButton, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-        wifiRadioButton.setChecked(false);
-        wifiRadioButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mediaType = GameView.WifiMediaType;
-                thisDeviceName = wifiDeviceName;
-                setPlayerName();
-            }
-        });
-
-        boolean isWifiDirectSupported = WifiDirectUtil.isWifiDirectSupported(this);
-        // device detecting
-        wifiRadioButton.setEnabled(false);
-        if (isWifiDirectSupported) {
-            // Wifi-Direct
-            WifiP2pManager mWifiP2pManager = (WifiP2pManager) getSystemService(WIFI_P2P_SERVICE);
-            if (mWifiP2pManager != null) {
-                WifiP2pManager.Channel mChannel = mWifiP2pManager.initialize(this, getMainLooper(), null);
-                if (mChannel != null) {
-                    wifiRadioButton.setEnabled(true);
-                }
-            }
-        } else {
-            ScreenUtil.showToast(this, wifiDirectNotSupportedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-        }
-        */
-
-        // Bluetooth
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            // this device does not support Bluetooth
-            ScreenUtil.showToast(this, bluetoothNotSupportedString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-            bluetoothRadioButton.setChecked(false);
-            bluetoothRadioButton.setEnabled(false);
-            mediaType = GameView.NoneMediaType; // added because removed the followings
-            /*
-            if (wifiRadioButton.isEnabled()) {
-                mediaType = GameView.WifiMediaType;
-            } else {
-                mediaType = GameView.NoneMediaType;
-            }
-            */
-        } else {
-            btDeviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothAdapter);
+        bluetoothRadioButton.setOnClickListener(view -> {
             mediaType = GameView.BluetoothMediaType;
-            bluetoothRadioButton.setEnabled(true);
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                // Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            if (mBluetoothAdapter.isDiscovering()) {
-                mBluetoothAdapter.cancelDiscovery();
-            }
-        }
+            thisDeviceName = btDeviceName;
+            setPlayerName();
+        });
 
-        switch (mediaType) {
-            case GameView.BluetoothMediaType:
-                explainProblemTextView.setText(explainProblemForBluetoothString);
-                bluetoothRadioButton.setChecked(true);
-                thisDeviceName = btDeviceName;
-                break;
-                /*
-            case GameView.WifiMediaType:
-                explainProblemTextView.setText(explainProblemForWifiString);
-                wifiRadioButton.setChecked(true);
-                // device name from Wifi-Direct
-                thisDeviceName = wifiDeviceName;
-                break;
-                */
-            default:
-                // no media supported
-                explainProblemTextView.setText("");
-                bluetoothRadioButton.setChecked(false);
-                // wifiRadioButton.setChecked(false);
-                thisDeviceName = "";
-                returnToPrevious();
-
-                return;
+        if (mediaType == GameView.BluetoothMediaType) {
+            explainProblemTextView.setText(explainProblemForBluetoothString);
+            bluetoothRadioButton.setChecked(true);
+            thisDeviceName = btDeviceName;
+        } else {// no media supported
+            explainProblemTextView.setText("");
+            bluetoothRadioButton.setChecked(false);
+            thisDeviceName = "";
+            returnToPrevious();
+            return;
         }
 
         TextView playerNameStringTextView = findViewById(R.id.playerNameStringTextView);
-        ScreenUtil.resizeTextSize(playerNameStringTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(playerNameStringTextView, textFontSize);
 
         playerNameEditText = findViewById(R.id.playerNameEditText);
         playerNameEditText.setEnabled(true);
         setPlayerName();
-        ScreenUtil.resizeTextSize(playerNameEditText, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(playerNameEditText, textFontSize);
         playerNameEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void afterTextChanged(Editable editable) {
                 playerName = editable.toString();
@@ -209,8 +111,6 @@ public class TwoPlayerActivity extends AppCompatActivity {
 
         int buttonLeftMargin = (int)ScreenUtil.dpToPixel(100);
         int buttonTopMargin = (int)ScreenUtil.dpToPixel(10);
-        int buttonRightMargin = buttonLeftMargin;
-        int buttonBottomMargin = buttonTopMargin;
         LinearLayout.LayoutParams buttonLp;
 
         final SmileImageButton createGameButton = findViewById(R.id.createTwoPlayerGameButton);
@@ -219,78 +119,164 @@ public class TwoPlayerActivity extends AppCompatActivity {
         buttonLp = (LinearLayout.LayoutParams) createGameButton.getLayoutParams();
         buttonLp.leftMargin = buttonLeftMargin;
         buttonLp.topMargin = buttonTopMargin;
-        buttonLp.rightMargin = buttonRightMargin;
-        buttonLp.bottomMargin = buttonBottomMargin;
-        createGameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Host game. Turn on Bluetooth and make this device visible to others
-                if (playerName.isEmpty()) {
-                    ScreenUtil.showToast(TwoPlayerActivity.this, playerNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    return;
-                }
-                Intent gameIntent;
-                switch (mediaType) {
-                    case GameView.BluetoothMediaType:
-                        gameIntent = new Intent(TwoPlayerActivity.this, BluetoothCreateGameActivity.class);
-                        gameIntent.putExtra("PlayerName", playerName);
-                        startActivity(gameIntent);
-                        break;
-                    // case GameView.WifiMediaType:
-                    //     break;
-                }
+        buttonLp.rightMargin = buttonLeftMargin;
+        buttonLp.bottomMargin = buttonTopMargin;
+        createGameButton.setOnClickListener(view -> {
+            // Host game. Turn on Bluetooth and make this device visible to others
+            if (playerName.isEmpty()) {
+                ScreenUtil.showToast(TwoPlayerActivity.this,
+                        playerNameCannotBeEmptyString, toastTextSize, Toast.LENGTH_SHORT);
+                return;
+            }
+            Intent gameIntent;
+            if (mediaType == GameView.BluetoothMediaType) {
+                gameIntent = new Intent(TwoPlayerActivity.this,
+                        BluetoothCreateGameActivity.class);
+                gameIntent.putExtra(CommonConstants.PLAYER_NAME, playerName);
+                startActivity(gameIntent);
             }
         });
 
         final SmileImageButton joinGameButton = findViewById(R.id.joinTwoPlayerGameButton);
-        Bitmap joinGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.joinString), colorDarkGreen);
+        Bitmap joinGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this,
+                R.drawable.normal_button_image, getString(R.string.joinString), colorDarkGreen);
         joinGameButton.setImageBitmap(joinGameBitmap);
         buttonLp = (LinearLayout.LayoutParams) joinGameButton.getLayoutParams();
         buttonLp.leftMargin = buttonLeftMargin;
         buttonLp.topMargin = buttonTopMargin;
-        buttonLp.rightMargin = buttonRightMargin;
-        buttonLp.bottomMargin = buttonBottomMargin;
-        joinGameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (playerName.isEmpty()) {
-                    ScreenUtil.showToast(TwoPlayerActivity.this, playerNameCannotBeEmptyString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    return;
-                }
-                Intent gameIntent;
-                switch (mediaType) {
-                    case GameView.BluetoothMediaType:
-                        gameIntent = new Intent(TwoPlayerActivity.this, BluetoothJoinGameActivity.class);
-                        gameIntent.putExtra("PlayerName", playerName);
-                        startActivity(gameIntent);
-                        break;
-                    // case GameView.WifiMediaType:
-                    //     break;
-                }
+        buttonLp.rightMargin = buttonLeftMargin;
+        buttonLp.bottomMargin = buttonTopMargin;
+        joinGameButton.setOnClickListener(view -> {
+            if (playerName.isEmpty()) {
+                ScreenUtil.showToast(TwoPlayerActivity.this,
+                        playerNameCannotBeEmptyString, toastTextSize, Toast.LENGTH_SHORT);
+                return;
+            }
+            Intent gameIntent;
+            if (mediaType == GameView.BluetoothMediaType) {
+                gameIntent = new Intent(TwoPlayerActivity.this,
+                        BluetoothJoinGameActivity.class);
+                gameIntent.putExtra(CommonConstants.PLAYER_NAME, playerName);
+                startActivity(gameIntent);
             }
         });
 
         final SmileImageButton cancelButton = findViewById(R.id.exitTwoPlayerActivityButton);
-        Bitmap cancelGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.exitString), colorDarkRed);
+        Bitmap cancelGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this,
+                R.drawable.normal_button_image, getString(R.string.exitString), colorDarkRed);
         cancelButton.setImageBitmap(cancelGameBitmap);
         buttonLp = (LinearLayout.LayoutParams) cancelButton.getLayoutParams();
         buttonLp.leftMargin = buttonLeftMargin;
         buttonLp.topMargin = buttonTopMargin;
-        buttonLp.rightMargin = buttonRightMargin;
-        buttonLp.bottomMargin = buttonBottomMargin;
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                returnToPrevious();
-            }
-        });
+        buttonLp.rightMargin = buttonLeftMargin;
+        buttonLp.bottomMargin = buttonTopMargin;
+        cancelButton.setOnClickListener(view -> returnToPrevious());
 
-        /*
-        wifiDirectReceiver = new WifiDirectReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        registerReceiver(wifiDirectReceiver, intentFilter);
-        */
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        returnToPrevious();
+                    }
+                });
+
+        // Bluetooth
+        askBluetoothPermission();
+    }
+
+    private void askBluetoothPermission() {
+        // Check for permissions at runtime if Android 12 or higher
+        String logStr = "askBluetoothPermission";
+        Log.d(TAG, logStr);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            Log.d(TAG, logStr + ".checkSelfPermission");
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, logStr + ".checkSelfPermission.not PERMISSION_GRANTED");
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN},
+                        REQUEST_BLUETOOTH_PERMISSIONS);
+                return;
+            } else {
+                // maybe it is PERMISSION_GRANTED when it is just asking but not needed now
+                // ,so it is always PERMISSION_GRANTED until when it needed
+                Log.d(TAG, logStr + ".checkSelfPermission.PERMISSION_GRANTED");
+            }
+        }
+        Log.d(TAG, logStr + ".< API 31 or PERMISSION_GRANTED");
+        isBluetoothPermitted = true;
+        initBluetooth();
+    }
+
+    private void initBluetooth() {
+        String logStr = "initBluetooth";
+        Log.d(TAG, logStr);
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter mBluetoothAdapter = bluetoothManager.getAdapter();
+        if (mBluetoothAdapter == null) {
+            Log.d(TAG, logStr + ".mBluetoothAdapter == null");
+            String bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
+            ScreenUtil.showToast(this, bluetoothNotSupportedString, toastTextSize, Toast.LENGTH_SHORT);
+            AppCompatRadioButton bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
+            bluetoothRadioButton.setChecked(false);
+            bluetoothRadioButton.setEnabled(false);
+            mediaType = GameView.NoneMediaType;
+            returnToPrevious(); // unable to do 2 players
+            return;
+        }
+        // If we have permissions (or are on an older version), run the logic
+        Log.d(TAG, logStr + ".mBluetoothAdapter != null");
+        accessBluetoothHardware(mBluetoothAdapter);
+    }
+
+    private void accessBluetoothHardware(BluetoothAdapter adapter) {
+        String logStr = "accessBluetoothHardware";
+        Log.d(TAG, logStr);
+        try {
+            btDeviceName = BluetoothUtil.getBluetoothDeviceName(adapter);
+            thisDeviceName = btDeviceName;
+            setPlayerName(); // Update the EditText with the name
+            AppCompatRadioButton bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
+            bluetoothRadioButton.setEnabled(true);
+            if (thisDeviceName == null || thisDeviceName.isEmpty()) {
+                mediaType = GameView.NoneMediaType;
+                returnToPrevious(); // unable to do 2 players
+                return;
+            }
+            mediaType = GameView.BluetoothMediaType;
+            if (adapter.isDiscovering()) {
+                adapter.cancelDiscovery();
+            }
+            Log.d(TAG, logStr + ".thisDeviceName = " + thisDeviceName);
+        } catch (SecurityException e) {
+            Log.e(TAG, logStr + ".Permission denied even after check", e);
+            returnToPrevious(); // unable to do 2 players
+        }
+    }
+
+    // Handle the user's response to the permission popup
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_BLUETOOTH_PERMISSIONS) {
+            isBluetoothPermitted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    isBluetoothPermitted = false;
+                    break;
+                }
+            }
+            if (isBluetoothPermitted) {
+                initBluetooth();
+            } else {
+                ScreenUtil.showToast(this,
+                        "Bluetooth permissions are required for multiplayer.",
+                        toastTextSize, Toast.LENGTH_SHORT);
+                returnToPrevious(); // unable to do 2 players
+            }
+        }
     }
 
     @Override
@@ -306,17 +292,6 @@ public class TwoPlayerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        /*
-        if (wifiDirectReceiver != null) {
-            unregisterReceiver(wifiDirectReceiver);
-        }
-        */
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        returnToPrevious();
     }
 
     private void returnToPrevious() {
@@ -326,26 +301,6 @@ public class TwoPlayerActivity extends AppCompatActivity {
     private void setPlayerName() {
         Log.d(TAG, "thisDeviceName = " + thisDeviceName);
         playerName = thisDeviceName;
-        // playerNameEditText.setText("");
-        // playerNameEditText.append(playerName);
         playerNameEditText.setText(playerName);
     }
-
-    /*
-    private class WifiDirectReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
-                WifiP2pDevice wifiDevice =(WifiP2pDevice)intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
-                wifiDeviceName = wifiDevice.deviceName;
-                if (wifiRadioButton.isChecked()) {
-                    thisDeviceName = wifiDeviceName;
-                    setPlayerName();
-                }
-            }
-        }
-    }
-    */
 }

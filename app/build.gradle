@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.plugin.compose'
+    // id 'org.jetbrains.kotlin.plugin.compose'
     id 'kotlin-parcelize'
 }
 
@@ -21,8 +21,8 @@ android {
         targetSdk = 36
         multiDexEnabled true
 
-        versionCode 213
-        versionName "2.13"
+        versionCode 214
+        versionName "2.14"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
@@ -34,7 +34,7 @@ android {
             debuggable false
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }
         debug {

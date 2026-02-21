@@ -9,14 +9,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.smile.groundhoghunter.Constants.CommonConstants;
+import androidx.annotation.NonNull;
+
+import com.smile.groundhoghunter.constants.CommonConstants;
 import com.smile.groundhoghunter.Models.Groundhog;
 import com.smile.groundhoghunter.Threads.GameTimerThread;
-import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class ClientGameActivity extends GroundhogActivity {
 
-    private final static String TAG = ".ClientGameActivity";
+    private final static String TAG = "ClientGameAct";
     private ClientGameHandler clientGameHandler;
 
     @Override
@@ -26,8 +27,6 @@ public class ClientGameActivity extends GroundhogActivity {
 
         startGameButton.setVisibility(View.INVISIBLE);
         startGameButton.setEnabled(false);
-        // pauseGameButton.setEnabled(false);
-        // resumeGameButton.setEnabled(false);
         newGameButton.setVisibility(View.INVISIBLE);
         newGameButton.setEnabled(false);
 
@@ -87,11 +86,9 @@ public class ClientGameActivity extends GroundhogActivity {
         }
 
         @Override
-        public void handleMessage(Message msg) {
-
-            String msgString = "";
+        public void handleMessage(@NonNull Message msg) {
+            String msgString;
             Bundle data = msg.getData();
-
             int i;
             int status;
             int hideByte;
@@ -143,8 +140,8 @@ public class ClientGameActivity extends GroundhogActivity {
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
                 case CommonConstants.TwoPlayerClientGameTimerRead:
-                    msgString = data.getString("TimerRemaining");
-                    int timeRemaining = Integer.valueOf(msgString);
+                    msgString = data.getString("TimerRemaining", "");
+                    int timeRemaining = Integer.parseInt(msgString);
                     GameTimerThread gameTimerThread = gameView.getGameTimerThread();
                     if (gameTimerThread != null) {
                         gameTimerThread.setTimeRemaining(timeRemaining);
@@ -152,20 +149,16 @@ public class ClientGameActivity extends GroundhogActivity {
                     selectedIoFunctionThread.setStartRead(true);
                     break;
                 case CommonConstants.TwoPlayerClientGameGroundhogRead:
-                    msgString = data.getString("GroundhogData");
+                    msgString = data.getString("GroundhogData", "");
                     i = 0;
                     for (Groundhog groundhog : gameView.groundhogArray) {
-                        status = Integer.valueOf(msgString.substring(i, i+1));
+                        status = Integer.parseInt(msgString.substring(i, i+1));
                         groundhog.setStatus(status);
 
-                        hideByte = Integer.valueOf(msgString.substring(i+1, i+2));
-                        if (hideByte == 1) {
-                            groundhog.setIsHiding(true);
-                        } else {
-                            groundhog.setIsHiding(false);
-                        }
+                        hideByte = Integer.parseInt(msgString.substring(i+1, i+2));
+                        groundhog.setIsHiding(hideByte == 1);
 
-                        numOfTimeIntervalShown = Integer.valueOf(msgString.substring(i+2, i+4));
+                        numOfTimeIntervalShown = Integer.parseInt(msgString.substring(i+2, i+4));
                         groundhog.setNumOfTimeIntervalShown(numOfTimeIntervalShown);
 
                         i += 4;
@@ -179,9 +172,9 @@ public class ClientGameActivity extends GroundhogActivity {
                     break;
                 case CommonConstants.TwoPlayerGameScoreReceived:
                     msgString = data.getString("OppositeCurrentScore", "0");
-                    int oppScore = Integer.valueOf(msgString.substring(0, 4));
+                    int oppScore = Integer.parseInt(msgString.substring(0, 4));
                     gameView.setOppositeCurrentScore(oppScore);
-                    int oppNumOfHits = Integer.valueOf(msgString.substring(4, 8));
+                    int oppNumOfHits = Integer.parseInt(msgString.substring(4, 8));
                     gameView.setOppositeNumOfHits(oppNumOfHits);
                     gameView.setReceivedScoreFromOpposite(true);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data

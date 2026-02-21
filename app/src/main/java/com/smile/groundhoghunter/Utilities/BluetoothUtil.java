@@ -1,18 +1,24 @@
 package com.smile.groundhoghunter.Utilities;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
+import androidx.annotation.RequiresPermission;
 
+import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
 import java.util.ArrayList;
 
 public class BluetoothUtil {
 
-    private static final String TAG = new String(".Utilities.BluetoothUtil");
+    private static final String TAG = "BluetoothUtil";
+    private static final Object lock = new Object();
 
+    @SuppressLint("SupportAnnotationUsage")
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     public static String getBluetoothDeviceName(BluetoothDevice mBluetoothDevice) {
         String deviceName = mBluetoothDevice.getName();
         String deviceHardwareAddress = mBluetoothDevice.getAddress(); // MAC address
@@ -30,15 +36,25 @@ public class BluetoothUtil {
         return deviceName;
     }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     public static String getBluetoothDeviceName(BluetoothAdapter mBluetoothAdapter) {
         String deviceName = mBluetoothAdapter.getName();
-        String deviceHardwareAddress = mBluetoothAdapter.getAddress(); // MAC address
-        if (deviceName == null) {
-            deviceName = "";
-        }
-        if (deviceName.isEmpty()) {
-            if ((deviceHardwareAddress != null) && (!deviceHardwareAddress.isEmpty())) {
-                deviceName = deviceHardwareAddress;
+        // mBluetoothAdapter.getAddress() is deprecated and restricted.
+        // We use a fallback string or just the name.
+        if (deviceName == null || deviceName.isEmpty()) {
+            // On modern Android, getAddress() returns "02:00:00:00:00:00"
+            // and requires LOCAL_MAC_ADDRESS (System only permission).
+            // It is best to avoid calling it or wrap it in a try-catch.
+            try {
+                @SuppressLint("HardwareIds")
+                String mac = mBluetoothAdapter.getAddress();
+                if (mac != null && !mac.equals("02:00:00:00:00:00")) {
+                    deviceName = mac;
+                } else {
+                    deviceName = "";
+                }
+            } catch (SecurityException e) {
+                deviceName = "";
             }
         }
 
@@ -46,13 +62,12 @@ public class BluetoothUtil {
     }
 
     public static void closeBluetoothSocket(BluetoothSocket mBluetoothSocket ) {
-
         if (mBluetoothSocket != null) {
             // close connection
             try {
                 mBluetoothSocket.close();
             } catch (Exception ex) {
-                ex.printStackTrace();
+                Log.e(TAG, "closeBluetoothSocket.Exception: ", ex);
             }
         }
     }
@@ -64,23 +79,25 @@ public class BluetoothUtil {
     }
 
     public static void stopBluetoothFunctionThread(BluetoothFunctionThread btFunctionThread) {
-        if (btFunctionThread != null) {
-            synchronized (btFunctionThread) {
-                btFunctionThread.setKeepRunning(false);
-                btFunctionThread.closeIoSocket();
-                btFunctionThread.setStartRead(true);
-                btFunctionThread.notify();
-            }
-            boolean retry = true;
-            while (retry) {
-                try {
-                    btFunctionThread.join();
-                    Log.d(TAG, "btFunctionThread.Join()........\n");
-                    retry = false;
-                    btFunctionThread = null;
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }// continue processing until the thread ends
+        if (btFunctionThread == null) {
+            Log.d(TAG, "stopBluetoothFunctionThread.btFunctionThread is null");
+            return;
+        }
+        synchronized (lock) {
+            btFunctionThread.setKeepRunning(false);
+            btFunctionThread.closeIoSocket();
+            btFunctionThread.setStartRead(true);
+            lock.notify();
+        }
+        boolean retry = true;
+        while (retry) {
+            try {
+                btFunctionThread.join();
+                Log.d(TAG, "stopBluetoothFunctionThread.join()");
+                retry = false;
+                btFunctionThread = null;
+            } catch (InterruptedException ex) {
+                Log.e(TAG, "stopBluetoothFunctionThread.Exception: ", ex);
             }
         }
     }

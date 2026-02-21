@@ -2,8 +2,6 @@ package com.smile.groundhoghunter.AbstractClasses;
 
 import android.os.Handler;
 
-import com.smile.groundhoghunter.Interfaces.ConnectDevice;
-
 public abstract class ClientConnectToThread extends Thread {
 
     protected Handler mHandler;

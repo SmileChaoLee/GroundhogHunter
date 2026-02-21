@@ -1,16 +1,15 @@
 package com.smile.groundhoghunter.Threads;
 
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-
-import com.smile.groundhoghunter.Constants.CommonConstants;
+import android.util.Log;
+import com.smile.groundhoghunter.constants.CommonConstants;
 
 public class ClientDiscoveryTimerThread extends Thread {
 
+    private static final String TAG = "CD_TimerThread";
     private final Handler mHandler;
     private final int mTimerPeriod;
-    private final int mTimeEachLopp = 300;   // 300 ms
     private boolean keepRunning;
 
     public ClientDiscoveryTimerThread(Handler handler, int timerPeriod) {
@@ -20,20 +19,19 @@ public class ClientDiscoveryTimerThread extends Thread {
     }
 
     public void run() {
-
         Message msg;
         int elapsedTime= 0;
-
         while ( (elapsedTime < mTimerPeriod) && keepRunning) {
             try {
+                // 300 ms
+                int mTimeEachLopp = 300;
                 Thread.sleep(mTimeEachLopp);
                 elapsedTime += mTimeEachLopp;
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                Log.e(TAG, "run.Exception: ", ex);
             }
         }
 
-        Intent broadcastIntent = new Intent();
         if (keepRunning) {
             // send message to activity to cancel discovery
             msg = mHandler.obtainMessage(CommonConstants.ClientDiscoveryTimerHasReached);

@@ -3,36 +3,35 @@ package com.smile.groundhoghunter;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-
 import android.util.Log;
 
-import com.smile.groundhoghunter.Constants.CommonConstants;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresPermission;
+import com.smile.groundhoghunter.constants.CommonConstants;
 import com.smile.groundhoghunter.Threads.BluetoothAcceptThread;
 
 public class BluetoothCreateGameActivity extends CreateGameActivity {
 
-    private static final String TAG = new String(".BluetoothCreateGameActivity");
-    private static final int Request_Enable_Bluetooth_For_Being_Discovered = 1; // request to enable bluetooth for being discovered
-    private static final int Request_Enable_Bluetooth_Discoverability = 3;
+    private static final String TAG = "BtCreateGameAct";
     private static final int DurationForBluetoothVisible = 120;  // 120 seconds
-
     private String bluetoothVisibilityIsDisabledString;
     private String bluetoothCannotBeTurnedOnString;
     private String bluetoothVisibilityForPeriodString;
     private String bluetoothCannotBeVisibleString;
-
     private BluetoothAdapter mBluetoothAdapter;
     private boolean isDefaultBluetoothEnabled;
     private BluetoothCreateGameBroadcastReceiver btCreateGameReceiver;
+    private ActivityResultLauncher<Intent> discoverableLauncher;
+    private ActivityResultLauncher<Intent> enableBtLauncher;
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -42,29 +41,10 @@ public class BluetoothCreateGameActivity extends CreateGameActivity {
         intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
         registerReceiver(btCreateGameReceiver, intentFilter);
 
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
         isDefaultBluetoothEnabled = mBluetoothAdapter.isEnabled();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            // Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
         if (mBluetoothAdapter.isDiscovering()) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                // Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
             mBluetoothAdapter.cancelDiscovery();
         }
 
@@ -73,60 +53,48 @@ public class BluetoothCreateGameActivity extends CreateGameActivity {
         bluetoothVisibilityForPeriodString = getString(R.string.bluetoothVisibilityForPeriodString)
                 + "(" + DurationForBluetoothVisible + " " + getString(R.string.secondString) + ")";
         bluetoothCannotBeVisibleString = getString(R.string.bluetoothCannotBeVisibleString);
+        discoverableLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    int resultCode = result.getResultCode();
+                    if (resultCode != Activity.RESULT_CANCELED) {
+                        // succeeded
+                        showMessage.showMessageInTextView(bluetoothVisibilityForPeriodString, MessageDuration);
+                        // create a BluetoothSocket for listening for connection using a thread
+                        mServerAcceptThread = new BluetoothAcceptThread(createGameHandler, mBluetoothAdapter, playerName, GroundhogHunterApp.ApplicationUUID);
+                        mServerAcceptThread.start();
+                    } else {
+                        showMessage.showMessageInTextView(bluetoothCannotBeVisibleString, MessageDuration);
+                    }
+                });
+        enableBtLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    int resultCode = result.getResultCode();
+                    Log.d(TAG, "enableBtLauncher.resultCode = " + resultCode);
+                    if (resultCode == Activity.RESULT_OK) {
+                        // succeeded to enable bluetooth. Start enabling discoverability
+                        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+                        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, DurationForBluetoothVisible);
+                        // startActivityForResult(discoverableIntent, Request_Enable_Bluetooth_Discoverability);
+                        Log.d(TAG, "enableBtLauncher.discoverableLauncher");
+                        discoverableLauncher.launch(discoverableIntent);
+                    } else {
+                        Log.d(TAG, "enableBtLauncher.Not Activity.RESULT_OK");
+                        showMessage.showMessageInTextView(bluetoothCannotBeTurnedOnString, MessageDuration);
+                    }
+                });
 
         super.onCreate(savedInstanceState);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "BluetoothCreateGameActivity --> Came back from BtHostGameActivity.");
-
-        switch(requestCode) {
-            case Request_Enable_Bluetooth_For_Being_Discovered:
-                if (resultCode == Activity.RESULT_OK) {
-                    // succeeded to enable bluetooth. Start enabling discoverability
-                    Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-                    discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, DurationForBluetoothVisible);
-                    startActivityForResult(discoverableIntent, Request_Enable_Bluetooth_Discoverability);
-                } else {
-                    // ScreenUtil.showToast(this, bluetoothCannotBeTurnedOnString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    showMessage.showMessageInTextView(bluetoothCannotBeTurnedOnString, MessageDuration);
-                }
-                break;
-            case Request_Enable_Bluetooth_Discoverability:
-                if (resultCode != Activity.RESULT_CANCELED) {
-                    // succeeded
-                    // ScreenUtil.showToast(this, bluetoothVisibilityForPeriodString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
-                    showMessage.showMessageInTextView(bluetoothVisibilityForPeriodString, MessageDuration);
-                    // create a BluetoothSocket for listening for connection using a thread
-
-                    mServerAcceptThread = new BluetoothAcceptThread(createGameHandler, mBluetoothAdapter, playerName, GroundhogHunterApp.ApplicationUUID);
-                    mServerAcceptThread.start();
-                } else {
-                    // ScreenUtil.showToast(this, bluetoothCannotBeVisibleString, toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_LONG);
-                    showMessage.showMessageInTextView(bluetoothCannotBeVisibleString, MessageDuration);
-                }
-                break;
-        }
-    }
-
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     @Override
     protected void onDestroy() {
         super.onDestroy();
         // recover the status of bluetooth
         if (mBluetoothAdapter != null) {
             if (isDefaultBluetoothEnabled) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    // Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
                 mBluetoothAdapter.enable();
             } else {
                 mBluetoothAdapter.disable();
@@ -141,35 +109,34 @@ public class BluetoothCreateGameActivity extends CreateGameActivity {
     protected void startDiscoverability() {
         super.startDiscoverability();
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        startActivityForResult(enableBtIntent, Request_Enable_Bluetooth_For_Being_Discovered);
+        // startActivityForResult(enableBtIntent, Request_Enable_Bluetooth_For_Being_Discovered);
+        enableBtLauncher.launch(enableBtIntent);
     }
 
     @Override
     protected void startHostGame() {
         super.startHostGame();
         Intent gameIntent = new Intent(this, BtHostGameActivity.class);
-        gameIntent.putExtra("GameType", CommonConstants.TwoPlayerGameByHost);
-        startActivityForResult(gameIntent, CommonConstants.TwoPlayerGameByHost);
+        gameIntent.putExtra(CommonConstants.GAME_TYPE, CommonConstants.TwoPlayerGameByHost);
+        // startActivityForResult(gameIntent, CommonConstants.TwoPlayerGameByHost);
+        startActivity(gameIntent);
     }
 
     private class BluetoothCreateGameBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String pName;
-            String action = "";
-            if (intent != null) {
-                action = intent.getAction();
-            }
-            switch (action) {
-                case BluetoothAdapter.ACTION_SCAN_MODE_CHANGED:
-                    int extraPreviousScanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_SCAN_MODE, BluetoothAdapter.ERROR);
-                    int extraScanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
-                    if (extraPreviousScanMode != extraScanMode) {
-                        if ((extraScanMode == BluetoothAdapter.SCAN_MODE_CONNECTABLE) || (extraScanMode == BluetoothAdapter.SCAN_MODE_NONE)) {
-                            showMessage.showMessageInTextView(bluetoothVisibilityIsDisabledString, MessageDuration);
-                        }
+            // String pName;
+            if (intent == null) return;
+            String action = intent.getAction();
+            if (action == null) return;
+            if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
+                int extraPreviousScanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_SCAN_MODE, BluetoothAdapter.ERROR);
+                int extraScanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
+                if (extraPreviousScanMode != extraScanMode) {
+                    if ((extraScanMode == BluetoothAdapter.SCAN_MODE_CONNECTABLE) || (extraScanMode == BluetoothAdapter.SCAN_MODE_NONE)) {
+                        showMessage.showMessageInTextView(bluetoothVisibilityIsDisabledString, MessageDuration);
                     }
-                    break;
+                }
             }
         }
     }

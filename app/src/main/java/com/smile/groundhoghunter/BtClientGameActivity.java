@@ -6,7 +6,6 @@ import com.smile.groundhoghunter.Utilities.BluetoothUtil;
 
 public class BtClientGameActivity extends ClientGameActivity {
 
-    private final static String TAG = ".BtClientGameActivity";
     private BluetoothFunctionThread selectedBtFunctionThread;
 
     @Override

@@ -55,8 +55,8 @@
     <string name="startGameString">启动游戏</string>
 
     <string name="gameStatusString">状态:</string>
-    <string name="loadingString">下载中 ...</string>
-    <string name="showingAdsString">广告显示中 ...</string>
+    <string name="loadingString">下载中 …</string>
+    <string name="showingAdsString">广告显示中 …</string>
 
     <string name="bluetoothAlreadyOnString">蓝芽已经开启.</string>
     <string name="bluetoothCannotBeTurnedOnString">蓝芽无法被开启.</string>

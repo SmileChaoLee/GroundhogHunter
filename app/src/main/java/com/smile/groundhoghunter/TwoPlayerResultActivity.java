@@ -1,50 +1,32 @@
 package com.smile.groundhoghunter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.smile.groundhoghunter.constants.CommonConstants;
 import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class TwoPlayerResultActivity extends AppCompatActivity {
 
-    private float textFontSize;
-    private float fontScale;
-
-    private TextView gameCreatorTitle;
-    private TextView hostGameScoreTitle;
-    private TextView hostGameScoreText;
-    private TextView hostGameHitNumTitle;
-    private TextView hostGameHitNumText;
-    private TextView gameJoinerTitle;
-    private TextView clientGameScoreTitle;
-    private TextView clientGameScoreText;
-    private TextView clientGameHitNumTitle;
-    private TextView clientGameHitNumText;
-    private Button messageArea_OK_button;
-
-    private int hostScore;
-    private int hostHitNum;
-    private int clientScore;
-    private int clientHitNum;
-
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
-        fontScale = ScreenUtil.getPxFontScale(this);
-
+        float textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
         Intent callingIntent = getIntent();
-        hostScore = callingIntent.getIntExtra("HostScore", 0);
-        hostHitNum = callingIntent.getIntExtra("HostHitNum", 0);
-        clientScore = callingIntent.getIntExtra("ClientScore", 0);
-        clientHitNum = callingIntent.getIntExtra("ClientHitNum", 0);
+        int hostScore = callingIntent.getIntExtra(CommonConstants.HOST_SCORE, 0);
+        int hostHitNum = callingIntent.getIntExtra(CommonConstants.HOST_HIT_NUM, 0);
+        int clientScore = callingIntent.getIntExtra(CommonConstants.CLIENT_SCORE, 0);
+        int clientHitNum = callingIntent.getIntExtra(CommonConstants.CLIENT_HIT_NUM, 0);
 
         super.onCreate(savedInstanceState);
 
@@ -55,51 +37,47 @@ public class TwoPlayerResultActivity extends AppCompatActivity {
 
         setContentView(R.layout.two_player_result_layout);
 
-        gameCreatorTitle = findViewById(R.id.gameCreatorTitle);
-        ScreenUtil.resizeTextSize(gameCreatorTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        TextView gameCreatorTitle = findViewById(R.id.gameCreatorTitle);
+        ScreenUtil.resizeTextSize(gameCreatorTitle, textFontSize);
 
-        hostGameScoreTitle = findViewById(R.id.hostGameScoreTitle);
-        ScreenUtil.resizeTextSize(hostGameScoreTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-        hostGameScoreText = findViewById(R.id.hostGameScoreText);
+        TextView hostGameScoreTitle = findViewById(R.id.hostGameScoreTitle);
+        ScreenUtil.resizeTextSize(hostGameScoreTitle, textFontSize);
+        TextView hostGameScoreText = findViewById(R.id.hostGameScoreText);
         hostGameScoreText.setText(String.valueOf(hostScore));
-        ScreenUtil.resizeTextSize(hostGameScoreText, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(hostGameScoreText, textFontSize);
 
-        hostGameHitNumTitle = findViewById(R.id.hostGameHitNumTitle);
-        ScreenUtil.resizeTextSize(hostGameHitNumTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-        hostGameHitNumText = findViewById(R.id.hostGameHitNumText);
+        TextView hostGameHitNumTitle = findViewById(R.id.hostGameHitNumTitle);
+        ScreenUtil.resizeTextSize(hostGameHitNumTitle, textFontSize);
+        TextView hostGameHitNumText = findViewById(R.id.hostGameHitNumText);
         hostGameHitNumText.setText(String.valueOf(hostHitNum));
-        ScreenUtil.resizeTextSize(hostGameHitNumText, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(hostGameHitNumText, textFontSize);
 
-        gameJoinerTitle = findViewById(R.id.gameJoinerTitle);
-        ScreenUtil.resizeTextSize(gameJoinerTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        TextView gameJoinerTitle = findViewById(R.id.gameJoinerTitle);
+        ScreenUtil.resizeTextSize(gameJoinerTitle, textFontSize);
 
-        clientGameScoreTitle = findViewById(R.id.clientGameScoreTitle);
-        ScreenUtil.resizeTextSize(clientGameScoreTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-        clientGameScoreText = findViewById(R.id.clientGameScoreText);
+        TextView clientGameScoreTitle = findViewById(R.id.clientGameScoreTitle);
+        ScreenUtil.resizeTextSize(clientGameScoreTitle, textFontSize);
+        TextView clientGameScoreText = findViewById(R.id.clientGameScoreText);
         clientGameScoreText.setText(String.valueOf(clientScore));
-        ScreenUtil.resizeTextSize(clientGameScoreText, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(clientGameScoreText, textFontSize);
 
-        clientGameHitNumTitle = findViewById(R.id.clientGameHitNumTitle);
-        ScreenUtil.resizeTextSize(clientGameHitNumTitle, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-        clientGameHitNumText = findViewById(R.id.clientGameHitNumText);
+        TextView clientGameHitNumTitle = findViewById(R.id.clientGameHitNumTitle);
+        ScreenUtil.resizeTextSize(clientGameHitNumTitle, textFontSize);
+        TextView clientGameHitNumText = findViewById(R.id.clientGameHitNumText);
         clientGameHitNumText.setText(String.valueOf(clientHitNum));
-        ScreenUtil.resizeTextSize(clientGameHitNumText, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(clientGameHitNumText, textFontSize);
 
-        messageArea_OK_button = findViewById(R.id.messageArea_OK_button);
-        ScreenUtil.resizeTextSize(messageArea_OK_button, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
-        messageArea_OK_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                returnToPrevious();
-            }
-        });
+        Button messageArea_OK_button = findViewById(R.id.messageArea_OK_button);
+        ScreenUtil.resizeTextSize(messageArea_OK_button, textFontSize);
+        messageArea_OK_button.setOnClickListener(view -> returnToPrevious());
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        returnToPrevious();
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        returnToPrevious();
+                    }
+                });
     }
 
     private void returnToPrevious() {

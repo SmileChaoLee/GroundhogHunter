@@ -10,7 +10,7 @@ import android.util.Log;
 
 import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.groundhoghunter.AbstractClasses.ServerAcceptThread;
-import com.smile.groundhoghunter.Constants.CommonConstants;
+import com.smile.groundhoghunter.constants.CommonConstants;
 import com.smile.groundhoghunter.Interfaces.ConnectDevice;
 import com.smile.groundhoghunter.Models.BtConnectDevice;
 

@@ -5,50 +5,34 @@ import android.content.res.Resources;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-
 import androidx.multidex.MultiDexApplication;
-
 import com.facebook.ads.AudienceNetworkAds;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
 import com.smile.smilelibraries.facebook_ads_util.*;
 import com.smile.smilelibraries.google_ads_util.AdMobInterstitial;
 import com.smile.smilelibraries.scoresqlite.*;
 import com.smile.smilelibraries.show_interstitial_ads.ShowInterstitial;
-import com.smile.smilelibraries.utilities.ScreenUtil;
-
 import java.util.UUID;
 
 public class GroundhogHunterApp extends MultiDexApplication {
-
-    // public final String REST_Website = new String("http://192.168.0.11:5000/Playerscore");
-    // public static final String REST_Website = "http://ec2-13-59-195-3.us-east-2.compute.amazonaws.com/Playerscore";
-    public static final String REST_Website = "http://ec2-13-59-195-3.us-east-2.compute.amazonaws.com/Playerscore";
-    public static final String GameId = "2"; // this GameId is for backend game_id in playerscore table
-    public static final int FontSize_Scale_Type = ScreenUtil.FontSize_Pixel_Type;
+    private static final String TAG = "GroundhogHunterApp";
+    // this GameId is for backend game_id in playerscore table
+    public static final String GameId = "2";
     public static final String UUID_String = "b5af9bad-42e0-4d0d-8546-ebeb97e1abfa";
     public static final UUID ApplicationUUID = UUID.fromString(UUID_String);
-
     public static Resources AppResources;
     public static Context AppContext;
     public static ScoreSQLite ScoreSQLiteDB;
     public static String DATABASE_NAME = "groundhog_hunter.db";
-    // public static BluetoothFunctionThread selectedBtFuncThread;
     public static IoFunctionThread selectedIoFuncThread;
-
     public static ShowInterstitial InterstitialAd;
     public static String facebookBannerID = "";
     public static String googleAdMobBannerID = "";
     public static int AdProvider = 0;    // default is AdMob
-
     public static boolean isFirstStartApp;
-
     public static FacebookInterstitial facebookAds;
     public static AdMobInterstitial googleInterstitialAd;
-
-    private static final String TAG = "GroundhogHunterApp";
 
     @Override
     public void onCreate() {
@@ -74,28 +58,21 @@ public class GroundhogHunterApp extends MultiDexApplication {
         // Google AdMob
         String googleAdMobAppID = getString(R.string.google_AdMobAppID);
         String googleAdMobInterstitialID = "ca-app-pub-8354869049759576/6595392508";
-        MobileAds.initialize(AppContext, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-                Log.d(TAG, "Google AdMob was initialized successfully.");
-            }
-        });
+        MobileAds.initialize(AppContext, initializationStatus ->
+                Log.d(TAG, "Google AdMob was initialized successfully."));
 
         googleInterstitialAd = new AdMobInterstitial(AppContext, googleAdMobInterstitialID);
         googleInterstitialAd.loadAd(); // load first ad
         googleAdMobBannerID = "ca-app-pub-8354869049759576/7169443235";
 
         final Handler adHandler = new Handler(Looper.getMainLooper());
-        final Runnable adRunnable = new Runnable() {
-            @Override
-            public void run() {
-                adHandler.removeCallbacksAndMessages(null);
-                if (googleInterstitialAd != null) {
-                    googleInterstitialAd.loadAd(); // load first google ad
-                }
-                if (facebookAds != null) {
-                    facebookAds.loadAd();   // load first facebook ad
-                }
+        final Runnable adRunnable = () -> {
+            adHandler.removeCallbacksAndMessages(null);
+            if (googleInterstitialAd != null) {
+                googleInterstitialAd.loadAd(); // load first google ad
+            }
+            if (facebookAds != null) {
+                facebookAds.loadAd();   // load first facebook ad
             }
         };
         adHandler.postDelayed(adRunnable, 1000);

@@ -7,15 +7,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Handler;
-import androidx.annotation.Nullable;
+
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.gridlayout.widget.GridLayout;
+
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -26,7 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
-import com.smile.groundhoghunter.Constants.CommonConstants;
+import com.smile.groundhoghunter.constants.CommonConstants;
 import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
 import com.smile.groundhoghunter.Services.LocalTop10IntentService;
 import com.smile.smilelibraries.interfaces.DismissFunction;
@@ -38,18 +43,13 @@ import com.smile.smilelibraries.alertdialogfragment.AlertDialogFragment;
 import com.smile.smilelibraries.show_interstitial_ads.*;
 import com.smile.smilelibraries.utilities.ScreenUtil;
 
+import java.util.ArrayList;
+
 public class GroundhogActivity extends AppCompatActivity {
 
-    // private properties
-    private final static String TAG = "GroundhogActivity";
+    private final static String TAG = "GroundhogAct";
     private final static String LoadingDialogTag = "LoadingDialogTag";
-
-    private final int SettingRequestCode = 0;
-    private final int LocalTop10RequestCode = 1;
-    private final int GlobalTop10RequestCode = 2;
-    private final int TwoPlayerResultRequestCode = 3;
     private String loadingString;
-
     private int rowNum;
     private int colNum;
     private int highestScore;
@@ -58,18 +58,13 @@ public class GroundhogActivity extends AppCompatActivity {
     private TextView scoreTextView;
     private TextView timerTextView;
     private TextView hitNumTextView;
-
     private SmileImageButton settingButton;
     private SmileImageButton top10Button;
     private SmileImageButton globalTop10Button;
-    private LinearLayout bannerLinearLayout = null;
-    private SetBannerAdView myBannerAdView;
-
     private boolean isShowingLoadingMessage;
     private AlertDialogFragment loadingDialog;
     private BroadcastReceiver bReceiver;
     private int gameType;
-
     protected GameView gameView;
     protected float textFontSize;
     protected float fontScale;
@@ -79,13 +74,13 @@ public class GroundhogActivity extends AppCompatActivity {
     protected SmileImageButton resumeGameButton;
     protected SmileImageButton newGameButton;
     protected SmileImageButton quitGameButton;
-
     protected IoFunctionThread selectedIoFunctionThread;
-
     // public static properties
     public static boolean GamePause = false;
     // public static final properties
-    public static final Handler ActivityHandler = new Handler();
+    public static final Handler ActivityHandler = new Handler(Looper.getMainLooper());
+    private ActivityResultLauncher<Intent> settingLauncher;
+    private ActivityResultLauncher<Intent> otherLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,22 +111,15 @@ public class GroundhogActivity extends AppCompatActivity {
         }
 
         highestScore = GroundhogHunterApp.ScoreSQLiteDB.readHighestScore();
-
         loadingString = getString(R.string.loadingString);
-
         textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
         fontScale = ScreenUtil.getPxFontScale(this);
         toastTextSize = textFontSize * 0.8f;
-
         isShowingLoadingMessage = false;
-
         Intent callingIntent = getIntent();
-        gameType = callingIntent.getIntExtra("GameType", CommonConstants.GameBySinglePlayer);
+        gameType = callingIntent.getIntExtra(CommonConstants.GAME_TYPE, CommonConstants.GameBySinglePlayer);
 
         super.onCreate(savedInstanceState);
-        // the following 2 statements have been moved to AndroidManifest.xml
-        // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        // getSupportActionBar().hide();
 
         setContentView(R.layout.activity_groundhog);
 
@@ -147,19 +135,17 @@ public class GroundhogActivity extends AppCompatActivity {
         settingButton = findViewById(R.id.settingButton);
         Bitmap settingBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.setting_button, settingString, Color.BLUE);
         settingButton.setImageBitmap(settingBitmap);
-        settingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (gameView != null) {
-                    if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
-                        // client is not playing game or not pause status
-                        disableAllButtons();
-                        Intent intent = new Intent(GroundhogActivity.this, SettingActivity.class);
-                        Bundle extras = new Bundle();
-                        extras.putBoolean("HasSound", gameView.getHasSound());
-                        intent.putExtras(extras);
-                        startActivityForResult(intent, SettingRequestCode);
-                    }
+        settingButton.setOnClickListener(view -> {
+            if (gameView != null) {
+                if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
+                    // client is not playing game or not pause status
+                    disableAllButtons();
+                    Intent intent = new Intent(GroundhogActivity.this, SettingActivity.class);
+                    Bundle extras = new Bundle();
+                    extras.putBoolean("HasSound", gameView.getHasSound());
+                    intent.putExtras(extras);
+                    // startActivityForResult(intent, SettingRequestCode);
+                    settingLauncher.launch(intent);
                 }
             }
         });
@@ -169,15 +155,12 @@ public class GroundhogActivity extends AppCompatActivity {
         top10Button = findViewById(R.id.top10Button);
         Bitmap top10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.top10_button, localTop10String, darkRed);
         top10Button.setImageBitmap(top10Bitmap);
-        top10Button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (gameView != null) {
-                    if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
-                        // client is not playing game or not pause status
-                        disableAllButtons();
-                        getLocalTop10ScoreList();    // removed for testing on 2019-05-07
-                    }
+        top10Button.setOnClickListener(view -> {
+            if (gameView != null) {
+                if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
+                    // client is not playing game or not pause status
+                    disableAllButtons();
+                    getLocalTop10ScoreList();    // removed for testing on 2019-05-07
                 }
             }
         });
@@ -187,47 +170,43 @@ public class GroundhogActivity extends AppCompatActivity {
         globalTop10Button = findViewById(R.id.globalTop10Button);
         Bitmap globalTop10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.global_top10_button, globalTop10String, darkRed);
         globalTop10Button.setImageBitmap(globalTop10Bitmap);
-        globalTop10Button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (gameView != null) {
-                    if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
-                        // client is not playing game or not pause status
-                        disableAllButtons();
-                        getGlobalTop10ScoreList();
-                    }
+        globalTop10Button.setOnClickListener(view -> {
+            if (gameView != null) {
+                if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
+                    // client is not playing game or not pause status
+                    disableAllButtons();
+                    getGlobalTop10ScoreList();
                 }
             }
         });
 
         // score layout
-
         TextView gameStatusTitleTextView = findViewById(R.id.gameStatusTitle);
-        ScreenUtil.resizeTextSize(gameStatusTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(gameStatusTitleTextView, textFontSize);
         soundOnOffImageView = findViewById(R.id.soundOnOffImageView);
 
         TextView highScoreTitleTextView = findViewById(R.id.highestScoreTitle);
-        ScreenUtil.resizeTextSize(highScoreTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(highScoreTitleTextView, textFontSize);
         highScoreTextView = findViewById(R.id.highestScoreText);
-        ScreenUtil.resizeTextSize(highScoreTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(highScoreTextView, textFontSize);
         highScoreTextView.setText(String.valueOf(highestScore));
 
         TextView scoreTitleTextView = findViewById(R.id.scoreTitle);
-        ScreenUtil.resizeTextSize(scoreTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(scoreTitleTextView, textFontSize);
         scoreTextView = findViewById(R.id.scoreText);
-        ScreenUtil.resizeTextSize(scoreTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(scoreTextView, textFontSize);
         scoreTextView.setText("0");
 
         TextView timerTitleTextView = findViewById(R.id.timerTitle);
-        ScreenUtil.resizeTextSize(timerTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(timerTitleTextView, textFontSize);
         timerTextView = findViewById(R.id.timerText);
-        ScreenUtil.resizeTextSize(timerTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(timerTextView, textFontSize);
         timerTextView.setText(String.valueOf(GameView.TimerInterval));
 
         TextView hitNumTitleTextView = findViewById(R.id.num_hit_Title);
-        ScreenUtil.resizeTextSize(hitNumTitleTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(hitNumTitleTextView, textFontSize);
         hitNumTextView = findViewById(R.id.num_hit_Text);
-        ScreenUtil.resizeTextSize(hitNumTextView, textFontSize, GroundhogHunterApp.FontSize_Scale_Type);
+        ScreenUtil.resizeTextSize(hitNumTextView, textFontSize);
         hitNumTextView.setText("0");
 
         final LinearLayout gameLinearLayout = findViewById(R.id.gameViewAreaLinearLayout);
@@ -255,7 +234,7 @@ public class GroundhogActivity extends AppCompatActivity {
             }
         }
 
-        bannerLinearLayout = findViewById(R.id.linearlayout_for_ads_in_myActivity);
+        LinearLayout bannerLinearLayout = findViewById(R.id.linearlayout_for_ads_in_myActivity);
         if (!GroundhogHunterApp.googleAdMobBannerID.isEmpty() || !GroundhogHunterApp.facebookBannerID.isEmpty())  {
             String testString = "";
             // for debug mode
@@ -264,11 +243,11 @@ public class GroundhogActivity extends AppCompatActivity {
             }
             String facebookBannerID = testString + GroundhogHunterApp.facebookBannerID;
             //
-            myBannerAdView = new SetBannerAdView(this, null, bannerLinearLayout
+            SetBannerAdView myBannerAdView = new SetBannerAdView(this, null, bannerLinearLayout
                     , GroundhogHunterApp.googleAdMobBannerID, facebookBannerID);
             myBannerAdView.showBannerAdView(GroundhogHunterApp.AdProvider);
         } else {
-            ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams)bannerLinearLayout.getLayoutParams();
+            ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) bannerLinearLayout.getLayoutParams();
             float tempPercent = lp.matchConstraintPercentHeight;
             lp.matchConstraintPercentHeight = 0.0f;
             // lp = (ConstraintLayout.LayoutParams)FrameLayout.getLayoutParams();
@@ -279,14 +258,8 @@ public class GroundhogActivity extends AppCompatActivity {
         gameFrameLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                    // ICE_CREAM_SANDWICH_MR1 is API 15
-                    // removeGlobalOnLayoutListener() deprecated after API 16
-                    gameFrameLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                } else {
-                    // hove to use removeGlobalOnLayoutListener() method after API 16 or is API 16
-                    gameFrameLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
+                // hove to use removeGlobalOnLayoutListener() method after API 16 or is API 16
+                gameFrameLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 int frameWidth = gameFrameLayout.getWidth();
                 int frameHeight = gameFrameLayout.getHeight();
 
@@ -323,152 +296,94 @@ public class GroundhogActivity extends AppCompatActivity {
         resumeGameButton.setEnabled(false);
         resumeGameButton.setVisibility(View.INVISIBLE);
 
-        startGameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startGame();
-            }
-        });
-
-        pauseGameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pauseGame();
-            }
-        });
-
-        resumeGameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                resumeGame();
-            }
-        });
+        startGameButton.setOnClickListener(view -> startGame());
+        pauseGameButton.setOnClickListener(view -> pauseGame());
+        resumeGameButton.setOnClickListener(view -> resumeGame());
 
         String newGameString = getString(R.string.newString);
         newGameButton = findViewById(R.id.newGameButton);
         Bitmap newGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.new_game_button, newGameString, Color.BLUE);
         newGameButton.setImageBitmap(newGameBitmap);
-        newGameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                newGame();
-            }
-        });
+        newGameButton.setOnClickListener(view -> newGame());
 
         String quitGameString = getString(R.string.quitString);
         quitGameButton = findViewById(R.id.quitGameButton);
-        final Bitmap quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.quit_game_button, quitGameString, Color.YELLOW);
+        final Bitmap quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this,
+                R.drawable.quit_game_button, quitGameString, Color.YELLOW);
         quitGameButton.setImageBitmap(quitGameBitmap);
-        quitGameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                quitGame();
-            }
-        });
+        quitGameButton.setOnClickListener(view -> quitGame());
 
         bReceiver = new GroundhogHunterBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(LocalTop10IntentService.Action_Name);
         intentFilter.addAction(GlobalTop10IntentService.Action_Name);
-
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.registerReceiver(bReceiver, intentFilter);
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case SettingRequestCode:
-                enableAllButtons();
-                if (resultCode == Activity.RESULT_OK) {
-                    Log.i(TAG, "SettingActivity returned ok.");
-                    Bundle extras = data.getExtras();
-                    if (extras != null) {
-                        boolean hasSound = extras.getBoolean("HasSound");
-                        gameView.setHasSound(hasSound);
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        exitApp();
                     }
-                } else {
-                    Log.i(TAG, "SettingActivity returned cancel.");
-                }
+                });
 
-                // update Main UI for sound
-                if (gameView.getHasSound()) {
-                    soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
-                } else {
-                    soundOnOffImageView.setImageResource(R.drawable.sound_off_image);
-                }
-                break;
-            case LocalTop10RequestCode:
-            case GlobalTop10RequestCode:
-            case TwoPlayerResultRequestCode:
-                if (GroundhogHunterApp.InterstitialAd != null) {
-                    int entryPoint = 0; //  no used
-                    ShowInterstitial.ShowAdThread showInterstitialAdThread =
-                            GroundhogHunterApp.InterstitialAd.new ShowAdThread(
-                                    new DismissFunction() {
-                                        @Override
-                                        public void backgroundWork() {
-                                            // do nothing
-                                        }
-
-                                        @Override
-                                        public void executeDismiss() {
-                                            enableAllButtons();
-                                        }
-
-                                        @Override
-                                        public void afterFinished(boolean isAdShown) {
-                                            if (!isAdShown) enableAllButtons();
-                                        }
-                                    });
-                    showInterstitialAdThread.startShowAd(GroundhogHunterApp.AdProvider);
-                } else {
+        settingLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
                     enableAllButtons();
-                }
-                break;
-        }
+                    int resultCode = result.getResultCode();
+                    if (resultCode == Activity.RESULT_OK) {
+                        Log.i(TAG, "SettingActivity returned ok.");
+                        Intent data = result.getData();
+                        if (data == null) return;
+                        Bundle extras = data.getExtras();
+                        if (extras != null) {
+                            boolean hasSound = extras.getBoolean("HasSound");
+                            gameView.setHasSound(hasSound);
+                        }
+                    } else {
+                        Log.i(TAG, "SettingActivity returned cancel.");
+                    }
+                    // update Main UI for sound
+                    if (gameView.getHasSound()) {
+                        soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
+                    } else {
+                        soundOnOffImageView.setImageResource(R.drawable.sound_off_image);
+                    }
+                });
+        otherLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> enableAllButtons());
     }
-
 
     @Override
     protected void onStart() {
         super.onStart();
-        System.out.println("MainActivity.onStart() is called.");
+        Log.d(TAG, "onStart() is called.");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println("MainActivity.onResume() is called.");
-
+        Log.d(TAG,"onResume() is called.");
         synchronized (ActivityHandler) {
             GamePause = false;
             ActivityHandler.notifyAll();
         }
-
-        /*
-        boolean hasSound = true;
-        if (gameView != null) {
-            // gameView has been created
-            hasSound = gameView.getHasSound();
-        }
-        */
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        System.out.println("MainActivity.onPause() is called.");
-
+        Log.d(TAG, "onPause() is called.");
         synchronized (ActivityHandler) {
             GamePause = true;
         }
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
+    protected void onNewIntent(@NonNull Intent intent) {
         Log.d(TAG, "onNewIntent() is called.");
         super.onNewIntent(intent);
     }
@@ -476,14 +391,12 @@ public class GroundhogActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        System.out.println("MainActivity.onStop() is called.");
+        Log.d(TAG, "onStop() is called.");
     }
 
     @Override
     public void onDestroy() {
-
         Log.d(TAG, "onDestroy() is called.");
-
         super.onDestroy();
         // release and destroy threads and resources before destroy activity
         if (isFinishing()) {
@@ -491,30 +404,27 @@ public class GroundhogActivity extends AppCompatActivity {
                 GroundhogHunterApp.ScoreSQLiteDB.close();
             }
         }
-
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.unregisterReceiver(bReceiver);
-
         finishApplication();
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putBoolean("IsShowingLoadingMessage", isShowingLoadingMessage);
         super.onSaveInstanceState(outState);
     }
 
-    @Override
-    public void onBackPressed() {
+    private void exitApp() {
         // capture the event of back button when it is pressed
         // change back button behavior
-        super.onBackPressed();
         ExitAppTimer exitAppTimer = ExitAppTimer.getInstance(1000); // singleton class
         if (exitAppTimer.canExit()) {
             quitGame();
         } else {
             exitAppTimer.start();
-            ScreenUtil.showToast(this, getString(R.string.backKeyToExitApp), toastTextSize, GroundhogHunterApp.FontSize_Scale_Type, Toast.LENGTH_SHORT);
+            ScreenUtil.showToast(this, getString(R.string.backKeyToExitApp),
+                    toastTextSize, Toast.LENGTH_SHORT);
         }
     }
 
@@ -589,7 +499,7 @@ public class GroundhogActivity extends AppCompatActivity {
         gameView.newGame(); // set to new game (refresh the UI and stop threads) before quiting game
         if (GroundhogHunterApp.InterstitialAd != null) {
             // free version
-            int entryPoint = 0; //  no used
+            // int entryPoint = 0; //  no used
             ShowInterstitial.ShowAdThread showInterstitialAdThread =
                     GroundhogHunterApp.InterstitialAd.new ShowAdThread(
                             new DismissFunction() {
@@ -661,7 +571,9 @@ public class GroundhogActivity extends AppCompatActivity {
     public void showLoadingMessage() {
         isShowingLoadingMessage = true;
 
-        loadingDialog = AlertDialogFragment.newInstance(loadingString, GroundhogHunterApp.FontSize_Scale_Type, textFontSize, Color.RED, 0, 0, true);
+        loadingDialog = AlertDialogFragment.newInstance(loadingString,
+                ScreenUtil.FontSize_Pixel_Type, textFontSize,
+                Color.RED, 0, 0, true);
         loadingDialog.show(getSupportFragmentManager(), LoadingDialogTag);
     }
 
@@ -679,11 +591,12 @@ public class GroundhogActivity extends AppCompatActivity {
 
     public void displayTwoPlayerResult(int hostScore, int hostHitNum, int clientScore, int clientHitNum) {
         Intent resultIntent = new Intent(this, TwoPlayerResultActivity.class);
-        resultIntent.putExtra("HostScore", hostScore);
-        resultIntent.putExtra("HostHitNum", hostHitNum);
-        resultIntent.putExtra("ClientScore", clientScore);
-        resultIntent.putExtra("ClientHitNum", clientHitNum);
-        startActivityForResult(resultIntent, TwoPlayerResultRequestCode);
+        resultIntent.putExtra(CommonConstants.HOST_SCORE, hostScore);
+        resultIntent.putExtra(CommonConstants.HOST_HIT_NUM, hostHitNum);
+        resultIntent.putExtra(CommonConstants.CLIENT_SCORE, clientScore);
+        resultIntent.putExtra(CommonConstants.CLIENT_HIT_NUM, clientHitNum);
+        // startActivityForResult(resultIntent, TwoPlayerResultRequestCode);
+        otherLauncher.launch(resultIntent);
     }
 
     // public methods
@@ -725,6 +638,7 @@ public class GroundhogActivity extends AppCompatActivity {
             Bundle extras = intent.getExtras();
 
             String actionName = intent.getAction();
+            if (actionName == null) return;
             switch (actionName) {
                 case LocalTop10IntentService.Action_Name:
                     // dismiss showing message
@@ -732,10 +646,16 @@ public class GroundhogActivity extends AppCompatActivity {
                     Intent localTop10Intent = new Intent(getApplicationContext(), Top10ScoreActivity.class);
                     Bundle localTop10Extras = new Bundle();
                     localTop10Extras.putString("Top10TitleName", getString(R.string.localTop10ScoreTitleString));
-                    localTop10Extras.putStringArrayList("Top10Players", extras.getStringArrayList("PlayerNames"));
-                    localTop10Extras.putIntegerArrayList("Top10Scores", extras.getIntegerArrayList("PlayerScores"));
+                    if (extras == null) {
+                        localTop10Extras.putStringArrayList("Top10Players", new ArrayList<>());
+                        localTop10Extras.putIntegerArrayList("Top10Scores", new ArrayList<>());
+                    } else {
+                        localTop10Extras.putStringArrayList("Top10Players", extras.getStringArrayList("PlayerNames"));
+                        localTop10Extras.putIntegerArrayList("Top10Scores", extras.getIntegerArrayList("PlayerScores"));
+                    }
                     localTop10Intent.putExtras(localTop10Extras);
-                    startActivityForResult(localTop10Intent, LocalTop10RequestCode);
+                    // startActivityForResult(localTop10Intent, LocalTop10RequestCode);
+                    otherLauncher.launch(localTop10Intent);
                     break;
                 case GlobalTop10IntentService.Action_Name:
                     // dismiss showing message
@@ -743,13 +663,18 @@ public class GroundhogActivity extends AppCompatActivity {
                     Intent globalTop10Intent = new Intent(getApplicationContext(), Top10ScoreActivity.class);
                     Bundle globalTop10Extras = new Bundle();
                     globalTop10Extras.putString("Top10TitleName", getString(R.string.globalTop10ScoreTitleString));
-                    globalTop10Extras.putStringArrayList("Top10Players", extras.getStringArrayList("PlayerNames"));
-                    globalTop10Extras.putIntegerArrayList("Top10Scores", extras.getIntegerArrayList("PlayerScores"));
+                    if (extras == null) {
+                        globalTop10Extras.putStringArrayList("Top10Players", new ArrayList<>());
+                        globalTop10Extras.putIntegerArrayList("Top10Scores", new ArrayList<>());
+                    } else {
+                        globalTop10Extras.putStringArrayList("Top10Players", extras.getStringArrayList("PlayerNames"));
+                        globalTop10Extras.putIntegerArrayList("Top10Scores", extras.getIntegerArrayList("PlayerScores"));
+                    }
                     globalTop10Intent.putExtras(globalTop10Extras);
-                    startActivityForResult(globalTop10Intent, GlobalTop10RequestCode);
+                    // startActivityForResult(globalTop10Intent, GlobalTop10RequestCode);
+                    otherLauncher.launch(globalTop10Intent);
                     break;
             }
-
         }
     }
 }

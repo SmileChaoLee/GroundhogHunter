@@ -1,7 +1,7 @@
 package com.smile.groundhoghunter.Threads;
 
 import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
-import com.smile.groundhoghunter.Constants.CommonConstants;
+import com.smile.groundhoghunter.constants.CommonConstants;
 import com.smile.groundhoghunter.GameView;
 import com.smile.groundhoghunter.GroundhogActivity;
 
