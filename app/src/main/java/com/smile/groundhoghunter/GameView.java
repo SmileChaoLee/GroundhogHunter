@@ -27,12 +27,12 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
-import com.smile.groundhoghunter.constants.CommonConstants;
-import com.smile.groundhoghunter.Models.Groundhog;
-import com.smile.groundhoghunter.Threads.GameTimerThread;
-import com.smile.groundhoghunter.Threads.GameViewDrawThread;
-import com.smile.groundhoghunter.Threads.GroundhogRandomThread;
+import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
+import com.smile.groundhoghunter.constants.Constants;
+import com.smile.groundhoghunter.models.Groundhog;
+import com.smile.groundhoghunter.threads.GameTimerThread;
+import com.smile.groundhoghunter.threads.GameViewDrawThread;
+import com.smile.groundhoghunter.threads.GroundhogRandomThread;
 import com.smile.smilelibraries.player_record_rest.httpUrl.PlayerRecordRest;
 import com.smile.smilelibraries.utilities.SoundPoolUtil;
 import com.smile.smilelibraries.utilities.ScreenUtil;
@@ -78,6 +78,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public static boolean GameViewPause = false;    // for synchronizing
     public static final Handler GameViewHandler = new Handler(Looper.getMainLooper());  // for synchronizing
     public static final int BluetoothMediaType = 0;
+    public static final int InternetMediaType = 1;
     public static final int NoneMediaType = -1;
     public static final int TimerInterval = 60; // 60 seconds
     public static final int DrawingInterval;
@@ -221,11 +222,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                     soundPoolUtil.playSound();
                                 }
 
-                                if (gameType == CommonConstants.GameBySinglePlayer) {
+                                if (gameType == Constants.GameBySinglePlayer) {
                                     newHitStatus = singlePlayerHitStatus;
                                 } else {
                                     // not single player
-                                    if (gameType == CommonConstants.TwoPlayerGameByHost) {
+                                    if (gameType == Constants.TwoPlayerGameByHost) {
                                         // host
                                         newHitStatus = hostPlayerHitStatus;
                                     } else {
@@ -245,7 +246,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                                     int numOfTimeIntervalShown = groundhog.getNumOfTimeIntervalShown();
                                     writeString += String.format(Locale.ENGLISH, "%02d", numOfTimeIntervalShown);
                                     writeString += newHitStatus; // hit status
-                                    selectedIoFunctionThread.write(CommonConstants.TwoPlayerGameGroundhogHit, writeString);
+                                    selectedIoFunctionThread.write(Constants.TwoPlayerGameGroundhogHit, writeString);
                                 }
                                 groundhog.setHitStatus(newHitStatus);
                                 ++numOfHits;
@@ -541,7 +542,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         groundhogRandomThread.setKeepRunning(false);
         gameTimerThread.setKeepRunning(false);
         runningStatus = 2;
-        if (gameType == CommonConstants.GameBySinglePlayer) {
+        if (gameType == Constants.GameBySinglePlayer) {
             // single player then record the score
             boolean isInTop10 = GroundhogHunterApp.ScoreSQLiteDB.isInTop10(currentScore);
             if (isInTop10) {
@@ -552,7 +553,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             // display the competition result
             String scoreString = String.format(Locale.ENGLISH, "%04d", currentScore);
             scoreString += String.format(Locale.ENGLISH, "%04d", numOfHits);
-            selectedIoFunctionThread.write(CommonConstants.TwoPlayerGameScoreReceived, scoreString);
+            selectedIoFunctionThread.write(Constants.TwoPlayerGameScoreReceived, scoreString);
             groundhogActivity.runOnUiThread(() -> {
                 AsyncTask<Void, Void, Void> displayResultAsyncTask = new DisplayResultAsyncTask();
                 displayResultAsyncTask.execute();
@@ -664,7 +665,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         @Override
         protected void onPostExecute(Void o) {
             super.onPostExecute(o);
-            if (gameType == CommonConstants.TwoPlayerGameByHost) {
+            if (gameType == Constants.TwoPlayerGameByHost) {
                 groundhogActivity.displayTwoPlayerResult(currentScore, numOfHits, oppositeCurrentScore, oppositeNumOfHits);
             } else {
                 // TwoPlayerGameByClient

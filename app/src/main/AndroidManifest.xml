@@ -8,18 +8,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <!-- Required for Android 12+ (API 31+) -->
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
-        android:usesPermissionFlags="neverForLocation"
-        tools:targetApi="31" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <!-- Required for legacy support (Android 11 and below) -->
-    <uses-permission android:name="android.permission.BLUETOOTH"
-        android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
-        android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
-        android:maxSdkVersion="30" />
-
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:name=".GroundhogHunterApp"
@@ -61,7 +55,7 @@
         </activity>
 
         <activity
-            android:name=".BluetoothCreateGameActivity">
+            android:name=".BtCreateGameActivity">
         </activity>
 
         <activity
@@ -69,7 +63,7 @@
         </activity>
 
         <activity
-            android:name=".BluetoothJoinGameActivity">
+            android:name=".BtJoinGameActivity">
         </activity>
 
         <activity
@@ -100,12 +94,12 @@
             android:theme="@style/AppThemeTransparent" />
 
         <service
-            android:name=".Services.LocalTop10IntentService"
+            android:name=".services.LocalTop10IntentService"
             android:enabled="true"
             android:exported="false">
         </service>
         <service
-            android:name=".Services.GlobalTop10IntentService"
+            android:name=".services.GlobalTop10IntentService"
             android:enabled="true"
             android:exported="false">
         </service>

@@ -9,14 +9,20 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.appcompat.widget.AppCompatRadioButton;
+import androidx.core.location.LocationManagerCompat;
+
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -25,8 +31,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.smile.groundhoghunter.Utilities.BluetoothUtil;
-import com.smile.groundhoghunter.constants.CommonConstants;
+import com.smile.groundhoghunter.utilities.BluetoothUtil;
+import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.smilelibraries.utilities.ScreenUtil;
@@ -46,19 +52,12 @@ public class TwoPlayerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        // private properties
         float textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
         toastTextSize = textFontSize * 0.8f;
-
         // String bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
         playerNameCannotBeEmptyString = getString(R.string.playerNameCannotBeEmptyString);
-        String explainProblemForBluetoothString = getString(R.string.explainProblemForBluetoothString);
         int colorDarkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed);
         int colorDarkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
-
-        btDeviceName = "";
-        mediaType = GameView.BluetoothMediaType;
 
         super.onCreate(savedInstanceState);
 
@@ -70,26 +69,28 @@ public class TwoPlayerActivity extends AppCompatActivity {
         TextView explainProblemTextView = findViewById(R.id.explainProblemTextView);
         ScreenUtil.resizeTextSize(explainProblemTextView, textFontSize);
 
-        AppCompatRadioButton bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
-        ScreenUtil.resizeTextSize(bluetoothRadioButton, textFontSize);
-        bluetoothRadioButton.setChecked(false);
-        bluetoothRadioButton.setOnClickListener(view -> {
+        btDeviceName = "";
+        mediaType = GameView.BluetoothMediaType;
+        AppCompatRadioButton btRadioButton = findViewById(R.id.bluetoothRadioButton);
+        ScreenUtil.resizeTextSize(btRadioButton, textFontSize);
+        btRadioButton.setChecked(true);
+        btRadioButton.setOnClickListener(view -> {
+            explainProblemTextView.setText(getString(R.string.explainProblemForBluetoothString));
+            btRadioButton.setChecked(true);
             mediaType = GameView.BluetoothMediaType;
             thisDeviceName = btDeviceName;
             setPlayerName();
         });
-
-        if (mediaType == GameView.BluetoothMediaType) {
-            explainProblemTextView.setText(explainProblemForBluetoothString);
-            bluetoothRadioButton.setChecked(true);
+        AppCompatRadioButton intRadioButton = findViewById(R.id.internetRadioButton);
+        ScreenUtil.resizeTextSize(intRadioButton, textFontSize);
+        intRadioButton.setChecked(false);
+        intRadioButton.setOnClickListener(view -> {
+            explainProblemTextView.setText(getString(R.string.explainProblemForInternetString));
+            intRadioButton.setChecked(true);
+            mediaType = GameView.InternetMediaType;
             thisDeviceName = btDeviceName;
-        } else {// no media supported
-            explainProblemTextView.setText("");
-            bluetoothRadioButton.setChecked(false);
-            thisDeviceName = "";
-            returnToPrevious();
-            return;
-        }
+            setPlayerName();
+        });
 
         TextView playerNameStringTextView = findViewById(R.id.playerNameStringTextView);
         ScreenUtil.resizeTextSize(playerNameStringTextView, textFontSize);
@@ -131,8 +132,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
             Intent gameIntent;
             if (mediaType == GameView.BluetoothMediaType) {
                 gameIntent = new Intent(TwoPlayerActivity.this,
-                        BluetoothCreateGameActivity.class);
-                gameIntent.putExtra(CommonConstants.PLAYER_NAME, playerName);
+                        BtCreateGameActivity.class);
+                gameIntent.putExtra(Constants.PLAYER_NAME, playerName);
                 startActivity(gameIntent);
             }
         });
@@ -155,8 +156,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
             Intent gameIntent;
             if (mediaType == GameView.BluetoothMediaType) {
                 gameIntent = new Intent(TwoPlayerActivity.this,
-                        BluetoothJoinGameActivity.class);
-                gameIntent.putExtra(CommonConstants.PLAYER_NAME, playerName);
+                        BtJoinGameActivity.class);
+                gameIntent.putExtra(Constants.PLAYER_NAME, playerName);
                 startActivity(gameIntent);
             }
         });
@@ -180,8 +181,34 @@ public class TwoPlayerActivity extends AppCompatActivity {
                     }
                 });
 
+        ActivityResultLauncher<Intent> locationLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    Log.d(TAG, "onCreate.locationLauncher.result");
+                    if (isLocationEnabled()) {
+                        askBluetoothPermission();
+                    } else {
+                        returnToPrevious(); // unable to do 2 players
+                    }
+                }
+        );
+
         // Bluetooth
-        askBluetoothPermission();
+        if (!isLocationEnabled()) {
+            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            locationLauncher.launch(intent);
+        } else {
+            Log.d(TAG, "onCreate.isLocationEnabled = true");
+            askBluetoothPermission();
+        }
+    }
+
+    private boolean isLocationEnabled() {
+        Log.d(TAG, "isLocationEnabled");
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean result = LocationManagerCompat.isLocationEnabled(lm);
+        Log.d(TAG, "isLocationEnabled.result = " + result);
+        return result;
     }
 
     private void askBluetoothPermission() {
@@ -191,19 +218,28 @@ public class TwoPlayerActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Log.d(TAG, logStr + ".checkSelfPermission");
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, logStr + ".checkSelfPermission.not PERMISSION_GRANTED");
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN},
-                        REQUEST_BLUETOOTH_PERMISSIONS);
+                        new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN,
+                                Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_BLUETOOTH_PERMISSIONS);
                 return;
             } else {
                 // maybe it is PERMISSION_GRANTED when it is just asking but not needed now
                 // ,so it is always PERMISSION_GRANTED until when it needed
                 Log.d(TAG, logStr + ".checkSelfPermission.PERMISSION_GRANTED");
             }
+        } else {
+            Log.d(TAG, logStr + ".< API 31 or PERMISSION_GRANTED");
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, logStr + ".checkSelfPermission.ACCESS_FINE_LOCATION.not PERMISSION_GRANTED");
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_BLUETOOTH_PERMISSIONS);
+                return;
+            }
         }
-        Log.d(TAG, logStr + ".< API 31 or PERMISSION_GRANTED");
         isBluetoothPermitted = true;
         initBluetooth();
     }
@@ -259,6 +295,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
+        String logStr = "onRequestPermissionsResult";
+        Log.d(TAG, logStr + ".requestCode = " + requestCode);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_BLUETOOTH_PERMISSIONS) {
             isBluetoothPermitted = true;
@@ -268,6 +306,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
                     break;
                 }
             }
+            Log.d(TAG, logStr + ".isBluetoothPermitted = " + isBluetoothPermitted);
             if (isBluetoothPermitted) {
                 initBluetooth();
             } else {

@@ -15,13 +15,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.TextView;
-import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
-import com.smile.groundhoghunter.AbstractClasses.ServerAcceptThread;
-import com.smile.groundhoghunter.ArrayAdapters.TwoPlayerListAdapter;
-import com.smile.groundhoghunter.constants.CommonConstants;
-import com.smile.groundhoghunter.Interfaces.ConnectDevice;
-import com.smile.groundhoghunter.Utilities.ConnectDeviceUtil;
-import com.smile.groundhoghunter.Utilities.MessageShowingUtil;
+import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
+import com.smile.groundhoghunter.abstract_threads.ServerAcceptThread;
+import com.smile.groundhoghunter.adapters.TwoPlayerListAdapter;
+import com.smile.groundhoghunter.constants.Constants;
+import com.smile.groundhoghunter.interfaces.ConnectDevice;
+import com.smile.groundhoghunter.utilities.ConnectDeviceUtil;
+import com.smile.groundhoghunter.utilities.MessageShowingUtil;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.smilelibraries.utilities.ScreenUtil;
@@ -55,7 +55,7 @@ public class CreateGameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         Intent callingIntent = getIntent();
-        playerName = callingIntent.getStringExtra(CommonConstants.PLAYER_NAME);
+        playerName = callingIntent.getStringExtra(Constants.PLAYER_NAME);
         if (playerName == null) {
             playerName = "";
         }
@@ -157,7 +157,7 @@ public class CreateGameActivity extends AppCompatActivity {
                 for (String remoteMacAddress : ioFunctionThreadMap.keySet()) {
                     IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
                     if (ioFunctionThread != null && ioFunctionThread != selectedIoFunctionThread) {
-                        ioFunctionThread.write(CommonConstants.TwoPlayerHostExitCode, "");
+                        ioFunctionThread.write(Constants.TwoPlayerHostExitCode, "");
                         ConnectDeviceUtil.stopIoFunctionThread(ioFunctionThread);
                     }
                 }
@@ -167,7 +167,7 @@ public class CreateGameActivity extends AppCompatActivity {
                 oppositePlayerNameMap.clear();
                 oppositePlayerNameMap = null;
                 createGameHandler.removeCallbacksAndMessages(null);
-                selectedIoFunctionThread.write(CommonConstants.TwoPlayerHostStartGame, "");
+                selectedIoFunctionThread.write(Constants.TwoPlayerHostStartGame, "");
                 startHostGame();
             }
         });
@@ -185,7 +185,7 @@ public class CreateGameActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "CreateGameActivity --> Came back from BtHostGameActivity.");
 
-        if (requestCode == CommonConstants.TwoPlayerGameByHost) {
+        if (requestCode == Constants.TwoPlayerGameByHost) {
             oppositePlayerName = "";
             oppositePlayerNameMap = new LinkedHashMap<>();
             mServerAcceptThread = null;
@@ -255,7 +255,7 @@ public class CreateGameActivity extends AppCompatActivity {
 
     private void hostLeavingNotification() {
         for (IoFunctionThread ioFunctionThread : ioFunctionThreadMap.values()) {
-            ioFunctionThread.write(CommonConstants.TwoPlayerHostExitCode, "");
+            ioFunctionThread.write(Constants.TwoPlayerHostExitCode, "");
         }
     }
 
@@ -294,7 +294,7 @@ public class CreateGameActivity extends AppCompatActivity {
             Bundle data = msg.getData();
 
             switch (msg.what) {
-                case CommonConstants.OppositePlayerNameHasBeenRead:
+                case Constants.OppositePlayerNameHasBeenRead:
                     megString = "has been read.";
                     String oppositeName = data.getString("OppositePlayerName");
                     megString = oppositeName + " " + megString;
@@ -322,10 +322,10 @@ public class CreateGameActivity extends AppCompatActivity {
                         ioFunctionThread.setStartRead(true);    // start reading data
                     }
                     break;
-                case CommonConstants.ServerAcceptThreadNoServerSocket:
+                case Constants.ServerAcceptThreadNoServerSocket:
                     showMessage.showMessageInTextView(cannotCreateServerSocketString, MessageDuration);
                     break;
-                case CommonConstants.ServerAcceptThreadConnected:
+                case Constants.ServerAcceptThreadConnected:
                     connectDevice = data.getParcelable("ConnectDevice");
                     if (connectDevice == null) break;
                     deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
@@ -340,10 +340,10 @@ public class CreateGameActivity extends AppCompatActivity {
                         ioFunctionThreadMap.put(remoteMacAddress, ioFunctionThread);
                     }
                     break;
-                case CommonConstants.ServerAcceptThreadStopped:
+                case Constants.ServerAcceptThreadStopped:
                     showMessage.showMessageInTextView(waitingStoppedCancelledString, MessageDuration);
                     break;
-                case CommonConstants.TwoPlayerClientExitCode:
+                case Constants.TwoPlayerClientExitCode:
                     connectDevice = data.getParcelable("ConnectDevice");
                     if (connectDevice == null) break;
                     remoteMacAddress = connectDevice.getAddress();
@@ -368,7 +368,7 @@ public class CreateGameActivity extends AppCompatActivity {
                     ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
                     twoPlayerListAdapter.updateData(oppNameList);
                     break;
-                case CommonConstants.TwoPlayerDefaultReading:
+                case Constants.TwoPlayerDefaultReading:
                     Log.d(TAG, "Default reading.");
                     connectDevice = data.getParcelable("ConnectDevice");
                     if (connectDevice != null) {

@@ -11,9 +11,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.smile.groundhoghunter.constants.CommonConstants;
-import com.smile.groundhoghunter.Models.Groundhog;
-import com.smile.groundhoghunter.Threads.GameTimerThread;
+import com.smile.groundhoghunter.constants.Constants;
+import com.smile.groundhoghunter.models.Groundhog;
+import com.smile.groundhoghunter.threads.GameTimerThread;
 
 public class ClientGameActivity extends GroundhogActivity {
 
@@ -55,7 +55,7 @@ public class ClientGameActivity extends GroundhogActivity {
         pauseGameButton.setVisibility(View.INVISIBLE);
         resumeGameButton.setEnabled(true);
         resumeGameButton.setVisibility(View.VISIBLE);
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerPauseGameButton, "");
+        selectedIoFunctionThread.write(Constants.TwoPlayerPauseGameButton, "");
     }
 
     @Override
@@ -65,13 +65,13 @@ public class ClientGameActivity extends GroundhogActivity {
         pauseGameButton.setVisibility(View.VISIBLE);
         resumeGameButton.setEnabled(false);
         resumeGameButton.setVisibility(View.INVISIBLE);
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerResumeGameButton, "");
+        selectedIoFunctionThread.write(Constants.TwoPlayerResumeGameButton, "");
     }
 
     @Override
     protected void quitGame() {
         super.quitGame();
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerOppositeLeftGame, "");
+        selectedIoFunctionThread.write(Constants.TwoPlayerOppositeLeftGame, "");
     }
 
     protected class ClientGameHandler extends Handler {
@@ -96,14 +96,14 @@ public class ClientGameActivity extends GroundhogActivity {
 
             Log.d(TAG, "Message received: " + msg.what);
             switch (msg.what) {
-                case CommonConstants.TwoPlayerOppositeLeftGame:
+                case Constants.TwoPlayerOppositeLeftGame:
                     // received by host and client sides
                     msgString = mContext.getString(R.string.oppositePlayerLeftGameString);
                     Toast.makeText(mContext, msgString, Toast.LENGTH_SHORT).show();
                     gameView.setOppositePlayerLeft(true);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerNewGameButton:
+                case Constants.TwoPlayerNewGameButton:
                     // received by client side
                     gameView.newGame(); // new game on client side
                     pauseGameButton.setEnabled(false);
@@ -112,7 +112,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     resumeGameButton.setVisibility(View.INVISIBLE);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerStartGameButton:
+                case Constants.TwoPlayerStartGameButton:
                     // received by client side
                     gameView.startGame();   // start game on client side
                     pauseGameButton.setEnabled(true);
@@ -121,7 +121,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     resumeGameButton.setVisibility(View.INVISIBLE);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerPauseGameButton:
+                case Constants.TwoPlayerPauseGameButton:
                     // received by host and client sides
                     gameView.pauseGame();
                     pauseGameButton.setEnabled(false);
@@ -130,7 +130,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     resumeGameButton.setVisibility(View.VISIBLE);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerResumeGameButton:
+                case Constants.TwoPlayerResumeGameButton:
                     // received by host and client sides
                     gameView.resumeGame();
                     resumeGameButton.setEnabled(false);
@@ -139,7 +139,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     pauseGameButton.setVisibility(View.VISIBLE);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerClientGameTimerRead:
+                case Constants.TwoPlayerClientGameTimerRead:
                     msgString = data.getString("TimerRemaining", "");
                     int timeRemaining = Integer.parseInt(msgString);
                     GameTimerThread gameTimerThread = gameView.getGameTimerThread();
@@ -148,7 +148,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     }
                     selectedIoFunctionThread.setStartRead(true);
                     break;
-                case CommonConstants.TwoPlayerClientGameGroundhogRead:
+                case Constants.TwoPlayerClientGameGroundhogRead:
                     msgString = data.getString("GroundhogData", "");
                     i = 0;
                     for (Groundhog groundhog : gameView.groundhogArray) {
@@ -165,12 +165,12 @@ public class ClientGameActivity extends GroundhogActivity {
                     }
                     selectedIoFunctionThread.setStartRead(true);
                     break;
-                case CommonConstants.TwoPlayerGameGroundhogHit:
+                case Constants.TwoPlayerGameGroundhogHit:
                     msgString = data.getString("GroundhogHitData");
                     gameView.setGroundhogByMsgString(msgString);
                     selectedIoFunctionThread.setStartRead(true);
                     break;
-                case CommonConstants.TwoPlayerGameScoreReceived:
+                case Constants.TwoPlayerGameScoreReceived:
                     msgString = data.getString("OppositeCurrentScore", "0");
                     int oppScore = Integer.parseInt(msgString.substring(0, 4));
                     gameView.setOppositeCurrentScore(oppScore);
@@ -179,7 +179,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     gameView.setReceivedScoreFromOpposite(true);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerDefaultReading:
+                case Constants.TwoPlayerDefaultReading:
                     // wrong or read error
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;

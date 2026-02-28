@@ -1,8 +1,8 @@
 package com.smile.groundhoghunter;
 
 import android.os.Bundle;
-import com.smile.groundhoghunter.Threads.BluetoothFunctionThread;
-import com.smile.groundhoghunter.Utilities.BluetoothUtil;
+import com.smile.groundhoghunter.threads.BluetoothFunctionThread;
+import com.smile.groundhoghunter.utilities.BluetoothUtil;
 
 public class BtClientGameActivity extends ClientGameActivity {
 

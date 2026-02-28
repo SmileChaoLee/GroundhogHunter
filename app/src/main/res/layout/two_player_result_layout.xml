@@ -3,11 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/transparent"
-    tools:context=".TwoPlayerResultActivity">
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/topLinearLayoutForTwoPlayerResult"
@@ -48,7 +48,8 @@
                 android:layout_height="0dp"
                 android:background="@drawable/two_player_result_host_layout_border"
                 android:layout_weight="4"
-                android:weightSum="2">
+                android:weightSum="2"
+                tools:ignore="NestedWeights">
                 <TextView
                     android:id="@+id/gameCreatorTitle"
                     android:layout_width="match_parent"
@@ -59,6 +60,7 @@
                     android:layout_weight="1">
                 </TextView>
                 <LinearLayout
+                    android:baselineAligned="false"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -74,7 +76,7 @@
                             android:id="@+id/hostGameScoreTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
                             android:textColor="@color/lightDarkGreen"
@@ -84,7 +86,7 @@
                             android:id="@+id/hostGameScoreText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_toRightOf="@+id/hostGameScoreTitle"
+                            android:layout_toEndOf="@+id/hostGameScoreTitle"
                             android:layout_alignTop="@+id/hostGameScoreTitle"
                             android:textColor="@color/darkRed"
                             android:text="">
@@ -99,7 +101,7 @@
                             android:id="@+id/hostGameHitNumTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
                             android:textColor="@color/lightDarkGreen"
@@ -109,7 +111,7 @@
                             android:id="@+id/hostGameHitNumText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_toRightOf="@+id/hostGameHitNumTitle"
+                            android:layout_toEndOf="@+id/hostGameHitNumTitle"
                             android:layout_alignTop="@+id/hostGameHitNumTitle"
                             android:textColor="@color/darkRed"
                             android:text="">
@@ -136,6 +138,7 @@
                     android:layout_weight="1">
                 </TextView>
                 <LinearLayout
+                    android:baselineAligned="false"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -146,12 +149,13 @@
                         android:gravity="center_vertical"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        tools:ignore="NestedWeights">
                         <TextView
                             android:id="@+id/clientGameScoreTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
                             android:textColor="@color/lightDarkGreen"
@@ -161,7 +165,7 @@
                             android:id="@+id/clientGameScoreText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_toRightOf="@+id/clientGameScoreTitle"
+                            android:layout_toEndOf="@+id/clientGameScoreTitle"
                             android:layout_alignTop="@+id/clientGameScoreTitle"
                             android:textColor="@color/darkRed"
                             android:text="">
@@ -176,7 +180,7 @@
                             android:id="@+id/clientGameHitNumTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
                             android:textColor="@color/lightDarkGreen"
@@ -186,7 +190,7 @@
                             android:id="@+id/clientGameHitNumText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_toRightOf="@+id/clientGameHitNumTitle"
+                            android:layout_toEndOf="@+id/clientGameHitNumTitle"
                             android:layout_alignTop="@+id/clientGameHitNumTitle"
                             android:textColor="@color/darkRed"
                             android:text="">

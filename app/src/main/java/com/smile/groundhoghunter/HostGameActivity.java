@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.smile.groundhoghunter.constants.CommonConstants;
+import com.smile.groundhoghunter.constants.Constants;
 
 public class HostGameActivity extends GroundhogActivity {
 
@@ -43,31 +43,31 @@ public class HostGameActivity extends GroundhogActivity {
     @Override
     protected void startGame() {
         super.startGame();
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerStartGameButton, "");
+        selectedIoFunctionThread.write(Constants.TwoPlayerStartGameButton, "");
     }
 
     @Override
     protected void pauseGame() {
         super.pauseGame();
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerPauseGameButton, "");
+        selectedIoFunctionThread.write(Constants.TwoPlayerPauseGameButton, "");
     }
 
     @Override
     protected void resumeGame() {
         super.resumeGame();
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerResumeGameButton, "");
+        selectedIoFunctionThread.write(Constants.TwoPlayerResumeGameButton, "");
     }
 
     @Override
     protected void newGame() {
         super.newGame();
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerNewGameButton, "");
+        selectedIoFunctionThread.write(Constants.TwoPlayerNewGameButton, "");
     }
 
     @Override
     protected void quitGame() {
         super.quitGame();
-        selectedIoFunctionThread.write(CommonConstants.TwoPlayerOppositeLeftGame, "");
+        selectedIoFunctionThread.write(Constants.TwoPlayerOppositeLeftGame, "");
     }
 
     protected class HostGameHandler extends Handler {
@@ -88,29 +88,29 @@ public class HostGameActivity extends GroundhogActivity {
             Bundle data = msg.getData();
             Log.d(TAG, "Message received: " + msg.what);
             switch (msg.what) {
-                case CommonConstants.TwoPlayerOppositeLeftGame:
+                case Constants.TwoPlayerOppositeLeftGame:
                     // received by host and client sides
                     msgString = mContext.getString(R.string.oppositePlayerLeftGameString);
                     Toast.makeText(mContext, msgString, Toast.LENGTH_SHORT).show();
                     gameView.setOppositePlayerLeft(true);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerPauseGameButton:
+                case Constants.TwoPlayerPauseGameButton:
                     // received by host and client sides
                     HostGameActivity.super.pauseGame();
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerResumeGameButton:
+                case Constants.TwoPlayerResumeGameButton:
                     // received by host and client sides
                     HostGameActivity.super.resumeGame();
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerGameGroundhogHit:
-                    msgString = data.getString("GroundhogHitData");
+                case Constants.TwoPlayerGameGroundhogHit:
+                    msgString = data.getString("GroundhogHitData", "");
                     gameView.setGroundhogByMsgString(msgString);
                     selectedIoFunctionThread.setStartRead(true);
                     break;
-                case CommonConstants.TwoPlayerGameScoreReceived:
+                case Constants.TwoPlayerGameScoreReceived:
                     msgString = data.getString("OppositeCurrentScore", "0");
                     int oppScore = Integer.parseInt(msgString.substring(0, 4));
                     gameView.setOppositeCurrentScore(oppScore);
@@ -119,7 +119,7 @@ public class HostGameActivity extends GroundhogActivity {
                     gameView.setReceivedScoreFromOpposite(true);
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;
-                case CommonConstants.TwoPlayerDefaultReading:
+                case Constants.TwoPlayerDefaultReading:
                     // wrong or read error
                     selectedIoFunctionThread.setStartRead(true);    // start reading data
                     break;

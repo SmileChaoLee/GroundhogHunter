@@ -8,7 +8,7 @@ import android.util.Log;
 import androidx.multidex.MultiDexApplication;
 import com.facebook.ads.AudienceNetworkAds;
 import com.google.android.gms.ads.MobileAds;
-import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
+import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
 import com.smile.smilelibraries.facebook_ads_util.*;
 import com.smile.smilelibraries.google_ads_util.AdMobInterstitial;
 import com.smile.smilelibraries.scoresqlite.*;

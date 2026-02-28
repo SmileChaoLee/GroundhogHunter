@@ -3,6 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:weightSum="100">
     <TextView
         android:id="@+id/playerNameStringTextView"
@@ -12,7 +13,7 @@
         android:textColor="@color/blue"
         android:textStyle="normal"
         android:gravity="center"
-        android:layout_marginRight="0dp"
+        android:layout_marginStart="0dp"
         android:text="@string/playerNameString"
         android:layout_weight="40">
     </TextView>

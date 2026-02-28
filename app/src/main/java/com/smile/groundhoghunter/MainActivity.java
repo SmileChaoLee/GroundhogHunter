@@ -13,7 +13,7 @@ import android.os.Looper;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.smile.groundhoghunter.constants.CommonConstants;
+import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.smilelibraries.privacy_policy.PrivacyPolicyUtil;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         buttonLp.bottomMargin = buttonTopMargin;
         singlePlayerButton.setOnClickListener(view -> {
             Intent gameIntent = new Intent(MainActivity.this, GroundhogActivity.class);
-            gameIntent.putExtra(CommonConstants.GAME_TYPE, CommonConstants.GameBySinglePlayer);
+            gameIntent.putExtra(Constants.GAME_TYPE, Constants.GameBySinglePlayer);
             startActivity(gameIntent);
         });
 

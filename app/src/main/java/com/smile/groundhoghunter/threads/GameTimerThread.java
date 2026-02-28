@@ -1,0 +1,88 @@
+package com.smile.groundhoghunter.threads;
+
+import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
+import com.smile.groundhoghunter.constants.Constants;
+import com.smile.groundhoghunter.GameView;
+import com.smile.groundhoghunter.GroundhogActivity;
+
+public class GameTimerThread extends Thread {
+
+    private final static String TAG = "Threads.GameTimerThread";
+    private final GameView gameView;
+    private final int gameType;
+    private final IoFunctionThread selectedIoFunctionThread;
+    private final int synchronizeTime = 1000; // one second
+
+    private boolean keepRunning;
+    private int timeRemaining;
+
+    public GameTimerThread(GameView gView) {
+        gameView = gView;
+        gameType = gameView.getGameType();
+        selectedIoFunctionThread = gameView.getIoFunctionThread();
+        keepRunning = true;
+        timeRemaining = GameView.TimerInterval;
+    }
+
+    public void run() {
+        while ((timeRemaining > 0) && (keepRunning)) {
+            synchronized (GroundhogActivity.ActivityHandler) {
+                // for application's (Main activity) synchronizing
+                while (GroundhogActivity.GamePause) {
+                    try {
+                        GroundhogActivity.ActivityHandler.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            synchronized (GameView.GameViewHandler) {
+                // for GameView's synchronizing
+                while (GameView.GameViewPause) {
+                    try {
+                        GameView.GameViewHandler.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            try {
+                Thread.sleep(synchronizeTime);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            switch (gameType) {
+                case Constants.GameBySinglePlayer:
+                    --timeRemaining;
+                    break;
+                case Constants.TwoPlayerGameByHost:
+                    --timeRemaining;
+                    selectedIoFunctionThread.write(Constants.TwoPlayerClientGameTimerRead, "" + timeRemaining);
+                    break;
+                case Constants.TwoPlayerGameByClient:
+                    // only read timeRemaining from Host game
+                    boolean isOppositePlayerLeft = gameView.getOppositePlayerLeft();
+                    if (isOppositePlayerLeft) {
+                        --timeRemaining;
+                    }
+                    break;
+            }
+
+        }
+    }
+
+    public int getTimeRemaining() {
+        return timeRemaining;
+    }
+
+    public void setTimeRemaining(int timeRemaining) {
+        this.timeRemaining = timeRemaining;
+    }
+
+    public void setKeepRunning(boolean keepRunning) {
+        this.keepRunning = keepRunning;
+    }
+}

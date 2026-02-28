@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.smile.groundhoghunter.constants.CommonConstants;
+import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class TwoPlayerResultActivity extends AppCompatActivity {
@@ -23,10 +23,10 @@ public class TwoPlayerResultActivity extends AppCompatActivity {
 
         float textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
         Intent callingIntent = getIntent();
-        int hostScore = callingIntent.getIntExtra(CommonConstants.HOST_SCORE, 0);
-        int hostHitNum = callingIntent.getIntExtra(CommonConstants.HOST_HIT_NUM, 0);
-        int clientScore = callingIntent.getIntExtra(CommonConstants.CLIENT_SCORE, 0);
-        int clientHitNum = callingIntent.getIntExtra(CommonConstants.CLIENT_HIT_NUM, 0);
+        int hostScore = callingIntent.getIntExtra(Constants.HOST_SCORE, 0);
+        int hostHitNum = callingIntent.getIntExtra(Constants.HOST_HIT_NUM, 0);
+        int clientScore = callingIntent.getIntExtra(Constants.CLIENT_SCORE, 0);
+        int clientHitNum = callingIntent.getIntExtra(Constants.CLIENT_HIT_NUM, 0);
 
         super.onCreate(savedInstanceState);
 

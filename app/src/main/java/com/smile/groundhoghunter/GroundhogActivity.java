@@ -30,10 +30,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.smile.groundhoghunter.AbstractClasses.IoFunctionThread;
-import com.smile.groundhoghunter.constants.CommonConstants;
-import com.smile.groundhoghunter.Services.GlobalTop10IntentService;
-import com.smile.groundhoghunter.Services.LocalTop10IntentService;
+import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
+import com.smile.groundhoghunter.constants.Constants;
+import com.smile.groundhoghunter.services.GlobalTop10IntentService;
+import com.smile.groundhoghunter.services.LocalTop10IntentService;
 import com.smile.smilelibraries.interfaces.DismissFunction;
 import com.smile.smilelibraries.models.ExitAppTimer;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
@@ -117,7 +117,7 @@ public class GroundhogActivity extends AppCompatActivity {
         toastTextSize = textFontSize * 0.8f;
         isShowingLoadingMessage = false;
         Intent callingIntent = getIntent();
-        gameType = callingIntent.getIntExtra(CommonConstants.GAME_TYPE, CommonConstants.GameBySinglePlayer);
+        gameType = callingIntent.getIntExtra(Constants.GAME_TYPE, Constants.GameBySinglePlayer);
 
         super.onCreate(savedInstanceState);
 
@@ -591,10 +591,10 @@ public class GroundhogActivity extends AppCompatActivity {
 
     public void displayTwoPlayerResult(int hostScore, int hostHitNum, int clientScore, int clientHitNum) {
         Intent resultIntent = new Intent(this, TwoPlayerResultActivity.class);
-        resultIntent.putExtra(CommonConstants.HOST_SCORE, hostScore);
-        resultIntent.putExtra(CommonConstants.HOST_HIT_NUM, hostHitNum);
-        resultIntent.putExtra(CommonConstants.CLIENT_SCORE, clientScore);
-        resultIntent.putExtra(CommonConstants.CLIENT_HIT_NUM, clientHitNum);
+        resultIntent.putExtra(Constants.HOST_SCORE, hostScore);
+        resultIntent.putExtra(Constants.HOST_HIT_NUM, hostHitNum);
+        resultIntent.putExtra(Constants.CLIENT_SCORE, clientScore);
+        resultIntent.putExtra(Constants.CLIENT_HIT_NUM, clientHitNum);
         // startActivityForResult(resultIntent, TwoPlayerResultRequestCode);
         otherLauncher.launch(resultIntent);
     }
