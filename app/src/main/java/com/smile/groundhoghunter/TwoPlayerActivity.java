@@ -26,6 +26,7 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -72,6 +73,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
         btDeviceName = "";
         mediaType = GameView.BluetoothMediaType;
         AppCompatRadioButton btRadioButton = findViewById(R.id.bluetoothRadioButton);
+        btRadioButton.setVisibility(View.VISIBLE);
         ScreenUtil.resizeTextSize(btRadioButton, textFontSize);
         btRadioButton.setChecked(true);
         btRadioButton.setOnClickListener(view -> {
@@ -82,6 +84,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
             setPlayerName();
         });
         AppCompatRadioButton intRadioButton = findViewById(R.id.internetRadioButton);
+        intRadioButton.setVisibility(View.GONE);
         ScreenUtil.resizeTextSize(intRadioButton, textFontSize);
         intRadioButton.setChecked(false);
         intRadioButton.setOnClickListener(view -> {
