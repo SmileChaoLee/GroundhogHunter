@@ -127,10 +127,10 @@ public class JoinGameActivity extends AppCompatActivity {
                             if (oppName != null) {
                                 if (oppName.equals(oppositePlayerName)) {
                                     selectedIoFunctionThread = ioFunctionThread;
-                                    selectedIoFunctionThread.write(Constants.OppositePlayerNameHasBeenRead, playerName);
+                                    selectedIoFunctionThread.write(Constants.OPPOS_PLAYER_NAME_READ, playerName);
                                     view.setSelected(true);
                                 } else {
-                                    ioFunctionThread.write(Constants.TwoPlayerClientExitCode, remoteMacAddress);
+                                    ioFunctionThread.write(Constants.TWO_PLAY_CLIENT_EX_CODE, remoteMacAddress);
                                 }
                             }
                         }
@@ -159,7 +159,7 @@ public class JoinGameActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "JoinGameActivity --> Came back from BtJoinGameActivity.");
-        if (requestCode == Constants.TwoPlayerGameByClient) {
+        if (requestCode == Constants.TWO_PLAY_GAME_BY_CLIENT) {
             oppositePlayerName = "";
             discoveredDeviceMap = new HashMap<>();
             ioFunctionThreadMap = new HashMap<>();
@@ -228,7 +228,7 @@ public class JoinGameActivity extends AppCompatActivity {
     private void clientLeavingNotification() {
         if (clientConnectDevice != null) {
             for (IoFunctionThread btFunctionThread : ioFunctionThreadMap.values()) {
-                btFunctionThread.write(Constants.TwoPlayerClientExitCode, "");
+                btFunctionThread.write(Constants.TWO_PLAY_CLIENT_EX_CODE, "");
             }
         }
     }
@@ -300,7 +300,7 @@ public class JoinGameActivity extends AppCompatActivity {
             String remoteMacAddress;
 
             switch (msg.what) {
-                case Constants.ClientDiscoveryTimerHasReached:
+                case Constants.CL_DISCOVER_TIMER_END:
                     Log.d(TAG, "handleMessage.ClientDiscoveryTimerHasReached");
                     megString = discoveryTimeHasReachedString;
                     Log.d(TAG, megString);
@@ -313,13 +313,13 @@ public class JoinGameActivity extends AppCompatActivity {
                         connectThread.start();
                     }
                     break;
-                case Constants.ClientDiscoveryTimerHasBeenDismissed:
+                case Constants.CL_DISCOVER_TIMER_DISMISSED:
                     Log.d(TAG, "handleMessage.ClientDiscoveryTimerHasBeenDismissed");
                     megString = discoveryWasDismissedString;
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView(megString, MessageDuration);
                     break;
-                case Constants.ClientConnectToThreadNoClientSocket:
+                case Constants.CL_CONN_TO_TH_NO_CL_SOCKET:
                     Log.d(TAG, "handleMessage.ClientConnectToThreadNoClientSocket");
                     connectDevice = data.getParcelable("ConnectDevice");
                     if (connectDevice == null) break;
@@ -331,7 +331,7 @@ public class JoinGameActivity extends AppCompatActivity {
                     connectToThread = discoveredDeviceMap.get(remoteMacAddress);
                     stopClientConnectToThread(connectToThread,true);
                     break;
-                case Constants.ClientConnectToThreadConnected:
+                case Constants.CL_CONN_TO_TH_CONNECTED:
                     Log.d(TAG, "handleMessage.ClientConnectToThreadConnected");
                     connectDevice = data.getParcelable("ConnectDevice");
                     if (connectDevice == null) break;
@@ -349,7 +349,7 @@ public class JoinGameActivity extends AppCompatActivity {
                     }
                     stopClientConnectToThread(connectToThread, false);
                     break;
-                case Constants.OppositePlayerNameHasBeenRead:
+                case Constants.OPPOS_PLAYER_NAME_READ:
                     Log.d(TAG, "handleMessage.OppositePlayerNameHasBeenRead");
                     connectDevice = data.getParcelable("ConnectDevice");
                     if (connectDevice == null) break;
@@ -371,7 +371,7 @@ public class JoinGameActivity extends AppCompatActivity {
                     if (ioFunctionThread == null) break;
                     ioFunctionThread.setStartRead(true);    // read next data data
                     break;
-                case Constants.ClientConnectToThreadFailedToConnect:
+                case Constants.CL_CONN_TO_TH_FAILED_CONNECT:
                     Log.d(TAG, "handleMessage.ClientConnectToThreadFailedToConnect");
                     connectDevice = data.getParcelable("ConnectDevice");
                     if (connectDevice == null) break;
@@ -384,7 +384,7 @@ public class JoinGameActivity extends AppCompatActivity {
                         stopClientConnectToThread(connectToThread, true);
                     }
                     break;
-                case Constants.TwoPlayerHostExitCode:
+                case Constants.TWO_PLAY_HOST_EX_CODE:
                     Log.d(TAG, "handleMessage.TwoPlayerHostExitCode");
                     connectDevice = data.getParcelable("ConnectDevice");
                     if (connectDevice == null) break;
@@ -399,7 +399,7 @@ public class JoinGameActivity extends AppCompatActivity {
                     ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
                     twoPlayerListAdapter.updateData(oppNameList);
                     break;
-                case Constants.TwoPlayerHostStartGame:
+                case Constants.TWO_PLAY_HOST_ST_GAME:
                     Log.d(TAG, "handleMessage.TwoPlayerHostStartGame");
                     if (selectedIoFunctionThread != null) {
                         GroundhogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
@@ -408,7 +408,7 @@ public class JoinGameActivity extends AppCompatActivity {
                             connectToThread = discoveredDeviceMap.get(remoteMac);
                             if (ioFuncThread != null) {
                                 if (ioFuncThread != selectedIoFunctionThread) {
-                                    ioFuncThread.write(Constants.TwoPlayerClientExitCode, "");
+                                    ioFuncThread.write(Constants.TWO_PLAY_CLIENT_EX_CODE, "");
                                     ConnectDeviceUtil.stopIoFunctionThread(ioFuncThread);
                                     stopClientConnectToThread(connectToThread, true);
                                 } else {
@@ -429,7 +429,7 @@ public class JoinGameActivity extends AppCompatActivity {
                         startClientGame();
                     }
                     break;
-                case Constants.TwoPlayerDefaultReading:
+                case Constants.TWO_PLAY_DEF_READ:
                     Log.d(TAG, "handleMessage.TwoPlayerDefaultReading");
                     // read the next data
                     connectDevice = data.getParcelable("ConnectDevice");

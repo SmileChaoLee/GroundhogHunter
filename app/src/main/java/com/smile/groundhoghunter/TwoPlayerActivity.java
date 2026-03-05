@@ -71,7 +71,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
         ScreenUtil.resizeTextSize(explainProblemTextView, textFontSize);
 
         btDeviceName = "";
-        mediaType = GameView.BluetoothMediaType;
+        mediaType = GameView.BT_MEDIA_TYPE;
         AppCompatRadioButton btRadioButton = findViewById(R.id.bluetoothRadioButton);
         btRadioButton.setVisibility(View.VISIBLE);
         ScreenUtil.resizeTextSize(btRadioButton, textFontSize);
@@ -79,7 +79,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
         btRadioButton.setOnClickListener(view -> {
             explainProblemTextView.setText(getString(R.string.explainProblemForBluetoothString));
             btRadioButton.setChecked(true);
-            mediaType = GameView.BluetoothMediaType;
+            mediaType = GameView.BT_MEDIA_TYPE;
             thisDeviceName = btDeviceName;
             setPlayerName();
         });
@@ -88,9 +88,9 @@ public class TwoPlayerActivity extends AppCompatActivity {
         ScreenUtil.resizeTextSize(intRadioButton, textFontSize);
         intRadioButton.setChecked(false);
         intRadioButton.setOnClickListener(view -> {
-            explainProblemTextView.setText(getString(R.string.explainProblemForInternetString));
+            explainProblemTextView.setText(getString(R.string.explainProblemForWifiString));
             intRadioButton.setChecked(true);
-            mediaType = GameView.InternetMediaType;
+            mediaType = GameView.WIFI_MEDIA_TYPE;
             thisDeviceName = btDeviceName;
             setPlayerName();
         });
@@ -133,7 +133,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
                 return;
             }
             Intent gameIntent;
-            if (mediaType == GameView.BluetoothMediaType) {
+            if (mediaType == GameView.BT_MEDIA_TYPE) {
                 gameIntent = new Intent(TwoPlayerActivity.this,
                         BtCreateGameActivity.class);
                 gameIntent.putExtra(Constants.PLAYER_NAME, playerName);
@@ -157,7 +157,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
                 return;
             }
             Intent gameIntent;
-            if (mediaType == GameView.BluetoothMediaType) {
+            if (mediaType == GameView.BT_MEDIA_TYPE) {
                 gameIntent = new Intent(TwoPlayerActivity.this,
                         BtJoinGameActivity.class);
                 gameIntent.putExtra(Constants.PLAYER_NAME, playerName);
@@ -251,21 +251,21 @@ public class TwoPlayerActivity extends AppCompatActivity {
         String logStr = "initBluetooth";
         Log.d(TAG, logStr);
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        BluetoothAdapter mBluetoothAdapter = bluetoothManager.getAdapter();
-        if (mBluetoothAdapter == null) {
-            Log.d(TAG, logStr + ".mBluetoothAdapter == null");
+        BluetoothAdapter btAdapter = bluetoothManager.getAdapter();
+        if (btAdapter == null) {
+            Log.d(TAG, logStr + ".btAdapter == null");
             String bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
             ScreenUtil.showToast(this, bluetoothNotSupportedString, toastTextSize, Toast.LENGTH_SHORT);
             AppCompatRadioButton bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
             bluetoothRadioButton.setChecked(false);
             bluetoothRadioButton.setEnabled(false);
-            mediaType = GameView.NoneMediaType;
+            mediaType = GameView.NONE_MEDIA_TYPE;
             returnToPrevious(); // unable to do 2 players
             return;
         }
         // If we have permissions (or are on an older version), run the logic
-        Log.d(TAG, logStr + ".mBluetoothAdapter != null");
-        accessBluetoothHardware(mBluetoothAdapter);
+        Log.d(TAG, logStr + ".btAdapter != null");
+        accessBluetoothHardware(btAdapter);
     }
 
     private void accessBluetoothHardware(BluetoothAdapter adapter) {
@@ -278,11 +278,11 @@ public class TwoPlayerActivity extends AppCompatActivity {
             AppCompatRadioButton bluetoothRadioButton = findViewById(R.id.bluetoothRadioButton);
             bluetoothRadioButton.setEnabled(true);
             if (thisDeviceName == null || thisDeviceName.isEmpty()) {
-                mediaType = GameView.NoneMediaType;
+                mediaType = GameView.NONE_MEDIA_TYPE;
                 returnToPrevious(); // unable to do 2 players
                 return;
             }
-            mediaType = GameView.BluetoothMediaType;
+            mediaType = GameView.BT_MEDIA_TYPE;
             if (adapter.isDiscovering()) {
                 adapter.cancelDiscovery();
             }

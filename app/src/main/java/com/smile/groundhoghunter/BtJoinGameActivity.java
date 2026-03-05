@@ -28,7 +28,7 @@ public class BtJoinGameActivity extends JoinGameActivity {
     private String foundDeviceString;
     private BtJoinGameBroadcastReceiver btJoinGameReceiver;
     private boolean isDefaultBluetoothEnabled;
-    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothAdapter mBtAdapter;
     private ActivityResultLauncher<Intent> enableBtLauncher;
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
@@ -45,12 +45,12 @@ public class BtJoinGameActivity extends JoinGameActivity {
         // device detecting
         // Bluetooth
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-        isDefaultBluetoothEnabled = mBluetoothAdapter.isEnabled();
-        if (mBluetoothAdapter.isDiscovering()) {
-            mBluetoothAdapter.cancelDiscovery();
+        mBtAdapter = bluetoothManager.getAdapter();
+        isDefaultBluetoothEnabled = mBtAdapter.isEnabled();
+        if (mBtAdapter.isDiscovering()) {
+            mBtAdapter.cancelDiscovery();
         }
-        clientConnectDevice = new BtConnectDevice(mBluetoothAdapter);
+        clientConnectDevice = new BtConnectDevice(mBtAdapter);
 
         bluetoothCannotBeTurnedOnString = getString(R.string.bluetoothCannotBeTurnedOnString);
         scanBluetoothStartedString = getString(R.string.scanBluetoothStartedString);
@@ -67,14 +67,14 @@ public class BtJoinGameActivity extends JoinGameActivity {
                         megString = "enableBtLauncher.Bluetooth has been turn on.";
                         Log.d(TAG, megString);
                         // Note: Ensure you have the BLUETOOTH_SCAN permission here
-                        if (mBluetoothAdapter.isDiscovering()) {
+                        if (mBtAdapter.isDiscovering()) {
                             Log.d(TAG, "enableBtLauncher.cancelDiscovery()");
-                            mBluetoothAdapter.cancelDiscovery();
+                            mBtAdapter.cancelDiscovery();
                         }
-                        boolean isBtEnabled = mBluetoothAdapter.isEnabled();
+                        boolean isBtEnabled = mBtAdapter.isEnabled();
                         Log.d(TAG, "enableBtLauncher.isBtEnabled = " + isBtEnabled);
                         Log.d(TAG, "enableBtLauncher.startDiscovery.");
-                        boolean isOK = mBluetoothAdapter.startDiscovery();
+                        boolean isOK = mBtAdapter.startDiscovery();
                         Log.d(TAG, "enableBtLauncher.startDiscovery.isOK = " + isOK);
                     } else {
                         megString = "enableBtLauncher." + bluetoothCannotBeTurnedOnString;
@@ -91,14 +91,14 @@ public class BtJoinGameActivity extends JoinGameActivity {
     protected void onDestroy() {
         super.onDestroy();
         // recover the status of bluetooth
-        if (mBluetoothAdapter != null) {
-            if (mBluetoothAdapter.isDiscovering()) {
-                mBluetoothAdapter.cancelDiscovery();
+        if (mBtAdapter != null) {
+            if (mBtAdapter.isDiscovering()) {
+                mBtAdapter.cancelDiscovery();
             }
             if (isDefaultBluetoothEnabled) {
-                mBluetoothAdapter.enable();
+                mBtAdapter.enable();
             } else {
-                mBluetoothAdapter.disable();
+                mBtAdapter.disable();
             }
         }
         if (btJoinGameReceiver != null) {
@@ -119,7 +119,7 @@ public class BtJoinGameActivity extends JoinGameActivity {
     protected void startClientGame() {
         super.startClientGame();
         Intent gameIntent = new Intent(this, BtClientGameActivity.class);
-        gameIntent.putExtra(Constants.GAME_TYPE, Constants.TwoPlayerGameByClient);
+        gameIntent.putExtra(Constants.GAME_TYPE, Constants.TWO_PLAY_GAME_BY_CLIENT);
         // startActivityForResult(gameIntent, CommonConstants.TwoPlayerGameByClient);
         startActivity(gameIntent);
     }

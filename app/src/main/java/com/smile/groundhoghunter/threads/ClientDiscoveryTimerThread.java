@@ -34,10 +34,10 @@ public class ClientDiscoveryTimerThread extends Thread {
 
         if (keepRunning) {
             // send message to activity to cancel discovery
-            msg = mHandler.obtainMessage(Constants.ClientDiscoveryTimerHasReached);
+            msg = mHandler.obtainMessage(Constants.CL_DISCOVER_TIMER_END);
             msg.sendToTarget();
         } else {
-            msg = mHandler.obtainMessage(Constants.ClientDiscoveryTimerHasBeenDismissed);
+            msg = mHandler.obtainMessage(Constants.CL_DISCOVER_TIMER_DISMISSED);
             msg.sendToTarget();
         }
     }

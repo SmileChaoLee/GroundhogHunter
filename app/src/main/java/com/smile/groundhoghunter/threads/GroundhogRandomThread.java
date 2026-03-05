@@ -10,10 +10,9 @@ import java.util.Random;
 
 public class GroundhogRandomThread extends Thread {
 
-    private static final String TAG = new String("Threads.GroundhogRandomThread");
     private final GameView gameView;
     private final int gameType;
-    private final IoFunctionThread selectedIoFunctionThread;
+    private final IoFunctionThread ioFuncThread;
     private final int synchronizeTime;
     private final int chanceToShow;
     private final Random groundhogRandom;
@@ -22,34 +21,32 @@ public class GroundhogRandomThread extends Thread {
 
     public GroundhogRandomThread(GameView gView) {
         gameView = gView;
-        gameType = gameView.getGameType();
-        selectedIoFunctionThread = gameView.getIoFunctionThread();
-        synchronizeTime = GameView.TimeIntervalShown;       // 500 mini seconds (1 second)
+        gameType = gameView.getGType();
+        ioFuncThread = gameView.getSelectedIoFuncTh();
+        synchronizeTime = GameView.TIMER_INTERVAL_SHOWN;       // 500 mini seconds (1 second)
         chanceToShow = 18;   // probability is 1/18
-
         groundhogRandom = new Random(System.currentTimeMillis());
-
         keepRunning = true; // keepRunning = true -> loop in run() still going
     }
 
     public void run() {
         while (keepRunning) {
-            synchronized (GroundhogActivity.ActivityHandler) {
+            synchronized (GroundhogActivity.activityLocker) {
                 // for application's (Main activity) synchronizing
                 while (GroundhogActivity.GamePause) {
                     try {
-                        GroundhogActivity.ActivityHandler.wait();
+                        GroundhogActivity.activityLocker.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
 
-            synchronized (GameView.GameViewHandler) {
+            synchronized (GameView.gViewLocker) {
                 // for GameView's synchronizing
-                while (GameView.GameViewPause) {
+                while (GameView.gViewPause) {
                     try {
-                        GameView.GameViewHandler.wait();
+                        GameView.gViewLocker.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -58,16 +55,18 @@ public class GroundhogRandomThread extends Thread {
 
             String writeString;
             switch (gameType) {
-                case Constants.GameBySinglePlayer:
+                case Constants.GAME_BY_SINGLE_PLAY:
                     writeString = setGroundhogArray();
                     break;
-                case Constants.TwoPlayerGameByHost:
+                case Constants.TWO_PLAY_GAME_BY_HOST:
                     writeString = setGroundhogArray();
-                    selectedIoFunctionThread.write(Constants.TwoPlayerClientGameGroundhogRead, writeString);
+                    if (ioFuncThread != null) {
+                        ioFuncThread.write(Constants.TWO_PLAY_CL_GAME_G_HOG_READ, writeString);
+                    }
                     break;
-                case Constants.TwoPlayerGameByClient:
+                case Constants.TWO_PLAY_GAME_BY_CLIENT:
                     // only read data from Host game
-                    boolean isOppositePlayerLeft = gameView.getOppositePlayerLeft();
+                    boolean isOppositePlayerLeft = gameView.isOpposPlayerLeft();
                     if (isOppositePlayerLeft) {
                         writeString = setGroundhogArray();
                     }
@@ -91,14 +90,14 @@ public class GroundhogRandomThread extends Thread {
 
         int hiding;
         int status;
-        for (Groundhog groundhog : gameView.groundhogArray) {
+        for (Groundhog groundhog : gameView.getGHogArray()) {
             if (groundhog.getIsHiding()) {
                 // if hiding
                 hiding = groundhogRandom.nextInt(chanceToShow);
                 if (hiding == 0) {
                     // showing
                     // original status is hiding then showing with an image that might be different from previous one
-                    status = groundhogRandom.nextInt(GameView.NumberOfGroundhogTypes);    // 0 - 3
+                    status = groundhogRandom.nextInt(GameView.NUM_G_HOG_TYPES);    // 0 - 3
                     groundhog.setStatus(status);
                     groundhog.setIsHiding(false);
                     groundhog.setNumOfTimeIntervalShown(0);     // status of starting showing

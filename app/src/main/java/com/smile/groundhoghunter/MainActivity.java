@@ -50,14 +50,13 @@ public class MainActivity extends AppCompatActivity {
         buttonLp.bottomMargin = buttonTopMargin;
         singlePlayerButton.setOnClickListener(view -> {
             Intent gameIntent = new Intent(MainActivity.this, GroundhogActivity.class);
-            gameIntent.putExtra(Constants.GAME_TYPE, Constants.GameBySinglePlayer);
+            gameIntent.putExtra(Constants.GAME_TYPE, Constants.GAME_BY_SINGLE_PLAY);
             startActivity(gameIntent);
         });
 
         final SmileImageButton twoPlayerButton = findViewById(R.id.twoPlayerButton);
         Bitmap twoPlayerBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this,
                 R.drawable.normal_button_image, twoPlayerString, Color.BLUE);
-
         twoPlayerButton.setImageBitmap(twoPlayerBitmap);
         buttonLp = (LinearLayout.LayoutParams) twoPlayerButton.getLayoutParams();
         buttonLp.leftMargin = buttonLeftMargin;

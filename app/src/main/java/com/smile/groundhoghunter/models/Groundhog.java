@@ -4,18 +4,17 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.smile.groundhoghunter.GameView;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.groundhoghunter.utilities.MathUtil;
 
 public class Groundhog {
-
-    // private final Paint eraserPaint = new Paint();
+    private static final String TAG = "Groundhog";
     private RectF drawArea;
-    private RectF scoreArea;
-    private RectF wholeGroundhogArea;
-
+    private final RectF scoreArea;
+    private final RectF wholeGroundhogArea;
     // status = 0 --> jump to first stage
     // status = 1 --> jump to second stage
     // status = 2 --> jump to third stage
@@ -60,7 +59,7 @@ public class Groundhog {
 
     public void setStatus(int status) {
         this.status = status;
-        halfOfAnimationTimes = GameView.NumTimeIntervalShown[status] / 2;
+        halfOfAnimationTimes = GameView.numTimeIntervalShown[status] / 2;
     }
 
     public int getNumOfTimeIntervalShown() {
@@ -68,7 +67,7 @@ public class Groundhog {
     }
 
     public void setNumOfTimeIntervalShown(int numTimeInterval) {
-        if (numTimeInterval < GameView.NumTimeIntervalShown[status]) {
+        if (numTimeInterval < GameView.numTimeIntervalShown[status]) {
             if (hitStatus > 0) {
                 // when it is hit, then it start hiding
                 --numOfAnimationsShown;
@@ -121,17 +120,21 @@ public class Groundhog {
     }
 
     public void draw(Canvas canvas) {
-
+        Log.d(TAG, "draw.status = " + status);
+        Log.d(TAG, "draw.isHiding = " + isHiding);
+        Log.d(TAG, "draw.hitStatus = " + hitStatus);
         if (!isHiding) {
             if (hitStatus > 0) {
                 // groundhog is hit
-                canvas.drawBitmap(GameView.GroundhogHitBitmaps[status], null, drawArea, null);
+                canvas.drawBitmap(GameView.groundhogHitBitmaps[status], null, drawArea, null);
                 // the following is displaying score image
-                Bitmap tempBm = FontAndBitmapUtil.getBitmapFromBitmapWithText(GameView.score_board[hitStatus-1], String.valueOf(GameView.hitScores[status]), Color.BLACK);
+                Bitmap tempBm = FontAndBitmapUtil.getBitmapFromBitmapWithText(GameView.score_board[hitStatus-1],
+                        String.valueOf(GameView.hitScores[status]), Color.BLACK);
+                Log.d(TAG, "draw.tempBm = " + tempBm);
                 canvas.drawBitmap(tempBm, null, scoreArea, null);
             } else {
                 // not hit
-                canvas.drawBitmap(GameView.GroundhogBitmaps[status], null, drawArea, null);
+                canvas.drawBitmap(GameView.groundhogBitmaps[status], null, drawArea, null);
             }
         } else {
             // hiding

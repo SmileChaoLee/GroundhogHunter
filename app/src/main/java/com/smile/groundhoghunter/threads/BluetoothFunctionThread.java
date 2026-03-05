@@ -87,52 +87,52 @@ public class BluetoothFunctionThread extends IoFunctionThread {
                 mBuffer = sb.toString();
 
                 switch (byteHead) {
-                    case Constants.OppositePlayerNameHasBeenRead:
-                        readMsg = mHandler.obtainMessage(Constants.OppositePlayerNameHasBeenRead);
+                    case Constants.OPPOS_PLAYER_NAME_READ:
+                        readMsg = mHandler.obtainMessage(Constants.OPPOS_PLAYER_NAME_READ);
                         data.putString("OppositePlayerName", mBuffer);
                         break;
-                    case Constants.TwoPlayerHostExitCode:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerHostExitCode);
+                    case Constants.TWO_PLAY_HOST_EX_CODE:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_HOST_EX_CODE);
                         break;
-                    case Constants.TwoPlayerClientExitCode:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerClientExitCode);
+                    case Constants.TWO_PLAY_CLIENT_EX_CODE:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_CLIENT_EX_CODE);
                         break;
-                    case Constants.TwoPlayerHostStartGame:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerHostStartGame);
+                    case Constants.TWO_PLAY_HOST_ST_GAME:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_HOST_ST_GAME);
                         break;
-                    case Constants.TwoPlayerOppositeLeftGame:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerOppositeLeftGame);
+                    case Constants.TWO_PLAY_OPPOS_LF_GAME:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_OPPOS_LF_GAME);
                         break;
-                    case Constants.TwoPlayerStartGameButton:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerStartGameButton);
+                    case Constants.TWO_PLAY_ST_GAME_BUT:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_ST_GAME_BUT);
                         break;
-                    case Constants.TwoPlayerPauseGameButton:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerPauseGameButton);
+                    case Constants.TWO_PLAY_PAU_GAME_BUT:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_PAU_GAME_BUT);
                         break;
-                    case Constants.TwoPlayerResumeGameButton:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerResumeGameButton);
+                    case Constants.TWO_PLAY_RES_GAME_BUT:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_RES_GAME_BUT);
                         break;
-                    case Constants.TwoPlayerNewGameButton:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerNewGameButton);
+                    case Constants.TWO_PLAY_NEW_GAME_BUT:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_NEW_GAME_BUT);
                         break;
-                    case Constants.TwoPlayerClientGameTimerRead:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerClientGameTimerRead);
+                    case Constants.TWO_PLAY_CL_GAME_TIMER_READ:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_CL_GAME_TIMER_READ);
                         data.putString("TimerRemaining", mBuffer);
                         break;
-                    case Constants.TwoPlayerClientGameGroundhogRead:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerClientGameGroundhogRead);
+                    case Constants.TWO_PLAY_CL_GAME_G_HOG_READ:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_CL_GAME_G_HOG_READ);
                         data.putString("GroundhogData", mBuffer);
                         break;
-                    case Constants.TwoPlayerGameGroundhogHit:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerGameGroundhogHit);
+                    case Constants.TWO_PLAY_GAME_G_HOG_HIT:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_GAME_G_HOG_HIT);
                         data.putString("GroundhogHitData", mBuffer);
                         break;
-                    case Constants.TwoPlayerGameScoreReceived:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerGameScoreReceived);
+                    case Constants.TWO_PLAY_GAME_SCORE_RECEIVED:
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_GAME_SCORE_RECEIVED);
                         data.putString("OppositeCurrentScore", mBuffer);
                         break;
                     default:
-                        readMsg = mHandler.obtainMessage(Constants.TwoPlayerDefaultReading);
+                        readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_DEF_READ);
                         break;
                 }
 

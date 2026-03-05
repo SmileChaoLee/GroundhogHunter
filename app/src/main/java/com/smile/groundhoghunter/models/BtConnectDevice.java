@@ -1,65 +1,73 @@
 package com.smile.groundhoghunter.models;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.RequiresPermission;
+
 import com.smile.groundhoghunter.interfaces.ConnectDevice;
 
 public class BtConnectDevice implements ConnectDevice {
 
-    private BluetoothAdapter bluetoothAdapter;
-    private BluetoothDevice bluetoothDevice;
+    private BluetoothAdapter mBtAdapter;
+    private final BluetoothDevice mBtDevice;
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     public BtConnectDevice(BluetoothAdapter btAdapter) {
-        bluetoothAdapter = btAdapter;
-        bluetoothDevice = bluetoothAdapter.getRemoteDevice(bluetoothAdapter.getAddress());
+        mBtAdapter = btAdapter;
+        mBtDevice = mBtAdapter.getRemoteDevice(mBtAdapter.getAddress());
 
     }
     public BtConnectDevice(BluetoothDevice btDevice) {
-        bluetoothAdapter = null;
-        bluetoothDevice = btDevice;
+        mBtAdapter = null;
+        mBtDevice = btDevice;
     }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     @Override
     public String getName() {
         String name;
-        if (bluetoothAdapter != null) {
-            name = bluetoothAdapter.getName();
+        if (mBtAdapter != null) {
+            name = mBtAdapter.getName();
         } else {
-            name = bluetoothDevice.getName();
+            name = mBtDevice.getName();
         }
         return name;
     }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     @Override
     public String getAddress() {
         String address;
-        if (bluetoothAdapter != null) {
-            address = bluetoothAdapter.getAddress();
+        if (mBtAdapter != null) {
+            address = mBtAdapter.getAddress();
         } else {
-            address = bluetoothDevice.getAddress();
+            address = mBtDevice.getAddress();
         }
         return address;
     }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     @Override
     public boolean isDiscovering() {
         boolean yn;
-        if (bluetoothAdapter != null) {
-            yn = bluetoothAdapter.isDiscovering();
+        if (mBtAdapter != null) {
+            yn = mBtAdapter.isDiscovering();
         } else {
             yn = false;
         }
         return yn;
     }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     @Override
     public boolean cancelDiscovery() {
         boolean yn;
-        if (bluetoothAdapter != null) {
-            yn = bluetoothAdapter.cancelDiscovery();
+        if (mBtAdapter != null) {
+            yn = mBtAdapter.cancelDiscovery();
         } else {
             yn = false;
         }
@@ -73,14 +81,14 @@ public class BtConnectDevice implements ConnectDevice {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(this.bluetoothDevice, flags);
+        dest.writeParcelable(this.mBtDevice, flags);
     }
 
     protected BtConnectDevice(Parcel in) {
-        this.bluetoothDevice = in.readParcelable(BluetoothDevice.class.getClassLoader());
+        this.mBtDevice = in.readParcelable(BluetoothDevice.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<BtConnectDevice> CREATOR = new Parcelable.Creator<BtConnectDevice>() {
+    public static final Parcelable.Creator<BtConnectDevice> CREATOR = new Parcelable.Creator<>() {
         @Override
         public BtConnectDevice createFromParcel(Parcel source) {
             return new BtConnectDevice(source);

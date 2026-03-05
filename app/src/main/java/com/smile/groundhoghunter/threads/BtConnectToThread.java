@@ -49,14 +49,14 @@ public class BtConnectToThread extends ClientConnectToThread {
         data.putParcelable("ConnectDevice", btConnectDevice);
         if (mBluetoothSocket == null) {
             // cannot create Server Socket
-            msg = mHandler.obtainMessage(Constants.ClientConnectToThreadNoClientSocket);
+            msg = mHandler.obtainMessage(Constants.CL_CONN_TO_TH_NO_CL_SOCKET);
             msg.setData(data);
             msg.sendToTarget();
             return;
         }
         String deviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothDevice);
         if ( (deviceName == null) || (deviceName.isEmpty()) ) {
-            msg = mHandler.obtainMessage(Constants.ClientConnectToThreadFailedToConnect);
+            msg = mHandler.obtainMessage(Constants.CL_CONN_TO_TH_FAILED_CONNECT);
             msg.setData(data);
             msg.sendToTarget();
             return;
@@ -70,11 +70,11 @@ public class BtConnectToThread extends ClientConnectToThread {
             // start reading the opposite player's name
             btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
             btFunctionThread.start();   // default is not reading input stream (startRead = false)
-            msg = mHandler.obtainMessage(Constants.ClientConnectToThreadConnected);
+            msg = mHandler.obtainMessage(Constants.CL_CONN_TO_TH_CONNECTED);
         } catch (Exception ex) {
             // Unable to connect; close the socket and return.
             Log.e(TAG, "run.Exception", ex);
-            msg = mHandler.obtainMessage(Constants.ClientConnectToThreadFailedToConnect);
+            msg = mHandler.obtainMessage(Constants.CL_CONN_TO_TH_FAILED_CONNECT);
             try {
                 mBluetoothSocket.close();
             } catch (Exception closeException) {

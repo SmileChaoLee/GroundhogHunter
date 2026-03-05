@@ -157,7 +157,7 @@ public class CreateGameActivity extends AppCompatActivity {
                 for (String remoteMacAddress : ioFunctionThreadMap.keySet()) {
                     IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
                     if (ioFunctionThread != null && ioFunctionThread != selectedIoFunctionThread) {
-                        ioFunctionThread.write(Constants.TwoPlayerHostExitCode, "");
+                        ioFunctionThread.write(Constants.TWO_PLAY_HOST_EX_CODE, "");
                         ConnectDeviceUtil.stopIoFunctionThread(ioFunctionThread);
                     }
                 }
@@ -167,7 +167,7 @@ public class CreateGameActivity extends AppCompatActivity {
                 oppositePlayerNameMap.clear();
                 oppositePlayerNameMap = null;
                 createGameHandler.removeCallbacksAndMessages(null);
-                selectedIoFunctionThread.write(Constants.TwoPlayerHostStartGame, "");
+                selectedIoFunctionThread.write(Constants.TWO_PLAY_HOST_ST_GAME, "");
                 startHostGame();
             }
         });
@@ -185,7 +185,7 @@ public class CreateGameActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "CreateGameActivity --> Came back from BtHostGameActivity.");
 
-        if (requestCode == Constants.TwoPlayerGameByHost) {
+        if (requestCode == Constants.TWO_PLAY_GAME_BY_HOST) {
             oppositePlayerName = "";
             oppositePlayerNameMap = new LinkedHashMap<>();
             mServerAcceptThread = null;
@@ -255,7 +255,7 @@ public class CreateGameActivity extends AppCompatActivity {
 
     private void hostLeavingNotification() {
         for (IoFunctionThread ioFunctionThread : ioFunctionThreadMap.values()) {
-            ioFunctionThread.write(Constants.TwoPlayerHostExitCode, "");
+            ioFunctionThread.write(Constants.TWO_PLAY_HOST_EX_CODE, "");
         }
     }
 
@@ -294,7 +294,7 @@ public class CreateGameActivity extends AppCompatActivity {
             Bundle data = msg.getData();
 
             switch (msg.what) {
-                case Constants.OppositePlayerNameHasBeenRead:
+                case Constants.OPPOS_PLAYER_NAME_READ:
                     megString = "has been read.";
                     String oppositeName = data.getString("OppositePlayerName");
                     megString = oppositeName + " " + megString;
@@ -322,10 +322,10 @@ public class CreateGameActivity extends AppCompatActivity {
                         ioFunctionThread.setStartRead(true);    // start reading data
                     }
                     break;
-                case Constants.ServerAcceptThreadNoServerSocket:
+                case Constants.SER_ACCEPT_TH_NO_SER_SOCKET:
                     showMessage.showMessageInTextView(cannotCreateServerSocketString, MessageDuration);
                     break;
-                case Constants.ServerAcceptThreadConnected:
+                case Constants.SER_ACCEPT_TH_CONNECTED:
                     connectDevice = data.getParcelable("ConnectDevice");
                     if (connectDevice == null) break;
                     deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
@@ -340,10 +340,10 @@ public class CreateGameActivity extends AppCompatActivity {
                         ioFunctionThreadMap.put(remoteMacAddress, ioFunctionThread);
                     }
                     break;
-                case Constants.ServerAcceptThreadStopped:
+                case Constants.SER_ACCEPT_TH_STOPPED:
                     showMessage.showMessageInTextView(waitingStoppedCancelledString, MessageDuration);
                     break;
-                case Constants.TwoPlayerClientExitCode:
+                case Constants.TWO_PLAY_CLIENT_EX_CODE:
                     connectDevice = data.getParcelable("ConnectDevice");
                     if (connectDevice == null) break;
                     remoteMacAddress = connectDevice.getAddress();
@@ -368,7 +368,7 @@ public class CreateGameActivity extends AppCompatActivity {
                     ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
                     twoPlayerListAdapter.updateData(oppNameList);
                     break;
-                case Constants.TwoPlayerDefaultReading:
+                case Constants.TWO_PLAY_DEF_READ:
                     Log.d(TAG, "Default reading.");
                     connectDevice = data.getParcelable("ConnectDevice");
                     if (connectDevice != null) {

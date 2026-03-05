@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.Handler;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -20,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.gridlayout.widget.GridLayout;
 
-import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -75,17 +73,15 @@ public class GroundhogActivity extends AppCompatActivity {
     protected SmileImageButton newGameButton;
     protected SmileImageButton quitGameButton;
     protected IoFunctionThread selectedIoFunctionThread;
-    // public static properties
     public static boolean GamePause = false;
-    // public static final properties
-    public static final Handler ActivityHandler = new Handler(Looper.getMainLooper());
+    public static final Object activityLocker = new Object();
     private ActivityResultLauncher<Intent> settingLauncher;
     private ActivityResultLauncher<Intent> otherLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Log.d(TAG, "onCreate() is called.");
+        Log.d(TAG, "onCreate(");
 
         if ( (GroundhogHunterApp.facebookAds != null) || (GroundhogHunterApp.googleInterstitialAd!= null) ) {
             GroundhogHunterApp.InterstitialAd = new ShowInterstitial(this, GroundhogHunterApp.facebookAds, GroundhogHunterApp.googleInterstitialAd);
@@ -94,15 +90,15 @@ public class GroundhogActivity extends AppCompatActivity {
         if (GroundhogHunterApp.isFirstStartApp) {
             // first time entering this activity
             GroundhogHunterApp.isFirstStartApp = false;
-            Log.d(TAG, "onCreate() --> First time entering.");
+            Log.d(TAG, "onCreate.First time entering.");
         } else {
-            Log.d(TAG, "onCreate() --> not First time entering.");
+            Log.d(TAG, "onCreate.not First time entering.");
         }
 
         if (savedInstanceState != null) {
-            Log.d(TAG, "onCreate() --> savedInstanceState is not null.");
+            Log.d(TAG, "onCreate.savedInstanceState is not null.");
         } else {
-            Log.d(TAG, "onCreate() --> savedInstanceState is null.");
+            Log.d(TAG, "onCreate.savedInstanceState is null.");
         }
 
         selectedIoFunctionThread = GroundhogHunterApp.selectedIoFuncThread;
@@ -117,7 +113,7 @@ public class GroundhogActivity extends AppCompatActivity {
         toastTextSize = textFontSize * 0.8f;
         isShowingLoadingMessage = false;
         Intent callingIntent = getIntent();
-        gameType = callingIntent.getIntExtra(Constants.GAME_TYPE, Constants.GameBySinglePlayer);
+        gameType = callingIntent.getIntExtra(Constants.GAME_TYPE, Constants.GAME_BY_SINGLE_PLAY);
 
         super.onCreate(savedInstanceState);
 
@@ -137,12 +133,12 @@ public class GroundhogActivity extends AppCompatActivity {
         settingButton.setImageBitmap(settingBitmap);
         settingButton.setOnClickListener(view -> {
             if (gameView != null) {
-                if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
+                if ((gameView.getRunningStatus() != 1) || (GameView.gViewPause)) {
                     // client is not playing game or not pause status
                     disableAllButtons();
                     Intent intent = new Intent(GroundhogActivity.this, SettingActivity.class);
                     Bundle extras = new Bundle();
-                    extras.putBoolean("HasSound", gameView.getHasSound());
+                    extras.putBoolean("HasSound", gameView.hasSound());
                     intent.putExtras(extras);
                     // startActivityForResult(intent, SettingRequestCode);
                     settingLauncher.launch(intent);
@@ -157,7 +153,7 @@ public class GroundhogActivity extends AppCompatActivity {
         top10Button.setImageBitmap(top10Bitmap);
         top10Button.setOnClickListener(view -> {
             if (gameView != null) {
-                if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
+                if ((gameView.getRunningStatus() != 1) || (GameView.gViewPause)) {
                     // client is not playing game or not pause status
                     disableAllButtons();
                     getLocalTop10ScoreList();    // removed for testing on 2019-05-07
@@ -172,7 +168,7 @@ public class GroundhogActivity extends AppCompatActivity {
         globalTop10Button.setImageBitmap(globalTop10Bitmap);
         globalTop10Button.setOnClickListener(view -> {
             if (gameView != null) {
-                if ((gameView.getRunningStatus() != 1) || (GameView.GameViewPause)) {
+                if ((gameView.getRunningStatus() != 1) || (GameView.gViewPause)) {
                     // client is not playing game or not pause status
                     disableAllButtons();
                     getGlobalTop10ScoreList();
@@ -201,7 +197,7 @@ public class GroundhogActivity extends AppCompatActivity {
         ScreenUtil.resizeTextSize(timerTitleTextView, textFontSize);
         timerTextView = findViewById(R.id.timerText);
         ScreenUtil.resizeTextSize(timerTextView, textFontSize);
-        timerTextView.setText(String.valueOf(GameView.TimerInterval));
+        timerTextView.setText(String.valueOf(GameView.TIMER_INTERVAL));
 
         TextView hitNumTitleTextView = findViewById(R.id.num_hit_Title);
         ScreenUtil.resizeTextSize(hitNumTitleTextView, textFontSize);
@@ -313,7 +309,7 @@ public class GroundhogActivity extends AppCompatActivity {
         quitGameButton.setImageBitmap(quitGameBitmap);
         quitGameButton.setOnClickListener(view -> quitGame());
 
-        bReceiver = new GroundhogHunterBroadcastReceiver();
+        bReceiver = new GhHunterBroadcastReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(LocalTop10IntentService.Action_Name);
         intentFilter.addAction(GlobalTop10IntentService.Action_Name);
@@ -339,14 +335,13 @@ public class GroundhogActivity extends AppCompatActivity {
                         if (data == null) return;
                         Bundle extras = data.getExtras();
                         if (extras != null) {
-                            boolean hasSound = extras.getBoolean("HasSound");
-                            gameView.setHasSound(hasSound);
+                            gameView.setHasSound(extras.getBoolean("HasSound"));
                         }
                     } else {
                         Log.i(TAG, "SettingActivity returned cancel.");
                     }
                     // update Main UI for sound
-                    if (gameView.getHasSound()) {
+                    if (gameView.hasSound()) {
                         soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
                     } else {
                         soundOnOffImageView.setImageResource(R.drawable.sound_off_image);
@@ -367,9 +362,9 @@ public class GroundhogActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         Log.d(TAG,"onResume() is called.");
-        synchronized (ActivityHandler) {
+        synchronized (activityLocker) {
             GamePause = false;
-            ActivityHandler.notifyAll();
+            activityLocker.notifyAll();
         }
     }
 
@@ -377,7 +372,7 @@ public class GroundhogActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         Log.d(TAG, "onPause() is called.");
-        synchronized (ActivityHandler) {
+        synchronized (activityLocker) {
             GamePause = true;
         }
     }
@@ -533,7 +528,6 @@ public class GroundhogActivity extends AppCompatActivity {
     private void getLocalTop10ScoreList() {
         // showing loading message
         showLoadingMessage();
-
         Intent serviceIntent = new Intent(GroundhogHunterApp.AppContext, LocalTop10IntentService.class);
         startService(serviceIntent);
     }
@@ -541,7 +535,6 @@ public class GroundhogActivity extends AppCompatActivity {
     private void getGlobalTop10ScoreList() {
         // showing loading message
         showLoadingMessage();
-
         Intent serviceIntent = new Intent(GroundhogHunterApp.AppContext,
                 GlobalTop10IntentService.class);
         startService(serviceIntent);
@@ -557,6 +550,7 @@ public class GroundhogActivity extends AppCompatActivity {
         top10Button.setEnabled(false);
         globalTop10Button.setEnabled(false);
     }
+
     public void enableAllButtons() {
         startGameButton.setEnabled(true);
         pauseGameButton.setEnabled(true);
@@ -579,7 +573,6 @@ public class GroundhogActivity extends AppCompatActivity {
 
     public void dismissShowingLoadingMessage() {
         isShowingLoadingMessage = false;
-
         if (loadingDialog != null) {
             if (loadingDialog.isStateSaved()) {
                 loadingDialog.dismissAllowingStateLoss();
@@ -626,17 +619,13 @@ public class GroundhogActivity extends AppCompatActivity {
     }
 
     // private class (Nested class)
-    private class GroundhogHunterBroadcastReceiver extends BroadcastReceiver {
-
+    private class GhHunterBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             if (intent == null) {
                 return;
             }
-
             Bundle extras = intent.getExtras();
-
             String actionName = intent.getAction();
             if (actionName == null) return;
             switch (actionName) {

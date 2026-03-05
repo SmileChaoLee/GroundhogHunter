@@ -4,8 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import com.smile.groundhoghunter.GroundhogHunterApp;
+import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.models.Player;
 import com.smile.smilelibraries.player_record_rest.httpUrl.PlayerRecordRest;
 
@@ -22,12 +21,12 @@ public class GlobalTop10IntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        System.out.println("GlobalTop10IntentService --> onHandleIntent() is called.");
+        System.out.println("GlobalTop10IntentService.onHandleIntent() is called.");
 
         ArrayList<String> playerNames = new ArrayList<>();
         ArrayList<Integer> playerScores = new ArrayList<>();
 
-        ArrayList<Player> players = PlayerRecordRest.GetGlobalTop10(GroundhogHunterApp.GameId);
+        ArrayList<Player> players = PlayerRecordRest.GetGlobalTop10(Constants.GROUNDHOG_GAME_ID);
         if (players.isEmpty()) {
             players = new ArrayList<>();
         }

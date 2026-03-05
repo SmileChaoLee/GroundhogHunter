@@ -7,7 +7,7 @@ public class GameViewDrawThread extends Thread {
 
     private GameView gameView;
     private boolean keepRunning;
-    private int synchronizeTime = GameView.DrawingInterval;
+    private int synchronizeTime = GameView.DRAWING_INTERVAL;
 
     public GameViewDrawThread(GameView gView) {
         this.gameView = gView;
@@ -16,22 +16,22 @@ public class GameViewDrawThread extends Thread {
 
     public void run() {
         while (keepRunning) {
-            synchronized (GroundhogActivity.ActivityHandler) {
+            synchronized (GroundhogActivity.activityLocker) {
                 // for application's (Main activity) synchronizing
                 while (GroundhogActivity.GamePause) {
                     try {
-                        GroundhogActivity.ActivityHandler.wait();
+                        GroundhogActivity.activityLocker.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
 
-            synchronized (GameView.GameViewHandler) {
+            synchronized (GameView.gViewLocker) {
                 // for GameView's synchronizing
-                while (GameView.GameViewPause) {
+                while (GameView.gViewPause) {
                     try {
-                        GameView.GameViewHandler.wait();
+                        GameView.gViewLocker.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

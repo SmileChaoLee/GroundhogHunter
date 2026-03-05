@@ -10,38 +10,37 @@ public class GameTimerThread extends Thread {
     private final static String TAG = "Threads.GameTimerThread";
     private final GameView gameView;
     private final int gameType;
-    private final IoFunctionThread selectedIoFunctionThread;
-    private final int synchronizeTime = 1000; // one second
+    private final IoFunctionThread ioFuncThread;
 
     private boolean keepRunning;
     private int timeRemaining;
 
     public GameTimerThread(GameView gView) {
         gameView = gView;
-        gameType = gameView.getGameType();
-        selectedIoFunctionThread = gameView.getIoFunctionThread();
+        gameType = gameView.getGType();
+        ioFuncThread = gameView.getSelectedIoFuncTh();
         keepRunning = true;
-        timeRemaining = GameView.TimerInterval;
+        timeRemaining = GameView.TIMER_INTERVAL;
     }
 
     public void run() {
         while ((timeRemaining > 0) && (keepRunning)) {
-            synchronized (GroundhogActivity.ActivityHandler) {
+            synchronized (GroundhogActivity.activityLocker) {
                 // for application's (Main activity) synchronizing
                 while (GroundhogActivity.GamePause) {
                     try {
-                        GroundhogActivity.ActivityHandler.wait();
+                        GroundhogActivity.activityLocker.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
 
-            synchronized (GameView.GameViewHandler) {
+            synchronized (GameView.gViewLocker) {
                 // for GameView's synchronizing
-                while (GameView.GameViewPause) {
+                while (GameView.gViewPause) {
                     try {
-                        GameView.GameViewHandler.wait();
+                        GameView.gViewLocker.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -49,22 +48,26 @@ public class GameTimerThread extends Thread {
             }
 
             try {
+                // one second
+                int synchronizeTime = 1000;
                 Thread.sleep(synchronizeTime);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             switch (gameType) {
-                case Constants.GameBySinglePlayer:
+                case Constants.GAME_BY_SINGLE_PLAY:
                     --timeRemaining;
                     break;
-                case Constants.TwoPlayerGameByHost:
+                case Constants.TWO_PLAY_GAME_BY_HOST:
                     --timeRemaining;
-                    selectedIoFunctionThread.write(Constants.TwoPlayerClientGameTimerRead, "" + timeRemaining);
+                    if (ioFuncThread != null) {
+                        ioFuncThread.write(Constants.TWO_PLAY_CL_GAME_TIMER_READ, "" + timeRemaining);
+                    }
                     break;
-                case Constants.TwoPlayerGameByClient:
+                case Constants.TWO_PLAY_GAME_BY_CLIENT:
                     // only read timeRemaining from Host game
-                    boolean isOppositePlayerLeft = gameView.getOppositePlayerLeft();
+                    boolean isOppositePlayerLeft = gameView.isOpposPlayerLeft();
                     if (isOppositePlayerLeft) {
                         --timeRemaining;
                     }

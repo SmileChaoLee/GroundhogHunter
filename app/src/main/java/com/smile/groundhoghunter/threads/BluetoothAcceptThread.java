@@ -62,7 +62,7 @@ public class BluetoothAcceptThread extends ServerAcceptThread {
 
         if (mServerSocket == null) {
             // cannot create Server Socket
-            msg = mHandler.obtainMessage(Constants.ServerAcceptThreadNoServerSocket);
+            msg = mHandler.obtainMessage(Constants.SER_ACCEPT_TH_NO_SER_SOCKET);
             msg.sendToTarget();
             return;
         }
@@ -84,12 +84,12 @@ public class BluetoothAcceptThread extends ServerAcceptThread {
 
                         BluetoothFunctionThread btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
                         btFunctionThread.start();
-                        btFunctionThread.write(Constants.OppositePlayerNameHasBeenRead, mPlayerName);
+                        btFunctionThread.write(Constants.OPPOS_PLAYER_NAME_READ, mPlayerName);
 
                         BtConnectDevice btConnectDevice = new BtConnectDevice(mBluetoothSocket.getRemoteDevice());
                         btFunctionThreadMap.put(btConnectDevice, btFunctionThread);
 
-                        msg = mHandler.obtainMessage(Constants.ServerAcceptThreadConnected);
+                        msg = mHandler.obtainMessage(Constants.SER_ACCEPT_TH_CONNECTED);
                         data = new Bundle();
                         data.putParcelable("ConnectDevice", btConnectDevice);
                         msg.setData(data);
@@ -102,7 +102,7 @@ public class BluetoothAcceptThread extends ServerAcceptThread {
                     Log.e(TAG, "BluetoothSocket's accept() method failed", ex);
 
                     // listening is stopped (means BluetoothServerSocket closed or exception occurred)
-                    msg = mHandler.obtainMessage(Constants.ServerAcceptThreadStopped);
+                    msg = mHandler.obtainMessage(Constants.SER_ACCEPT_TH_STOPPED);
                     msg.sendToTarget();
                 }
             }

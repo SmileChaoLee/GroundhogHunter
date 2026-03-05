@@ -9,6 +9,7 @@ import androidx.multidex.MultiDexApplication;
 import com.facebook.ads.AudienceNetworkAds;
 import com.google.android.gms.ads.MobileAds;
 import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
+import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.facebook_ads_util.*;
 import com.smile.smilelibraries.google_ads_util.AdMobInterstitial;
 import com.smile.smilelibraries.scoresqlite.*;
@@ -17,14 +18,11 @@ import java.util.UUID;
 
 public class GroundhogHunterApp extends MultiDexApplication {
     private static final String TAG = "GroundhogHunterApp";
-    // this GameId is for backend game_id in playerscore table
-    public static final String GameId = "2";
     public static final String UUID_String = "b5af9bad-42e0-4d0d-8546-ebeb97e1abfa";
     public static final UUID ApplicationUUID = UUID.fromString(UUID_String);
     public static Resources AppResources;
     public static Context AppContext;
     public static ScoreSQLite ScoreSQLiteDB;
-    public static String DATABASE_NAME = "groundhog_hunter.db";
     public static IoFunctionThread selectedIoFuncThread;
     public static ShowInterstitial InterstitialAd;
     public static String facebookBannerID = "";
@@ -42,7 +40,7 @@ public class GroundhogHunterApp extends MultiDexApplication {
 
         AppResources = getResources();
         AppContext = getApplicationContext();
-        ScoreSQLiteDB = new ScoreSQLite(GroundhogHunterApp.AppContext,DATABASE_NAME);
+        ScoreSQLiteDB = new ScoreSQLite(GroundhogHunterApp.AppContext, Constants.DATABASE_NAME);
         // Facebook ads (Interstitial ads)
         // groundhog hunter contains ads
         AudienceNetworkAds.initialize(this);
