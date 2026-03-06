@@ -10,13 +10,14 @@
         <item>Stage 4</item>
     </string-array>
 
+    <string name="emptyString">""</string>
     <string name="secondString">Sec.</string>
     <string name="startString">Start</string>
     <string name="pauseString">Pause</string>
     <string name="resumeString">Resume</string>
     <string name="newString">New</string>
     <string name="quitString">Quit</string>
-    <string name="okString">Ok</string>
+    <string name="okString">OK</string>
     <string name="cancelString">Cancel</string>
     <string name="submitString">Send</string>
     <string name="nameString">Input your name</string>

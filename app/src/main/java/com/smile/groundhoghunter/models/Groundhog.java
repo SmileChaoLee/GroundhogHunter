@@ -7,6 +7,7 @@ import android.graphics.RectF;
 import android.util.Log;
 
 import com.smile.groundhoghunter.GameView;
+import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.groundhoghunter.utilities.MathUtil;
 
@@ -68,7 +69,7 @@ public class Groundhog {
 
     public void setNumOfTimeIntervalShown(int numTimeInterval) {
         if (numTimeInterval < GameView.numTimeIntervalShown[status]) {
-            if (hitStatus > 0) {
+            if (hitStatus > Constants.NO_HIT_STATUS) {
                 // when it is hit, then it start hiding
                 --numOfAnimationsShown;
             } else {
@@ -101,7 +102,7 @@ public class Groundhog {
     public void setIsHiding(boolean isHiding) {
         this.isHiding = isHiding;
         if (this.isHiding) {
-            setHitStatus(0);        // disable hit
+            setHitStatus(Constants.NO_HIT_STATUS);        // disable hit
             numOfTimeIntervalShown = 0;
             numOfAnimationsShown = 0;
         }
@@ -124,7 +125,7 @@ public class Groundhog {
         Log.d(TAG, "draw.isHiding = " + isHiding);
         Log.d(TAG, "draw.hitStatus = " + hitStatus);
         if (!isHiding) {
-            if (hitStatus > 0) {
+            if (hitStatus > Constants.NO_HIT_STATUS) {
                 // groundhog is hit
                 canvas.drawBitmap(GameView.groundhogHitBitmaps[status], null, drawArea, null);
                 // the following is displaying score image

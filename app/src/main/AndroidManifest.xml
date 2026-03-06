@@ -55,7 +55,7 @@
         </activity>
 
         <activity
-            android:name=".BtCreateGameActivity">
+            android:name=".bluetooth_view.BtCreateGameActivity">
         </activity>
 
         <activity
@@ -63,7 +63,7 @@
         </activity>
 
         <activity
-            android:name=".BtJoinGameActivity">
+            android:name=".bluetooth_view.BtJoinGameActivity">
         </activity>
 
         <activity
@@ -79,13 +79,13 @@
             android:name=".HostGameActivity">
         </activity>
         <activity
-            android:name=".BtHostGameActivity">
+            android:name=".bluetooth_view.BtHostGameActivity">
         </activity>
         <activity
             android:name=".ClientGameActivity">
         </activity>
         <activity
-            android:name=".BtClientGameActivity">
+            android:name=".bluetooth_view.BtClientGameActivity">
         </activity>
 
         <activity

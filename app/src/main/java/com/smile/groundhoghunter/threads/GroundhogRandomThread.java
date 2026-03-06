@@ -22,7 +22,7 @@ public class GroundhogRandomThread extends Thread {
     public GroundhogRandomThread(GameView gView) {
         gameView = gView;
         gameType = gameView.getGType();
-        ioFuncThread = gameView.getSelectedIoFuncTh();
+        ioFuncThread = gameView.getIoFuncThread();
         synchronizeTime = GameView.TIMER_INTERVAL_SHOWN;       // 500 mini seconds (1 second)
         chanceToShow = 18;   // probability is 1/18
         groundhogRandom = new Random(System.currentTimeMillis());

@@ -1,53 +1,43 @@
 package com.smile.groundhoghunter
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.DialogInterface
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.PorterDuff
 import android.graphics.RectF
-import android.graphics.Typeface
-import android.os.AsyncTask
 import android.util.Log
-import android.view.Gravity
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.view.Window
-import android.view.WindowManager
-import android.widget.EditText
-import android.widget.LinearLayout
-import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import com.smile.groundhoghunter.abstract_threads.IoFunctionThread
 import com.smile.groundhoghunter.constants.Constants
 import com.smile.groundhoghunter.models.Groundhog
 import com.smile.groundhoghunter.threads.GameTimerThread
 import com.smile.groundhoghunter.threads.GameViewDrawThread
 import com.smile.groundhoghunter.threads.GroundhogRandomThread
-import com.smile.smilelibraries.player_record_rest.httpUrl.PlayerRecordRest
-import com.smile.smilelibraries.utilities.ScreenUtil
 import com.smile.smilelibraries.utilities.SoundPoolUtil
-import okhttp3.internal.notifyAll
-import org.json.JSONObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 @SuppressLint("ViewConstructor")
 class GameView(
-    context: Context, gameType: Int, gWidth: Int, gHeight: Int,
-    ioFunctionThread: IoFunctionThread?
-) : SurfaceView(context), SurfaceHolder.Callback {
-
+    private val mActivity: GroundhogActivity,
+    private val mGType: Int,
+    private val mRowNum: Int,
+    private val mColNum: Int,
+    private val mGViewWidth: Int,
+    private val mGViewHeight: Int,
+    private val mIoFuncThread: IoFunctionThread?
+) : SurfaceView(mActivity), SurfaceHolder.Callback {
 
     companion object {
         private const val TAG = "GameView"
-        @JvmField
-        var gViewPause: Boolean = false // for synchronizing
-        @JvmField
-        val gViewLocker = Object()  // for synchronizing
         const val BT_MEDIA_TYPE: Int = 0
         const val WIFI_MEDIA_TYPE: Int = 1
         const val NONE_MEDIA_TYPE: Int = -1
@@ -55,6 +45,10 @@ class GameView(
         const val DRAWING_INTERVAL: Int = 80
         const val NUM_G_HOG_TYPES: Int = 4 // including hiding
         const val TIMER_INTERVAL_SHOWN: Int = 300 // 300 milli seconds
+        @JvmField
+        var gViewPause: Boolean = false // for synchronizing
+        @JvmField
+        val gViewLocker = Object()  // for synchronizing
         @JvmField
         val numTimeIntervalShown = intArrayOf(
             4, // has to be even (4 frames for animation, total time is 300 * 4 milliseconds
@@ -112,14 +106,7 @@ class GameView(
         )
     }
 
-    private var mGType: Int
-    private val mTextFontSize: Float
     private val mSurfaceHolder: SurfaceHolder
-    private val mGroundhogAct: GroundhogActivity
-    private val mRowNum: Int
-    private val mColNum: Int
-    private val mGViewWidth: Int
-    private val mGViewHeight: Int
     private var mRectWidthForOneHog = 0f
     private var mRectHeightForOneHog = 0f
     private var mHighestScore: Int
@@ -136,20 +123,11 @@ class GameView(
     private var isSFViewCreated: Boolean
     private var mRunningStatus: Int
     private var hasSound: Boolean
-    private var mSelectedIoFuncTh: IoFunctionThread? = null
     private val mSNDPoolUtil: SoundPoolUtil
     private lateinit var mGHogArray: Array<Groundhog>
 
     init {
         Log.d(TAG, "GameView.init")
-        mSelectedIoFuncTh = ioFunctionThread
-        mGroundhogAct = context as GroundhogActivity
-        mGType = gameType
-        mTextFontSize = ScreenUtil.getPxTextFontSizeNeeded(mGroundhogAct)
-        mRowNum = mGroundhogAct.rowNum
-        mColNum = mGroundhogAct.colNum
-        mGViewWidth = gWidth
-        mGViewHeight = gHeight
         gViewPause = false // for synchronizing
         setWillNotDraw(true) // added on 2017-11-07 for just in case, the default is true
         mSurfaceHolder = holder
@@ -157,7 +135,7 @@ class GameView(
         setZOrderOnTop(true)
         // surfaceHolder.setFormat(PixelFormat.TRANSPARENT);    // same effect as the following
         mSurfaceHolder.setFormat(PixelFormat.TRANSLUCENT)
-        mHighestScore = mGroundhogAct.highestScore
+        mHighestScore = mActivity.getHighestScore()
         mCurrentScore = 0
         mNumOfHits = 0
         isOpposPlayerLeft = false
@@ -167,7 +145,7 @@ class GameView(
         mTimeRemaining = TIMER_INTERVAL
         hasSound = true // default is having sound
         // create sound pool
-        mSNDPoolUtil = SoundPoolUtil(context, R.raw.ouh)
+        mSNDPoolUtil = SoundPoolUtil(mActivity, R.raw.ouh)
         // Creating groundhogs' object
         // start to initialize groundhogArray array
         createGroundhogs()
@@ -183,6 +161,10 @@ class GameView(
 
     fun setHasSound(hasSound: Boolean) {
         this.hasSound = hasSound
+    }
+
+    fun setHighestScore(hScore: Int) {
+        mHighestScore = hScore
     }
 
     fun isOpposPlayerLeft(): Boolean {
@@ -205,8 +187,12 @@ class GameView(
         return mGType
     }
 
-    fun getSelectedIoFuncTh(): IoFunctionThread? {
-        return mSelectedIoFuncTh
+    fun getIoFuncThread(): IoFunctionThread? {
+        return mIoFuncThread
+    }
+
+    fun getOpposCurrentScore(): Int {
+        return mOpposCurrentScore
     }
 
     fun setOpposCurrentScore(opposCurrentScore: Int) {
@@ -255,7 +241,7 @@ class GameView(
                     if (!groundhog.isHiding) {
                         // showing but not hiding
                         val hitStatus = groundhog.hitStatus
-                        if (hitStatus == 0) {
+                        if (hitStatus == Constants.NO_HIT_STATUS) {
                             // not hit
                             val newHitStatus: Int
                             if (groundhog.drawArea.contains(x.toFloat(), y.toFloat())) {
@@ -295,7 +281,7 @@ class GameView(
                                         numOfTimeIntervalShown
                                     )
                                     writeString += newHitStatus // hit status
-                                    mSelectedIoFuncTh?.write(
+                                    mIoFuncThread?.write(
                                         Constants.TWO_PLAY_GAME_G_HOG_HIT,
                                         writeString
                                     )
@@ -304,6 +290,7 @@ class GameView(
                                 Log.d(TAG, "onTouchEvent.hitStatus = " + groundhog.hitStatus)
                                 ++mNumOfHits
                                 mCurrentScore += hitScores[groundhog.status]
+                                Log.d(TAG, "onTouchEvent.mCurrentScore = $mCurrentScore")
                                 Log.d(TAG, "onTouchEvent.startDrawingScreen()")
                                 startDrawingScreen() // added on 2018-10-29 for testing
                             }
@@ -328,9 +315,12 @@ class GameView(
             mGTimerTh = GameTimerThread(this)
             mGHogRandomTh = GroundhogRandomThread(this)
             mGDrawTh = GameViewDrawThread(this)
-            mGHogRandomTh!!.start()
-            mGDrawTh!!.start()
-            mGTimerTh!!.start()
+            val mGd = mGDrawTh ?: return
+            val mGH = mGHogRandomTh ?: return
+            val mGT = mGTimerTh ?: return
+            mGH.start()
+            mGd.start()
+            mGT.start()
         }
     }
 
@@ -371,7 +361,8 @@ class GameView(
 
     fun drawGameScreen() {
         // Canvas canvas = null;
-        mTimeRemaining = mGTimerTh!!.timeRemaining
+        val mGT = mGTimerTh ?: return
+        mTimeRemaining = mGT.timeRemaining
         startDrawingScreen()
         if ((mTimeRemaining <= 0) && (mRunningStatus == 1)) {
             // if game is running and timer is finished, then it is game over
@@ -399,46 +390,43 @@ class GameView(
 
     fun stopThreads() {
         var retry: Boolean
-        if (mGHogRandomTh != null) {
-            mGHogRandomTh!!.setKeepRunning(false)
-            retry = true
-            while (retry) {
-                try {
-                    mGHogRandomTh!!.join()
-                    Log.d(TAG, "stopThreads.groundhogRandomThread.Join()")
-                    retry = false
-                } catch (ex: InterruptedException) {
-                    Log.e(TAG, "stopThreads.Exception: ", ex)
-                } // continue processing until the thread ends
-            }
+        val mGH = mGHogRandomTh ?: return
+        val mGD = mGDrawTh ?: return
+        val mGT = mGTimerTh ?: return
+        mGH.setKeepRunning(false)
+        retry = true
+        while (retry) {
+            try {
+                mGH.join()
+                Log.d(TAG, "stopThreads.groundhogRandomThread.Join()")
+                retry = false
+            } catch (ex: InterruptedException) {
+                Log.e(TAG, "stopThreads.Exception: ", ex)
+            } // continue processing until the thread ends
         }
 
-        if (mGDrawTh != null) {
-            mGDrawTh!!.setKeepRunning(false)
-            retry = true
-            while (retry) {
-                try {
-                    mGDrawTh!!.join()
-                    Log.d(TAG, "stopThreads.gameViewDrawThread.Join()")
-                    retry = false
-                } catch (ex: InterruptedException) {
-                    Log.e(TAG, "stopThreads.Exception: ", ex)
-                } // continue processing until the thread ends
-            }
+        mGD.setKeepRunning(false)
+        retry = true
+        while (retry) {
+            try {
+                mGD.join()
+                Log.d(TAG, "stopThreads.gameViewDrawThread.Join()")
+                retry = false
+            } catch (ex: InterruptedException) {
+                Log.e(TAG, "stopThreads.Exception: ", ex)
+            } // continue processing until the thread ends
         }
 
-        if (mGTimerTh != null) {
-            mGTimerTh!!.setKeepRunning(false) // stop the gameTimerThread
-            retry = true
-            while (retry) {
-                try {
-                    mGTimerTh!!.join()
-                    Log.d(TAG, "gameTimerThread.Join()")
-                    retry = false
-                } catch (ex: InterruptedException) {
-                    Log.e(TAG, "stopThreads.Exception: ", ex)
-                } // continue processing until the thread ends
-            }
+        mGT.setKeepRunning(false) // stop the gameTimerThread
+        retry = true
+        while (retry) {
+            try {
+                mGT.join()
+                Log.d(TAG, "gameTimerThread.Join()")
+                retry = false
+            } catch (ex: InterruptedException) {
+                Log.e(TAG, "stopThreads.Exception: ", ex)
+            } // continue processing until the thread ends
         }
     }
 
@@ -460,36 +448,6 @@ class GameView(
         groundhog.hitStatus = hitByte
     }
 
-    // private methods
-    /*
-    private fun createGroundhogs() {
-        mGHogArray = Array<Groundhog>(mRowNum * mColNum)
-        var x: Float
-        var y = 0f
-        mRectWidthForOneHog = mGViewWidth / mColNum.toFloat()
-        mRectHeightForOneHog = mGViewHeight / mRowNum.toFloat()
-        var bottomY: Float
-        var index: Int
-        var groundhog: Groundhog?
-        val temp = RectF()
-        for (i in 0..<mRowNum) {
-            x = 0f
-            bottomY = y + mRectHeightForOneHog
-            for (j in 0..<mColNum) {
-                index = mColNum * i + j
-                temp.left = x
-                x += mRectWidthForOneHog
-                temp.right = x
-                temp.top = y
-                temp.bottom = bottomY
-                groundhog = Groundhog(temp)
-                mGHogArray!![index] = groundhog
-            }
-            y = bottomY
-        }
-    }
-    */
-
     private fun createGroundhogs() {
         Log.d(TAG, "createGroundhogs")
         val totalHogs = mRowNum * mColNum
@@ -508,6 +466,7 @@ class GameView(
     }
 
     private fun startDrawingScreen() {
+        Log.d(TAG, "startDrawingScreen")
         var canvas: Canvas? = null
         try {
             canvas = mSurfaceHolder.lockCanvas(null)
@@ -526,12 +485,22 @@ class GameView(
     }
 
     private fun doDraw(canvas: Canvas?) {
-        mGroundhogAct.runOnUiThread {
-            mGroundhogAct.setTextForHighScoreTextView(mHighestScore.toString())
-            mGroundhogAct.setTextForScoreTextView(mCurrentScore.toString())
-            mGroundhogAct.setTextForTimerTextView(mTimeRemaining.toString())
-            mGroundhogAct.setTextForHitNumTextView(mNumOfHits.toString())
-        }
+        Log.d(TAG, "doDraw.mHighestScore = $mHighestScore")
+        val hScore = mHighestScore.toString()
+        Log.d(TAG, "doDraw.hScore = $hScore")
+        Log.d(TAG, "doDraw.mCurrentScore = $mCurrentScore")
+        val cScore = mCurrentScore.toString()
+        Log.d(TAG, "doDraw.cScore = $cScore")
+        Log.d(TAG, "doDraw.mTimeRemaining = $mTimeRemaining")
+        val tRemaining = mTimeRemaining.toString()
+        Log.d(TAG, "doDraw.tRemaining = $tRemaining")
+        Log.d(TAG, "doDraw.mNumOfHits = $mNumOfHits")
+        val nHits = mNumOfHits.toString()
+        Log.d(TAG, "doDraw.nHits = $nHits")
+        mActivity.setTextForHighScoreTextView(hScore)
+        mActivity.setTextForScoreTextView(cScore)
+        mActivity.setTextForTimerTextView(tRemaining)
+        mActivity.setTextForHitNumTextView(nHits)
         Log.d(TAG, "doDraw.canvas = $canvas")
         if (canvas != null) {
             canvas.drawColor(0, PorterDuff.Mode.CLEAR)
@@ -544,158 +513,77 @@ class GameView(
     }
 
     private fun gameOver() {
+        Log.d(TAG, "gameOver")
+        val mGd = mGDrawTh ?: return
+        val mGH = mGHogRandomTh ?: return
+        val mGT = mGTimerTh ?: return
         // game over
         // set threads to stop running loop
         // but do not use Thread.join() to stop stop thread
-        mGDrawTh!!.setKeepRunning(false)
-        mGHogRandomTh!!.setKeepRunning(false)
-        mGTimerTh!!.setKeepRunning(false)
+        mGd.setKeepRunning(false)
+        mGH.setKeepRunning(false)
+        mGT.setKeepRunning(false)
         mRunningStatus = 2
         if (mGType == Constants.GAME_BY_SINGLE_PLAY) {
             // single player then record the score
-            val isInTop10 = GroundhogHunterApp.ScoreSQLiteDB.isInTop10(mCurrentScore)
-            if (isInTop10) {
-                // record the current score
-                recordScore(mCurrentScore)
+            mActivity.lifecycleScope.launch(Dispatchers.IO) {
+                val isInTop10 = GroundhogHunterApp.ScoreSQLiteDB.isInTop10(mCurrentScore)
+                if (isInTop10) {
+                    // record the current score
+                    withContext(Dispatchers.Main) {
+                        mActivity.recordScore(mCurrentScore)
+                    }
+                }
             }
         } else {
             // display the competition result
+            val mIO = mIoFuncThread ?: return
             var scoreString = String.format(Locale.ENGLISH, "%04d", mCurrentScore)
             scoreString += String.format(Locale.ENGLISH, "%04d", mNumOfHits)
-            mSelectedIoFuncTh?.write(Constants.TWO_PLAY_GAME_SCORE_RECEIVED, scoreString)
-            mGroundhogAct.runOnUiThread {
+            mIO.write(Constants.TWO_PLAY_GAME_SCORE_RECEIVED, scoreString)
+            /*
+            mPresentView.getGHogActivity().runOnUiThread {
                 val displayResultAsyncTask: AsyncTask<Void?, Void?, Void?> =
                     DisplayResultAsyncTask()
                 displayResultAsyncTask.execute()
             }
-        }
-    }
-
-    private fun recordScore(score: Int) {
-        //    record currentScore as a score in database
-        val res = resources
-        mGroundhogAct.runOnUiThread {
-            val et = EditText(mGroundhogAct)
-            ScreenUtil.resizeTextSize(et, mTextFontSize)
-            et.setTextColor(Color.BLUE)
-            et.setHint(res.getString(R.string.nameString))
-            et.setGravity(Gravity.CENTER)
-            val alertD = AlertDialog.Builder(mGroundhogAct).create()
-            alertD.setTitle(null)
-            alertD.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            alertD.setCancelable(false)
-            alertD.setView(et)
-            alertD.setButton(
-                DialogInterface.BUTTON_NEGATIVE, res.getString(R.string.cancelString)
-            ) { dialog: DialogInterface?, which: Int -> dialog!!.dismiss() }
-            alertD.setButton(
-                DialogInterface.BUTTON_POSITIVE, res.getString(R.string.submitString)
-            ) { dialog: DialogInterface?, which: Int ->
-                dialog!!.dismiss()
-                // use thread to add a record to database (remote database on AWS-EC2)
-                val restThread: Thread = object : Thread() {
-                    override fun run() {
-                        try {
-                            val jsonObject = JSONObject()
-                            jsonObject.put(Constants.PLAYER_NAME, et.getText().toString())
-                            jsonObject.put(Constants.SCORE, score)
-                            jsonObject.put(Constants.GAME_ID, Constants.GROUNDHOG_GAME_ID)
-                            PlayerRecordRest.addOneRecord(jsonObject)
-                        } catch (ex: Exception) {
-                            Log.e(TAG, "recordScore.Exception", ex)
+            */
+            mActivity.lifecycleScope.launch(Dispatchers.Main) {
+                mActivity.disableAllButtons()
+                if (isOpposPlayerLeft) {
+                    // opposite player has left game then show result
+                    mOpposCurrentScore = 0
+                    mOpposNumOfHits = 0
+                } else {
+                    // waiting until received the scores from opposite player (only wait 6 seconds)
+                    withContext(Dispatchers.IO) {
+                        val maxLoop = 30
+                        var i = 0
+                        while ((!isReceivedScoreFromOppos) && (i < maxLoop)) {
+                            Log.d(TAG, "doInBackground.Number of loop (i) = $i")
+                            delay(200)
+                            i++
                         }
                     }
-                }
-                restThread.start()
-                GroundhogHunterApp.ScoreSQLiteDB.addScore(et.getText().toString(), score)
-                GroundhogHunterApp.ScoreSQLiteDB.deleteAllAfterTop10() // only keep the top 10
-                if (mCurrentScore > mHighestScore) {
-                    mHighestScore = mCurrentScore
-                    mGroundhogAct.highestScore = mHighestScore
-                    mGroundhogAct.setTextForHighScoreTextView(mHighestScore.toString())
-                }
-            }
-            alertD.setOnShowListener { dialog: DialogInterface? ->
-                this.setDialogStyle(
-                    dialog
-                )
-            }
-            alertD.show()
-        }
-    }
-
-    private fun setDialogStyle(dialog: DialogInterface?) {
-        val dlg = dialog as AlertDialog
-        val win = dlg.window
-        if (win == null) return
-        win.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-        win.setDimAmount(0.0f) // no dim for background screen
-        win.setLayout(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-        win.setBackgroundDrawableResource(R.drawable.dialog_background_image)
-        val nBtn = dlg.getButton(DialogInterface.BUTTON_NEGATIVE)
-        ScreenUtil.resizeTextSize(nBtn, mTextFontSize)
-        nBtn.setTypeface(Typeface.DEFAULT_BOLD)
-        nBtn.setTextColor(Color.RED)
-        val layoutParams = nBtn.layoutParams as LinearLayout.LayoutParams
-        layoutParams.weight = 10f
-        nBtn.setLayoutParams(layoutParams)
-        val pBtn = dlg.getButton(DialogInterface.BUTTON_POSITIVE)
-        ScreenUtil.resizeTextSize(pBtn, mTextFontSize)
-        pBtn.setTypeface(Typeface.DEFAULT_BOLD)
-        pBtn.setTextColor(Color.rgb(0x00, 0x64, 0x00))
-        pBtn.setLayoutParams(layoutParams)
-    }
-
-    private inner class DisplayResultAsyncTask : AsyncTask<Void?, Void?, Void?>() {
-        override fun onPreExecute() {
-            super.onPreExecute()
-            mGroundhogAct.disableAllButtons()
-        }
-
-        override fun doInBackground(vararg params: Void?): Void? {
-            if (isOpposPlayerLeft) {
-                // opposite player has left game then show result
-                mOpposCurrentScore = 0
-                mOpposNumOfHits = 0
-            } else {
-                // waiting until received the scores from opposite player (only wait 6 seconds)
-                val maxLoop = 30
-                var i = 0
-                while ((!isReceivedScoreFromOppos) && (i < maxLoop)) {
-                    try {
-                        Thread.sleep(200)
-                    } catch (ex: InterruptedException) {
-                        Log.e(TAG, "doInBackground.Exception: ", ex)
+                    if (mGType == Constants.TWO_PLAY_GAME_BY_HOST) {
+                        mActivity.displayTwoPlayerResult(
+                            mCurrentScore,
+                            mNumOfHits,
+                            mOpposCurrentScore,
+                            mOpposNumOfHits
+                        )
+                    } else {
+                        // TwoPlayerGameByClient
+                        mActivity.displayTwoPlayerResult(
+                            mOpposCurrentScore,
+                            mOpposNumOfHits,
+                            mCurrentScore,
+                            mNumOfHits
+                        )
                     }
-                    i++
+                    mActivity.disableAllButtons()
                 }
-                Log.d(TAG, "doInBackground.Number of loop (i) = $i")
             }
-            return null
-        }
-
-        override fun onPostExecute(o: Void?) {
-            super.onPostExecute(o)
-            if (mGType == Constants.TWO_PLAY_GAME_BY_HOST) {
-                mGroundhogAct.displayTwoPlayerResult(
-                    mCurrentScore,
-                    mNumOfHits,
-                    mOpposCurrentScore,
-                    mOpposNumOfHits
-                )
-            } else {
-                // TwoPlayerGameByClient
-                mGroundhogAct.displayTwoPlayerResult(
-                    mOpposCurrentScore,
-                    mOpposNumOfHits,
-                    mCurrentScore,
-                    mNumOfHits
-                )
-            }
-            mGroundhogAct.disableAllButtons()
         }
     }
 }

@@ -5,9 +5,8 @@ import com.smile.groundhoghunter.GroundhogActivity;
 
 public class GameViewDrawThread extends Thread {
 
-    private GameView gameView;
+    private final GameView gameView;
     private boolean keepRunning;
-    private int synchronizeTime = GameView.DRAWING_INTERVAL;
 
     public GameViewDrawThread(GameView gView) {
         this.gameView = gView;
@@ -26,7 +25,6 @@ public class GameViewDrawThread extends Thread {
                     }
                 }
             }
-
             synchronized (GameView.gViewLocker) {
                 // for GameView's synchronizing
                 while (GameView.gViewPause) {
@@ -37,11 +35,11 @@ public class GameViewDrawThread extends Thread {
                     }
                 }
             }
-
             // start drawing
             gameView.drawGameScreen();
-
-            try{Thread.sleep(synchronizeTime);}
+            try{
+                int synchronizeTime = GameView.DRAWING_INTERVAL;
+                Thread.sleep(synchronizeTime);}
             catch(Exception e){e.printStackTrace();}
         }
     }

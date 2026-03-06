@@ -18,7 +18,7 @@ public class GameTimerThread extends Thread {
     public GameTimerThread(GameView gView) {
         gameView = gView;
         gameType = gameView.getGType();
-        ioFuncThread = gameView.getSelectedIoFuncTh();
+        ioFuncThread = gameView.getIoFuncThread();
         keepRunning = true;
         timeRemaining = GameView.TIMER_INTERVAL;
     }

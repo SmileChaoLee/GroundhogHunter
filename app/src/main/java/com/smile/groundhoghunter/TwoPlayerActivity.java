@@ -32,6 +32,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.smile.groundhoghunter.bluetooth_view.BtCreateGameActivity;
+import com.smile.groundhoghunter.bluetooth_view.BtJoinGameActivity;
 import com.smile.groundhoghunter.utilities.BluetoothUtil;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.customized_button.SmileImageButton;

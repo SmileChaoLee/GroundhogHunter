@@ -21,7 +21,7 @@ import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final int PrivacyPolicyActivityRequestCode = 10;
+    private final int PP_REQUEST_CODE = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         buttonLp.bottomMargin = buttonTopMargin;
         privacyPolicyButton.setOnClickListener(view ->
                 PrivacyPolicyUtil.startPrivacyPolicyActivity(MainActivity.this,
-                        PrivacyPolicyActivityRequestCode));
+                        PP_REQUEST_CODE));
 
         final SmileImageButton exitAppButton = findViewById(R.id.exitAppButton);
         Bitmap exitAppBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this,

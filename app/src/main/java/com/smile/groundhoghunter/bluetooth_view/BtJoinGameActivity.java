@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.bluetooth_view;
 
 import android.Manifest;
 import android.app.Activity;
@@ -14,6 +14,10 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresPermission;
 import android.util.Log;
+
+import com.smile.groundhoghunter.GroundhogHunterApp;
+import com.smile.groundhoghunter.JoinGameActivity;
+import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.groundhoghunter.models.BtConnectDevice;
 import com.smile.groundhoghunter.threads.BtConnectToThread;

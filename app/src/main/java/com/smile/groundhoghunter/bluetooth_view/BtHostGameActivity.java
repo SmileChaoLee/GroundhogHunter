@@ -1,7 +1,9 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.bluetooth_view;
 
 import android.os.Bundle;
 import android.util.Log;
+
+import com.smile.groundhoghunter.HostGameActivity;
 import com.smile.groundhoghunter.threads.BluetoothFunctionThread;
 import com.smile.groundhoghunter.utilities.BluetoothUtil;
 
@@ -14,8 +16,8 @@ public class BtHostGameActivity extends HostGameActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate() is called.");
         super.onCreate(savedInstanceState);
-        if (selectedIoFunctionThread != null) {
-            selectedBtFunctionThread = (BluetoothFunctionThread) selectedIoFunctionThread;
+        if (selectedIoFuncThread != null) {
+            selectedBtFunctionThread = (BluetoothFunctionThread) selectedIoFuncThread;
             selectedBtFunctionThread.setStartRead(true);    // start reading data
         } else {
             // selectedIoFunctionThread is null then return to previous

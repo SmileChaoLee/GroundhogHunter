@@ -1,6 +1,7 @@
 package com.smile.groundhoghunter.constants
 
 object Constants {
+    const val NO_HIT_STATUS: Int = 0
     const val SINGLE_PLAY_HIT_STATUS: Int = 1
     const val HOST_PLAY_HIT_STATUS: Int = 1
     const val CLIENT_PLAY_HIT_STATUS: Int = 2

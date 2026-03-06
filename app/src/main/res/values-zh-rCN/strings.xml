@@ -12,6 +12,7 @@
         <item>第四关</item>
     </string-array>
 
+    <string name="emptyString">""</string>
     <string name="secondString">秒</string>
     <string name="startString">开始</string>
     <string name="pauseString">暂停</string>

@@ -1,668 +1,855 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.Color;
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.IntentFilter
+import android.graphics.Color
+import android.graphics.Typeface
+import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.view.Window
+import android.view.WindowManager
+import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.gridlayout.widget.GridLayout
+import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.smile.groundhoghunter.abstract_threads.IoFunctionThread
+import com.smile.groundhoghunter.constants.Constants
+import com.smile.groundhoghunter.services.GlobalTop10IntentService
+import com.smile.groundhoghunter.services.LocalTop10IntentService
+import com.smile.smilelibraries.alertdialogfragment.AlertDialogFragment
+import com.smile.smilelibraries.customized_button.SmileImageButton
+import com.smile.smilelibraries.interfaces.DismissFunction
+import com.smile.smilelibraries.models.ExitAppTimer
+import com.smile.smilelibraries.player_record_rest.httpUrl.PlayerRecordRest
+import com.smile.smilelibraries.show_banner_ads.SetBannerAdView
+import com.smile.smilelibraries.show_interstitial_ads.ShowInterstitial
+import com.smile.smilelibraries.utilities.FontAndBitmapUtil
+import com.smile.smilelibraries.utilities.ScreenUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
-import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
-import androidx.gridlayout.widget.GridLayout;
+open class GroundhogActivity : AppCompatActivity() {
 
-import android.util.Log;
-import android.view.View;
-import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+    companion object {
+        private const val TAG = "GroundhogAct"
+        private const val LOAD_DIALOG_TAG = "LoadingDialogTag"
+        @JvmField
+        var GamePause: Boolean = false
+        @JvmField
+        val activityLocker: Object = Object()
+    }
 
-import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
-import com.smile.groundhoghunter.constants.Constants;
-import com.smile.groundhoghunter.services.GlobalTop10IntentService;
-import com.smile.groundhoghunter.services.LocalTop10IntentService;
-import com.smile.smilelibraries.interfaces.DismissFunction;
-import com.smile.smilelibraries.models.ExitAppTimer;
-import com.smile.smilelibraries.customized_button.SmileImageButton;
-import com.smile.smilelibraries.show_banner_ads.*;
-import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
-import com.smile.smilelibraries.alertdialogfragment.AlertDialogFragment;
-import com.smile.smilelibraries.show_interstitial_ads.*;
-import com.smile.smilelibraries.utilities.ScreenUtil;
+    private var rowNum = 0
+    private var colNum = 0
+    private var highestScore = 0
+    private var isShowingLoadingMessage = false
+    private var gameType = 0
+    protected var textFontSize: Float = 0f
+    protected var fontScale: Float = 0f
+    protected var toastTextSize: Float = 0f
+    private lateinit var loadingString: String
+    private lateinit var soundOnOffImageView: ImageView
+    private lateinit var highScoreTextView: TextView
+    private lateinit var scoreTextView: TextView
+    private lateinit var timerTextView: TextView
+    private lateinit var hitNumTextView: TextView
+    private lateinit var settingButton: SmileImageButton
+    private lateinit var top10Button: SmileImageButton
+    private lateinit var globalTop10Button: SmileImageButton
+    private var loadingDialog: AlertDialogFragment? = null
+    private lateinit var bReceiver: BroadcastReceiver
+    protected lateinit var startGameButton: SmileImageButton
+    protected lateinit var pauseGameButton: SmileImageButton
+    protected lateinit var resumeGameButton: SmileImageButton
+    protected lateinit var newGameButton: SmileImageButton
+    protected lateinit var quitGameButton: SmileImageButton
+    @JvmField
+    protected var gameView: GameView? = null
+    @JvmField
+    protected var selectedIoFuncThread: IoFunctionThread? = null
+    private lateinit var settingLauncher: ActivityResultLauncher<Intent>
+    private lateinit var otherLauncher: ActivityResultLauncher<Intent>
 
-import java.util.ArrayList;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate(")
 
-public class GroundhogActivity extends AppCompatActivity {
-
-    private final static String TAG = "GroundhogAct";
-    private final static String LoadingDialogTag = "LoadingDialogTag";
-    private String loadingString;
-    private int rowNum;
-    private int colNum;
-    private int highestScore;
-    private ImageView soundOnOffImageView;
-    private TextView highScoreTextView;
-    private TextView scoreTextView;
-    private TextView timerTextView;
-    private TextView hitNumTextView;
-    private SmileImageButton settingButton;
-    private SmileImageButton top10Button;
-    private SmileImageButton globalTop10Button;
-    private boolean isShowingLoadingMessage;
-    private AlertDialogFragment loadingDialog;
-    private BroadcastReceiver bReceiver;
-    private int gameType;
-    protected GameView gameView;
-    protected float textFontSize;
-    protected float fontScale;
-    protected float toastTextSize;
-    protected SmileImageButton startGameButton;
-    protected SmileImageButton pauseGameButton;
-    protected SmileImageButton resumeGameButton;
-    protected SmileImageButton newGameButton;
-    protected SmileImageButton quitGameButton;
-    protected IoFunctionThread selectedIoFunctionThread;
-    public static boolean GamePause = false;
-    public static final Object activityLocker = new Object();
-    private ActivityResultLauncher<Intent> settingLauncher;
-    private ActivityResultLauncher<Intent> otherLauncher;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
-        Log.d(TAG, "onCreate(");
-
-        if ( (GroundhogHunterApp.facebookAds != null) || (GroundhogHunterApp.googleInterstitialAd!= null) ) {
-            GroundhogHunterApp.InterstitialAd = new ShowInterstitial(this, GroundhogHunterApp.facebookAds, GroundhogHunterApp.googleInterstitialAd);
+        if ((GroundhogHunterApp.facebookAds != null) || (GroundhogHunterApp.googleInterstitialAd != null)) {
+            GroundhogHunterApp.InterstitialAd = ShowInterstitial(
+                this,
+                GroundhogHunterApp.facebookAds,
+                GroundhogHunterApp.googleInterstitialAd
+            )
         }
 
         if (GroundhogHunterApp.isFirstStartApp) {
             // first time entering this activity
-            GroundhogHunterApp.isFirstStartApp = false;
-            Log.d(TAG, "onCreate.First time entering.");
+            GroundhogHunterApp.isFirstStartApp = false
+            Log.d(TAG, "onCreate.First time entering.")
         } else {
-            Log.d(TAG, "onCreate.not First time entering.");
+            Log.d(TAG, "onCreate.not First time entering.")
         }
 
-        if (savedInstanceState != null) {
-            Log.d(TAG, "onCreate.savedInstanceState is not null.");
-        } else {
-            Log.d(TAG, "onCreate.savedInstanceState is null.");
+        Log.d(TAG, "onCreate.savedInstanceState = $savedInstanceState")
+
+        selectedIoFuncThread = GroundhogHunterApp.selectedIoFuncThread
+        if (selectedIoFuncThread == null) {
+            Log.d(TAG, "selectedIoFunctionThread is null.")
         }
 
-        selectedIoFunctionThread = GroundhogHunterApp.selectedIoFuncThread;
-        if (selectedIoFunctionThread == null) {
-            Log.d(TAG, "selectedIoFunctionThread is null.");
-        }
+        highestScore = GroundhogHunterApp.ScoreSQLiteDB.readHighestScore()
+        loadingString = getString(R.string.loadingString)
+        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this)
+        fontScale = ScreenUtil.getPxFontScale(this)
+        toastTextSize = textFontSize * 0.8f
+        isShowingLoadingMessage = false
+        val callingIntent = intent
+        gameType = callingIntent.getIntExtra(Constants.GAME_TYPE, Constants.GAME_BY_SINGLE_PLAY)
 
-        highestScore = GroundhogHunterApp.ScoreSQLiteDB.readHighestScore();
-        loadingString = getString(R.string.loadingString);
-        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
-        fontScale = ScreenUtil.getPxFontScale(this);
-        toastTextSize = textFontSize * 0.8f;
-        isShowingLoadingMessage = false;
-        Intent callingIntent = getIntent();
-        gameType = callingIntent.getIntExtra(Constants.GAME_TYPE, Constants.GAME_BY_SINGLE_PLAY);
+        super.onCreate(savedInstanceState)
 
-        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_groundhog)
 
-        setContentView(R.layout.activity_groundhog);
-
-        GamePause = false;
+        GamePause = false
 
         // int darkOrange = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkOrange);
-        int darkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed);
+        val darkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed)
         // int darkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
-
-        // upper buttons layout
-        // for setting button
-        String settingString = getString(R.string.settingString);
-        settingButton = findViewById(R.id.settingButton);
-        Bitmap settingBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.setting_button, settingString, Color.BLUE);
-        settingButton.setImageBitmap(settingBitmap);
-        settingButton.setOnClickListener(view -> {
-            if (gameView != null) {
-                if ((gameView.getRunningStatus() != 1) || (GameView.gViewPause)) {
+        val settingString = getString(R.string.settingString)
+        settingButton = findViewById(R.id.settingButton)
+        val settingBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
+            this,
+            R.drawable.setting_button,
+            settingString,
+            Color.BLUE
+        )
+        settingButton.setImageBitmap(settingBitmap)
+        settingButton.setOnClickListener { view: View? ->
+            gameView?.let { gv ->
+                if ((gv.getRunningStatus() != 1) || (GameView.gViewPause)) {
                     // client is not playing game or not pause status
-                    disableAllButtons();
-                    Intent intent = new Intent(GroundhogActivity.this, SettingActivity.class);
-                    Bundle extras = new Bundle();
-                    extras.putBoolean("HasSound", gameView.hasSound());
-                    intent.putExtras(extras);
-                    // startActivityForResult(intent, SettingRequestCode);
-                    settingLauncher.launch(intent);
+                    disableAllButtons()
+                    val intent = Intent(this@GroundhogActivity,
+                        SettingActivity::class.java)
+                    val extras = Bundle()
+                    extras.putBoolean("HasSound", gameView!!.hasSound())
+                    intent.putExtras(extras)
+                    settingLauncher.launch(intent)
                 }
             }
-        });
-
-        // for top 10 button
-        String localTop10String = getString(R.string.localTop10String);
-        top10Button = findViewById(R.id.top10Button);
-        Bitmap top10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.top10_button, localTop10String, darkRed);
-        top10Button.setImageBitmap(top10Bitmap);
-        top10Button.setOnClickListener(view -> {
-            if (gameView != null) {
-                if ((gameView.getRunningStatus() != 1) || (GameView.gViewPause)) {
-                    // client is not playing game or not pause status
-                    disableAllButtons();
-                    getLocalTop10ScoreList();    // removed for testing on 2019-05-07
-                }
-            }
-        });
+        }
 
         // for top 10 button
-        String globalTop10String = getString(R.string.globalTop10String);
-        globalTop10Button = findViewById(R.id.globalTop10Button);
-        Bitmap globalTop10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.global_top10_button, globalTop10String, darkRed);
-        globalTop10Button.setImageBitmap(globalTop10Bitmap);
-        globalTop10Button.setOnClickListener(view -> {
-            if (gameView != null) {
-                if ((gameView.getRunningStatus() != 1) || (GameView.gViewPause)) {
+        val localTop10String = getString(R.string.localTop10String)
+        top10Button = findViewById(R.id.top10Button)
+        val top10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
+            this,
+            R.drawable.top10_button,
+            localTop10String,
+            darkRed
+        )
+        top10Button.setImageBitmap(top10Bitmap)
+        top10Button.setOnClickListener { view: View? ->
+            gameView?.let { gv ->
+                if ((gv.getRunningStatus() != 1) || (GameView.gViewPause)) {
                     // client is not playing game or not pause status
-                    disableAllButtons();
-                    getGlobalTop10ScoreList();
+                    disableAllButtons()
+                    getLocalTop10ScoreList() // removed for testing on 2019-05-07
                 }
             }
-        });
+        }
+
+        // for top 10 button
+        val globalTop10String = getString(R.string.globalTop10String)
+        globalTop10Button = findViewById(R.id.globalTop10Button)
+        val globalTop10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
+            this,
+            R.drawable.global_top10_button,
+            globalTop10String,
+            darkRed
+        )
+        globalTop10Button.setImageBitmap(globalTop10Bitmap)
+        globalTop10Button.setOnClickListener { view: View? ->
+            gameView?.let { gv ->
+                if ((gv.getRunningStatus() != 1) || (GameView.gViewPause)) {
+                    // client is not playing game or not pause status
+                    disableAllButtons()
+                    getGlobalTop10ScoreList()
+                }
+            }
+        }
 
         // score layout
-        TextView gameStatusTitleTextView = findViewById(R.id.gameStatusTitle);
-        ScreenUtil.resizeTextSize(gameStatusTitleTextView, textFontSize);
-        soundOnOffImageView = findViewById(R.id.soundOnOffImageView);
+        val gameStatusTitleTextView = findViewById<TextView>(R.id.gameStatusTitle)
+        ScreenUtil.resizeTextSize(gameStatusTitleTextView, textFontSize)
+        soundOnOffImageView = findViewById(R.id.soundOnOffImageView)
 
-        TextView highScoreTitleTextView = findViewById(R.id.highestScoreTitle);
-        ScreenUtil.resizeTextSize(highScoreTitleTextView, textFontSize);
-        highScoreTextView = findViewById(R.id.highestScoreText);
-        ScreenUtil.resizeTextSize(highScoreTextView, textFontSize);
-        highScoreTextView.setText(String.valueOf(highestScore));
+        val highScoreTitleTextView = findViewById<TextView>(R.id.highestScoreTitle)
+        ScreenUtil.resizeTextSize(highScoreTitleTextView, textFontSize)
+        highScoreTextView = findViewById(R.id.highestScoreText)
+        ScreenUtil.resizeTextSize(highScoreTextView, textFontSize)
+        highScoreTextView.text = highestScore.toString()
 
-        TextView scoreTitleTextView = findViewById(R.id.scoreTitle);
-        ScreenUtil.resizeTextSize(scoreTitleTextView, textFontSize);
-        scoreTextView = findViewById(R.id.scoreText);
-        ScreenUtil.resizeTextSize(scoreTextView, textFontSize);
-        scoreTextView.setText("0");
+        val timerTitleTextView = findViewById<TextView>(R.id.timerTitle)
+        ScreenUtil.resizeTextSize(timerTitleTextView, textFontSize)
+        timerTextView = findViewById(R.id.timerText)
+        ScreenUtil.resizeTextSize(timerTextView, textFontSize)
+        timerTextView.text = GameView.TIMER_INTERVAL.toString()
 
-        TextView timerTitleTextView = findViewById(R.id.timerTitle);
-        ScreenUtil.resizeTextSize(timerTitleTextView, textFontSize);
-        timerTextView = findViewById(R.id.timerText);
-        ScreenUtil.resizeTextSize(timerTextView, textFontSize);
-        timerTextView.setText(String.valueOf(GameView.TIMER_INTERVAL));
+        val scoreTitleTextView = findViewById<TextView>(R.id.scoreTitle)
+        ScreenUtil.resizeTextSize(scoreTitleTextView, textFontSize)
+        scoreTextView = findViewById(R.id.scoreText)
+        ScreenUtil.resizeTextSize(scoreTextView, textFontSize)
+        // scoreTextView.text = "0000"
 
-        TextView hitNumTitleTextView = findViewById(R.id.num_hit_Title);
-        ScreenUtil.resizeTextSize(hitNumTitleTextView, textFontSize);
-        hitNumTextView = findViewById(R.id.num_hit_Text);
-        ScreenUtil.resizeTextSize(hitNumTextView, textFontSize);
-        hitNumTextView.setText("0");
+        val hitNumTitleTextView = findViewById<TextView>(R.id.num_hit_Title)
+        ScreenUtil.resizeTextSize(hitNumTitleTextView, textFontSize)
+        hitNumTextView = findViewById(R.id.num_hit_Text)
+        ScreenUtil.resizeTextSize(hitNumTextView, textFontSize)
+        // hitNumTextView.text = "0000"
 
-        final LinearLayout gameLinearLayout = findViewById(R.id.gameViewAreaLinearLayout);
-        final FrameLayout gameFrameLayout = findViewById(R.id.gameViewAreaFrameLayout);
+        val gameLinearLayout = findViewById<LinearLayout>(R.id.gameViewAreaLinearLayout)
+        val gameFrameLayout = findViewById<FrameLayout>(R.id.gameViewAreaFrameLayout)
         // game view area
-        GridLayout gameGrid = findViewById(R.id.gameAreaGridLayout);
-        rowNum = gameGrid.getRowCount();
-        colNum = gameGrid.getColumnCount();
-        for (int i=0; i<rowNum; i++) {
-            GridLayout.Spec rowSpec = GridLayout.spec(i, 1, 1);
-            for (int j=0; j<colNum; j++) {
-                GridLayout.Spec colSpec = GridLayout.spec(j, 1, 1);
-                GridLayout.LayoutParams glP = new GridLayout.LayoutParams();
-                glP.width = 0;
-                glP.height = 0;
-                glP.rowSpec = rowSpec;
-                glP.columnSpec = colSpec;
+        val gameGrid = findViewById<GridLayout>(R.id.gameAreaGridLayout)
+        rowNum = gameGrid.rowCount
+        colNum = gameGrid.columnCount
+        for (i in 0..<rowNum) {
+            val rowSpec = GridLayout.spec(i, 1, 1f)
+            for (j in 0..<colNum) {
+                val colSpec = GridLayout.spec(j, 1, 1f)
+                val glP = GridLayout.LayoutParams()
+                glP.width = 0
+                glP.height = 0
+                glP.rowSpec = rowSpec
+                glP.columnSpec = colSpec
 
-                int index = rowNum * i + j;
-                ImageView imageView = new ImageView(this);
-                imageView.setId(index);
-                imageView.setClickable(true);
-                imageView.setBackgroundResource(R.drawable.groundhog_hole);
-                gameGrid.addView(imageView, index, glP);
+                val index = rowNum * i + j
+                val imageView = ImageView(this)
+                imageView.setId(index)
+                imageView.isClickable = true
+                imageView.setBackgroundResource(R.drawable.groundhog_hole)
+                gameGrid.addView(imageView, index, glP)
             }
         }
 
-        LinearLayout bannerLinearLayout = findViewById(R.id.linearlayout_for_ads_in_myActivity);
-        if (!GroundhogHunterApp.googleAdMobBannerID.isEmpty() || !GroundhogHunterApp.facebookBannerID.isEmpty())  {
-            String testString = "";
+        val bannerLinearLayout = findViewById<LinearLayout>(R.id.linearlayout_for_ads_in_myActivity)
+        if (!GroundhogHunterApp.googleAdMobBannerID.isEmpty() || !GroundhogHunterApp.facebookBannerID.isEmpty()) {
+            var testString = ""
             // for debug mode
             if (BuildConfig.DEBUG) {
-                testString = "IMG_16_9_APP_INSTALL#";
+                testString = "IMG_16_9_APP_INSTALL#"
             }
-            String facebookBannerID = testString + GroundhogHunterApp.facebookBannerID;
+            val facebookBannerID = testString + GroundhogHunterApp.facebookBannerID
             //
-            SetBannerAdView myBannerAdView = new SetBannerAdView(this, null, bannerLinearLayout
-                    , GroundhogHunterApp.googleAdMobBannerID, facebookBannerID);
-            myBannerAdView.showBannerAdView(GroundhogHunterApp.AdProvider);
+            val myBannerAdView = SetBannerAdView(
+                this, null, bannerLinearLayout,
+                GroundhogHunterApp.googleAdMobBannerID, facebookBannerID
+            )
+            myBannerAdView.showBannerAdView(GroundhogHunterApp.AdProvider)
         } else {
-            ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) bannerLinearLayout.getLayoutParams();
-            float tempPercent = lp.matchConstraintPercentHeight;
-            lp.matchConstraintPercentHeight = 0.0f;
-            // lp = (ConstraintLayout.LayoutParams)FrameLayout.getLayoutParams();
-            lp = (ConstraintLayout.LayoutParams)gameLinearLayout.getLayoutParams();
-            lp.matchConstraintPercentHeight += tempPercent;
+            var lp = bannerLinearLayout.layoutParams as ConstraintLayout.LayoutParams
+            val tempPercent = lp.matchConstraintPercentHeight
+            lp.matchConstraintPercentHeight = 0.0f
+            lp = gameLinearLayout.layoutParams as ConstraintLayout.LayoutParams
+            lp.matchConstraintPercentHeight += tempPercent
         }
 
-        gameFrameLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                // hove to use removeGlobalOnLayoutListener() method after API 16 or is API 16
-                gameFrameLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int frameWidth = gameFrameLayout.getWidth();
-                int frameHeight = gameFrameLayout.getHeight();
-
-                gameView = new GameView(GroundhogActivity.this, gameType, frameWidth, frameHeight, selectedIoFunctionThread);
-                Log.i(TAG, "gameView created.");
-                gameFrameLayout.addView(gameView);
-                soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
-            }
-        });
+        gameFrameLayout.getViewTreeObserver()
+            .addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    // hove to use removeGlobalOnLayoutListener() method after API 16 or is API 16
+                    gameFrameLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                    val frameWidth = gameFrameLayout.width
+                    val frameHeight = gameFrameLayout.height
+                    gameView = GameView(
+                        this@GroundhogActivity,
+                        gameType,
+                        rowNum,
+                        colNum,
+                        frameWidth,
+                        frameHeight,
+                        selectedIoFuncThread
+                    )
+                    Log.i(TAG, "gameView created.")
+                    gameFrameLayout.addView(gameView)
+                    soundOnOffImageView.setImageResource(R.drawable.sound_on_image)
+                }
+            })
 
         // buttons for start game, new game, quit game
-        String startString = getString(R.string.startString);
-        String pauseString = getString(R.string.pauseString);
-        String resumeString = getString(R.string.resumeString);
+        val startString = getString(R.string.startString)
+        val pauseString = getString(R.string.pauseString)
+        val resumeString = getString(R.string.resumeString)
 
-        startGameButton = findViewById(R.id.startGameButton);
-        final Bitmap startGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.start_game_button, startString, Color.BLUE);
-        startGameButton.setImageBitmap(startGameBitmap);
-        startGameButton.setClickable(true);
-        startGameButton.setEnabled(true);
-        startGameButton.setVisibility(View.VISIBLE);
+        startGameButton = findViewById(R.id.startGameButton)
+        val startGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
+            this,
+            R.drawable.start_game_button,
+            startString,
+            Color.BLUE
+        )
+        startGameButton.apply {
+            setImageBitmap(startGameBitmap)
+            isClickable = true
+            isEnabled = true
+            visibility = View.VISIBLE
+            setOnClickListener { view: View? -> startGame() }
+        }
 
-        pauseGameButton = findViewById(R.id.pauseGameButton);
-        Bitmap pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.pause_game_button, pauseString, Color.BLUE);
-        pauseGameButton.setImageBitmap(pauseGameBitmap);
-        pauseGameButton.setClickable(false);
-        pauseGameButton.setEnabled(false);
-        pauseGameButton.setVisibility(View.INVISIBLE);
+        pauseGameButton = findViewById(R.id.pauseGameButton)
+        val pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
+            this,
+            R.drawable.pause_game_button,
+            pauseString,
+            Color.BLUE
+        )
+        pauseGameButton.apply {
+            setImageBitmap(pauseGameBitmap)
+            isClickable = false
+            isEnabled = false
+            visibility = View.INVISIBLE
+            setOnClickListener { view: View? -> pauseGame() }
+        }
 
-        resumeGameButton = findViewById(R.id.resumeGameButton);
-        Bitmap resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.resume_game_button, resumeString, Color.BLUE);
-        resumeGameButton.setImageBitmap(resumeGameBitmap);
-        resumeGameButton.setClickable(false);
-        resumeGameButton.setEnabled(false);
-        resumeGameButton.setVisibility(View.INVISIBLE);
+        resumeGameButton = findViewById(R.id.resumeGameButton)
+        val resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
+            this,
+            R.drawable.resume_game_button,
+            resumeString,
+            Color.BLUE
+        )
+        resumeGameButton.apply {
+            setImageBitmap(resumeGameBitmap)
+            isClickable = false
+            isEnabled = false
+            visibility = View.INVISIBLE
+            setOnClickListener { view: View? -> resumeGame() }
+        }
 
-        startGameButton.setOnClickListener(view -> startGame());
-        pauseGameButton.setOnClickListener(view -> pauseGame());
-        resumeGameButton.setOnClickListener(view -> resumeGame());
+        val newGameString = getString(R.string.newString)
+        newGameButton = findViewById(R.id.newGameButton)
+        val newGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
+            this,
+            R.drawable.new_game_button,
+            newGameString,
+            Color.BLUE
+        )
+        newGameButton.apply {
+            setImageBitmap(newGameBitmap)
+            setOnClickListener { view: View? -> newGame() }
+        }
 
-        String newGameString = getString(R.string.newString);
-        newGameButton = findViewById(R.id.newGameButton);
-        Bitmap newGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.new_game_button, newGameString, Color.BLUE);
-        newGameButton.setImageBitmap(newGameBitmap);
-        newGameButton.setOnClickListener(view -> newGame());
+        val quitGameString = getString(R.string.quitString)
+        quitGameButton = findViewById(R.id.quitGameButton)
+        val quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
+            this,
+            R.drawable.quit_game_button,
+            quitGameString, Color.YELLOW
+        )
+        quitGameButton.apply {
+            setImageBitmap(quitGameBitmap)
+            setOnClickListener { view: View? -> quitGame() }
+        }
 
-        String quitGameString = getString(R.string.quitString);
-        quitGameButton = findViewById(R.id.quitGameButton);
-        final Bitmap quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this,
-                R.drawable.quit_game_button, quitGameString, Color.YELLOW);
-        quitGameButton.setImageBitmap(quitGameBitmap);
-        quitGameButton.setOnClickListener(view -> quitGame());
+        bReceiver = GhHunterBroadcastReceiver()
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(LocalTop10IntentService.Action_Name)
+        intentFilter.addAction(GlobalTop10IntentService.Action_Name)
+        val localBroadcastManager = LocalBroadcastManager.getInstance(this)
+        localBroadcastManager.registerReceiver(bReceiver, intentFilter)
 
-        bReceiver = new GhHunterBroadcastReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(LocalTop10IntentService.Action_Name);
-        intentFilter.addAction(GlobalTop10IntentService.Action_Name);
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        localBroadcastManager.registerReceiver(bReceiver, intentFilter);
-
-        getOnBackPressedDispatcher().addCallback(this,
-                new OnBackPressedCallback(true) {
-                    @Override
-                    public void handleOnBackPressed() {
-                        exitApp();
-                    }
-                });
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    exitApp()
+                }
+            })
 
         settingLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    enableAllButtons();
-                    int resultCode = result.getResultCode();
-                    if (resultCode == Activity.RESULT_OK) {
-                        Log.i(TAG, "SettingActivity returned ok.");
-                        Intent data = result.getData();
-                        if (data == null) return;
-                        Bundle extras = data.getExtras();
-                        if (extras != null) {
-                            gameView.setHasSound(extras.getBoolean("HasSound"));
-                        }
-                    } else {
-                        Log.i(TAG, "SettingActivity returned cancel.");
-                    }
-                    // update Main UI for sound
-                    if (gameView.hasSound()) {
-                        soundOnOffImageView.setImageResource(R.drawable.sound_on_image);
-                    } else {
-                        soundOnOffImageView.setImageResource(R.drawable.sound_off_image);
-                    }
-                });
-        otherLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> enableAllButtons());
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(TAG, "onStart() is called.");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG,"onResume() is called.");
-        synchronized (activityLocker) {
-            GamePause = false;
-            activityLocker.notifyAll();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause() is called.");
-        synchronized (activityLocker) {
-            GamePause = true;
-        }
-    }
-
-    @Override
-    protected void onNewIntent(@NonNull Intent intent) {
-        Log.d(TAG, "onNewIntent() is called.");
-        super.onNewIntent(intent);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop() is called.");
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.d(TAG, "onDestroy() is called.");
-        super.onDestroy();
-        // release and destroy threads and resources before destroy activity
-        if (isFinishing()) {
-            if (GroundhogHunterApp.ScoreSQLiteDB != null) {
-                GroundhogHunterApp.ScoreSQLiteDB.close();
+            ActivityResultContracts.StartActivityForResult()) {
+            result: ActivityResult ->
+            enableAllButtons()
+            val resultCode = result.resultCode
+            if (resultCode == RESULT_OK) {
+                Log.i(TAG, "SettingActivity returned ok.")
+                val data = result.data
+                if (data == null) return@registerForActivityResult
+                val extras = data.extras
+                if (extras == null) return@registerForActivityResult
+                gameView?.setHasSound(extras.getBoolean("HasSound"))
+            } else {
+                Log.d(TAG, "SettingActivity returned cancel.")
+            }
+            // update Main UI for sound
+            gameView?.let { gv ->
+                if (gv.hasSound()) {
+                    soundOnOffImageView.setImageResource(R.drawable.sound_on_image)
+                } else {
+                    soundOnOffImageView.setImageResource(R.drawable.sound_off_image)
+                }
             }
         }
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        localBroadcastManager.unregisterReceiver(bReceiver);
-        finishApplication();
+        otherLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult -> enableAllButtons() }
     }
 
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putBoolean("IsShowingLoadingMessage", isShowingLoadingMessage);
-        super.onSaveInstanceState(outState);
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart")
     }
 
-    private void exitApp() {
+    public override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume")
+        synchronized(activityLocker) {
+            GamePause = false
+            activityLocker.notifyAll()
+        }
+    }
+
+    public override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause() is called.")
+        synchronized(activityLocker) {
+            GamePause = true
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        Log.d(TAG, "onNewIntent() is called.")
+        super.onNewIntent(intent)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop() is called.")
+    }
+
+    public override fun onDestroy() {
+        Log.d(TAG, "onDestroy() is called.")
+        super.onDestroy()
+        // release and destroy threads and resources before destroy activity
+        if (isFinishing) {
+            if (GroundhogHunterApp.ScoreSQLiteDB != null) {
+                GroundhogHunterApp.ScoreSQLiteDB.close()
+            }
+        }
+        val localBroadcastManager = LocalBroadcastManager.getInstance(this)
+        localBroadcastManager.unregisterReceiver(bReceiver)
+        finishApplication()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean("IsShowingLoadingMessage", isShowingLoadingMessage)
+        super.onSaveInstanceState(outState)
+    }
+
+    private fun exitApp() {
         // capture the event of back button when it is pressed
         // change back button behavior
-        ExitAppTimer exitAppTimer = ExitAppTimer.getInstance(1000); // singleton class
+        val exitAppTimer = ExitAppTimer.getInstance(1000) // singleton class
         if (exitAppTimer.canExit()) {
-            quitGame();
+            quitGame()
         } else {
-            exitAppTimer.start();
-            ScreenUtil.showToast(this, getString(R.string.backKeyToExitApp),
-                    toastTextSize, Toast.LENGTH_SHORT);
+            exitAppTimer.start()
+            ScreenUtil.showToast(
+                this, getString(R.string.backKeyToExitApp),
+                toastTextSize, Toast.LENGTH_SHORT
+            )
         }
     }
 
     // private methods
-    private void finishApplication() {
+    private fun finishApplication() {
         // release resources and threads
-        if (gameView == null) {
-            return;
+        gameView?.apply {
+            releaseSynchronizations()
+            stopThreads()
+            releaseResources()
         }
-        gameView.releaseSynchronizations();
-        gameView.stopThreads();
-        gameView.releaseResources();
     }
 
-    protected void startGame() {
-        if (gameView == null) {
-            return;
+    protected open fun startGame() {
+        val gv = gameView ?: return
+        gv.startGame()
+        startGameButton.apply {
+            startGameButton.isEnabled = false
+            startGameButton.visibility = View.INVISIBLE
         }
-        gameView.startGame();
-        startGameButton.setEnabled(false);
-        startGameButton.setVisibility(View.INVISIBLE);
-        pauseGameButton.setEnabled(true);
-        pauseGameButton.setVisibility(View.VISIBLE);
-        resumeGameButton.setEnabled(false);
-        resumeGameButton.setVisibility(View.INVISIBLE);
+        pauseGameButton.apply {
+            isEnabled = true
+            visibility = View.VISIBLE
+        }
+        resumeGameButton.apply {
+            isEnabled = false
+            visibility = View.INVISIBLE
+        }
     }
 
-    protected void pauseGame() {
-        if (gameView == null) {
-            return;
+    protected open fun pauseGame() {
+        val gv = gameView ?: return
+        gv.pauseGame()
+        startGameButton.apply {
+            isEnabled = false
+            visibility = View.INVISIBLE
         }
-        gameView.pauseGame();
-        startGameButton.setEnabled(false);
-        startGameButton.setVisibility(View.INVISIBLE);
-        pauseGameButton.setEnabled(false);
-        pauseGameButton.setVisibility(View.INVISIBLE);
-        resumeGameButton.setEnabled(true);
-        resumeGameButton.setVisibility(View.VISIBLE);
+        pauseGameButton.apply {
+            isEnabled = false
+            visibility = View.INVISIBLE
+        }
+        resumeGameButton.apply {
+            isEnabled = true
+            visibility = View.VISIBLE
+        }
     }
 
-    protected void resumeGame() {
-        if (gameView == null) {
-            return;
+    protected open fun resumeGame() {
+        val gv = gameView ?: return
+        gv.resumeGame()
+        startGameButton.apply {
+            isEnabled = false
+            visibility = View.INVISIBLE
         }
-        gameView.resumeGame();
-        startGameButton.setEnabled(false);
-        startGameButton.setVisibility(View.INVISIBLE);
-        pauseGameButton.setEnabled(true);
-        pauseGameButton.setVisibility(View.VISIBLE);
-        resumeGameButton.setEnabled(false);
-        resumeGameButton.setVisibility(View.INVISIBLE);
+        pauseGameButton.apply {
+            isEnabled = true
+            visibility = View.VISIBLE
+        }
+        resumeGameButton.apply {
+            isEnabled = false
+            visibility = View.INVISIBLE
+        }
     }
 
-    protected void newGame() {
-        if (gameView == null) {
-            return;
+    protected open fun newGame() {
+        val gv = gameView ?: return
+        gv.newGame()
+        startGameButton.apply {
+            isEnabled = true
+            visibility = View.VISIBLE
         }
-        gameView.newGame();
-        startGameButton.setEnabled(true);
-        startGameButton.setVisibility(View.VISIBLE);
-        pauseGameButton.setEnabled(false);
-        pauseGameButton.setVisibility(View.INVISIBLE);
-        resumeGameButton.setEnabled(false);
-        resumeGameButton.setVisibility(View.INVISIBLE);
+        pauseGameButton.apply {
+            isEnabled = false
+            visibility = View.INVISIBLE
+        }
+        resumeGameButton.apply {
+            isEnabled = false
+            visibility = View.INVISIBLE
+        }
     }
 
-    protected void quitGame() {
-        if (gameView == null) {
-            return;
-        }
+    protected open fun quitGame() {
+        val gv = gameView ?: return
         // close the socket (BluetoothSocket, Wifi socket, or internet socket)
-        gameView.newGame(); // set to new game (refresh the UI and stop threads) before quiting game
+        gv.newGame() // set to new game (refresh the UI and stop threads) before quiting game
         if (GroundhogHunterApp.InterstitialAd != null) {
             // free version
             // int entryPoint = 0; //  no used
-            ShowInterstitial.ShowAdThread showInterstitialAdThread =
-                    GroundhogHunterApp.InterstitialAd.new ShowAdThread(
-                            new DismissFunction() {
-                                @Override
-                                public void backgroundWork() {
+            val showInterstitialAdThread =
+                GroundhogHunterApp.InterstitialAd.ShowAdThread(
+                    object : DismissFunction {
+                        override fun backgroundWork() {
+                        }
 
-                                }
+                        override fun executeDismiss() {
+                            returnToPrevious()
+                        }
 
-                                @Override
-                                public void executeDismiss() {
-                                    returnToPrevious();
-                                }
-
-                                @Override
-                                public void afterFinished(boolean isAdShown) {
-                                    if (!isAdShown) returnToPrevious();
-                                }
-                            });
-            showInterstitialAdThread.startShowAd(GroundhogHunterApp.AdProvider);
+                        override fun afterFinished(isAdShown: Boolean) {
+                            if (!isAdShown) returnToPrevious()
+                        }
+                    })
+            showInterstitialAdThread.startShowAd(GroundhogHunterApp.AdProvider)
         } else {
-            returnToPrevious();
+            returnToPrevious()
         }
     }
 
-    private void returnToPrevious() {
-        Intent returnIntent = new Intent(); // used to bundle data
-        setResult(Activity.RESULT_OK, returnIntent);
-        finish();
+    private fun returnToPrevious() {
+        val returnIntent = Intent() // used to bundle data
+        setResult(RESULT_OK, returnIntent)
+        finish()
     }
 
-    private void getLocalTop10ScoreList() {
+    private fun getLocalTop10ScoreList() {
+        showLoadingMessage()
+        val serviceIntent = Intent(this@GroundhogActivity,
+                LocalTop10IntentService::class.java)
+        startService(serviceIntent)
+    }
+
+    private fun getGlobalTop10ScoreList() {
         // showing loading message
-        showLoadingMessage();
-        Intent serviceIntent = new Intent(GroundhogHunterApp.AppContext, LocalTop10IntentService.class);
-        startService(serviceIntent);
+        showLoadingMessage()
+        val serviceIntent = Intent(this@GroundhogActivity,
+            GlobalTop10IntentService::class.java)
+        startService(serviceIntent)
     }
 
-    private void getGlobalTop10ScoreList() {
-        // showing loading message
-        showLoadingMessage();
-        Intent serviceIntent = new Intent(GroundhogHunterApp.AppContext,
-                GlobalTop10IntentService.class);
-        startService(serviceIntent);
+    fun enableAllButtons() {
+        startGameButton.isEnabled = true
+        pauseGameButton.isEnabled = true
+        resumeGameButton.isEnabled = true
+        newGameButton.isEnabled = true
+        quitGameButton.isEnabled = true
+        settingButton.isEnabled = true
+        top10Button.isEnabled = true
+        globalTop10Button.isEnabled = true
     }
 
-    public void disableAllButtons() {
-        startGameButton.setEnabled(false);
-        pauseGameButton.setEnabled(false);
-        resumeGameButton.setEnabled(false);
-        newGameButton.setEnabled(false);
-        quitGameButton.setEnabled(false);
-        settingButton.setEnabled(false);
-        top10Button.setEnabled(false);
-        globalTop10Button.setEnabled(false);
+    fun showLoadingMessage() {
+        isShowingLoadingMessage = true
+        loadingDialog = AlertDialogFragment.newInstance(
+            loadingString,
+            ScreenUtil.FontSize_Pixel_Type, textFontSize,
+            Color.RED, 0, 0, true
+        )
+        loadingDialog?.show(supportFragmentManager, LOAD_DIALOG_TAG)
     }
 
-    public void enableAllButtons() {
-        startGameButton.setEnabled(true);
-        pauseGameButton.setEnabled(true);
-        resumeGameButton.setEnabled(true);
-        newGameButton.setEnabled(true);
-        quitGameButton.setEnabled(true);
-        settingButton.setEnabled(true);
-        top10Button.setEnabled(true);
-        globalTop10Button.setEnabled(true);
+    fun dismissShowingLoadingMessage() {
+        isShowingLoadingMessage = false
+        val lDialog = loadingDialog ?: return
+        if (lDialog.isStateSaved()) {
+            lDialog.dismissAllowingStateLoss()
+        } else {
+            lDialog.dismiss()
+        }
     }
 
-    public void showLoadingMessage() {
-        isShowingLoadingMessage = true;
-
-        loadingDialog = AlertDialogFragment.newInstance(loadingString,
-                ScreenUtil.FontSize_Pixel_Type, textFontSize,
-                Color.RED, 0, 0, true);
-        loadingDialog.show(getSupportFragmentManager(), LoadingDialogTag);
+    // public methods for others to use (GameView)
+    fun getHighestScore(): Int {
+        return highestScore
     }
 
-    public void dismissShowingLoadingMessage() {
-        isShowingLoadingMessage = false;
-        if (loadingDialog != null) {
-            if (loadingDialog.isStateSaved()) {
-                loadingDialog.dismissAllowingStateLoss();
-            } else {
-                loadingDialog.dismiss();
+    fun setTextForHighScoreTextView(text: String) {
+        Log.d(TAG, "setTextForHighScoreTextView.text = $text")
+        highScoreTextView.text = text
+    }
+
+    fun setTextForTimerTextView(text: String) {
+        Log.d(TAG, "setTextForTimerTextView.text = $text")
+        timerTextView.text = text
+    }
+
+    fun setTextForScoreTextView(text: String) {
+        Log.d(TAG, "setTextForScoreTextView.str = $text")
+        scoreTextView.text = text
+    }
+
+    fun setTextForHitNumTextView(text: String) {
+        Log.d(TAG, "setTextForHitNumTextView.text = $text")
+        hitNumTextView.text = text
+    }
+
+    fun recordScore(score: Int) {
+        val et = EditText(this@GroundhogActivity)
+        ScreenUtil.resizeTextSize(et, textFontSize)
+        et.setTextColor(Color.BLUE)
+        et.setHint(getString(R.string.nameString))
+        et.setGravity(Gravity.CENTER)
+        val alertD = AlertDialog.Builder(this@GroundhogActivity).create()
+        alertD.setTitle(null)
+        alertD.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        alertD.setCancelable(false)
+        alertD.setView(et)
+        alertD.setButton(
+            DialogInterface.BUTTON_NEGATIVE,
+            getString(R.string.cancelString)
+        ) { dialog: DialogInterface?, which: Int -> dialog!!.dismiss() }
+        alertD.setButton(
+            DialogInterface.BUTTON_POSITIVE,
+            getString(R.string.submitString)
+        ) { dialog: DialogInterface, which: Int ->
+            dialog.dismiss()
+            // use thread to add a record to database (remote database on cloud)
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    val jsonObject = JSONObject()
+                    jsonObject.put(Constants.PLAYER_NAME, et.getText().toString())
+                    jsonObject.put(Constants.SCORE, score)
+                    jsonObject.put(Constants.GAME_ID, Constants.GROUNDHOG_GAME_ID)
+                    PlayerRecordRest.addOneRecord(jsonObject)
+                } catch (ex: Exception) {
+                    Log.e(TAG, "recordScore.Exception", ex)
+                }
+                delay(200)
+                GroundhogHunterApp.ScoreSQLiteDB.addScore(et.getText().toString(), score)
+                GroundhogHunterApp.ScoreSQLiteDB.deleteAllAfterTop10() // only keep the top 10
+                withContext(Dispatchers.Main) {
+                    if (score > highestScore) {
+                        highestScore = score
+                        gameView?.setHighestScore(highestScore)
+                        setTextForHighScoreTextView(highestScore.toString())
+                    }
+                }
             }
+            /*
+            val restThread: Thread = object : Thread() {
+                override fun run() {
+                    try {
+                        val jsonObject = JSONObject()
+                        jsonObject.put(Constants.PLAYER_NAME, et.getText().toString())
+                        jsonObject.put(Constants.SCORE, score)
+                        jsonObject.put(Constants.GAME_ID, Constants.GROUNDHOG_GAME_ID)
+                        PlayerRecordRest.addOneRecord(jsonObject)
+                    } catch (ex: Exception) {
+                        Log.e(TAG, "recordScore.Exception", ex)
+                    }
+                }
+            }
+            restThread.start()
+            GroundhogHunterApp.ScoreSQLiteDB.addScore(et.getText().toString(), score)
+            GroundhogHunterApp.ScoreSQLiteDB.deleteAllAfterTop10() // only keep the top 10
+            if (score > highestScore) {
+                highestScore = score
+                setTextForHighScoreTextView(highestScore.toString())
+                gameView?.setHighestScore(highestScore)
+            }
+            */
         }
+        alertD.setOnShowListener { dialog: DialogInterface ->
+            setDialogStyle(
+                dialog
+            )
+        }
+        alertD.show()
     }
 
-    public void displayTwoPlayerResult(int hostScore, int hostHitNum, int clientScore, int clientHitNum) {
-        Intent resultIntent = new Intent(this, TwoPlayerResultActivity.class);
-        resultIntent.putExtra(Constants.HOST_SCORE, hostScore);
-        resultIntent.putExtra(Constants.HOST_HIT_NUM, hostHitNum);
-        resultIntent.putExtra(Constants.CLIENT_SCORE, clientScore);
-        resultIntent.putExtra(Constants.CLIENT_HIT_NUM, clientHitNum);
-        // startActivityForResult(resultIntent, TwoPlayerResultRequestCode);
-        otherLauncher.launch(resultIntent);
+    fun disableAllButtons() {
+        startGameButton.isEnabled = false
+        pauseGameButton.isEnabled = false
+        resumeGameButton.isEnabled = false
+        newGameButton.isEnabled = false
+        quitGameButton.isEnabled = false
+        settingButton.isEnabled = false
+        top10Button.isEnabled = false
+        globalTop10Button.isEnabled = false
     }
 
-    // public methods
-    public int getRowNum() {
-        return rowNum;
+    fun displayTwoPlayerResult(
+        hostScore: Int,
+        hostHitNum: Int,
+        clientScore: Int,
+        clientHitNum: Int
+    ) {
+        val resultIntent = Intent(this, TwoPlayerResultActivity::class.java)
+        resultIntent.putExtra(Constants.HOST_SCORE, hostScore)
+        resultIntent.putExtra(Constants.HOST_HIT_NUM, hostHitNum)
+        resultIntent.putExtra(Constants.CLIENT_SCORE, clientScore)
+        resultIntent.putExtra(Constants.CLIENT_HIT_NUM, clientHitNum)
+        otherLauncher.launch(resultIntent)
     }
-    public int getColNum() {
-        return colNum;
-    }
-    public int getHighestScore() {
-        return highestScore;
-    }
-    public void setHighestScore(int highestScore) {
-        this.highestScore = highestScore;
-    }
-    public void setTextForHighScoreTextView(String text) {
-        highScoreTextView.setText(text);
-    }
-    public void setTextForScoreTextView(String text) {
-        scoreTextView.setText(text);
-    }
-    public void setTextForTimerTextView(String text) {
-        timerTextView.setText(text);
-    }
-    public void setTextForHitNumTextView(String text) {
-        hitNumTextView.setText(text);
+
+    private fun setDialogStyle(dialog: DialogInterface?) {
+        val dlg = dialog as AlertDialog
+        val win = dlg.window
+        if (win == null) return
+        win.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        win.setDimAmount(0.0f) // no dim for background screen
+        win.setLayout(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        win.setBackgroundDrawableResource(R.drawable.dialog_background_image)
+        val nBtn = dlg.getButton(DialogInterface.BUTTON_NEGATIVE)
+        ScreenUtil.resizeTextSize(nBtn, textFontSize)
+        nBtn.setTypeface(Typeface.DEFAULT_BOLD)
+        nBtn.setTextColor(Color.RED)
+        val layoutParams = nBtn.layoutParams as LinearLayout.LayoutParams
+        layoutParams.weight = 10f
+        nBtn.setLayoutParams(layoutParams)
+        val pBtn = dlg.getButton(DialogInterface.BUTTON_POSITIVE)
+        ScreenUtil.resizeTextSize(pBtn, textFontSize)
+        pBtn.setTypeface(Typeface.DEFAULT_BOLD)
+        pBtn.setTextColor(Color.rgb(0x00, 0x64, 0x00))
+        pBtn.setLayoutParams(layoutParams)
     }
 
     // private class (Nested class)
-    private class GhHunterBroadcastReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null) {
-                return;
-            }
-            Bundle extras = intent.getExtras();
-            String actionName = intent.getAction();
-            if (actionName == null) return;
-            switch (actionName) {
-                case LocalTop10IntentService.Action_Name:
+    private inner class GhHunterBroadcastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent == null) return
+            val extras = intent.extras
+            val actionName = intent.action
+            if (actionName == null) return
+            when (actionName) {
+                LocalTop10IntentService.Action_Name -> {
                     // dismiss showing message
-                    dismissShowingLoadingMessage();
-                    Intent localTop10Intent = new Intent(getApplicationContext(), Top10ScoreActivity.class);
-                    Bundle localTop10Extras = new Bundle();
-                    localTop10Extras.putString("Top10TitleName", getString(R.string.localTop10ScoreTitleString));
+                    dismissShowingLoadingMessage()
+                    val localTop10Intent =
+                        Intent(applicationContext, Top10ScoreActivity::class.java)
+                    val localTop10Extras = Bundle()
+                    localTop10Extras.putString(
+                        "Top10TitleName",
+                        getString(R.string.localTop10ScoreTitleString)
+                    )
                     if (extras == null) {
-                        localTop10Extras.putStringArrayList("Top10Players", new ArrayList<>());
-                        localTop10Extras.putIntegerArrayList("Top10Scores", new ArrayList<>());
+                        localTop10Extras.putStringArrayList("Top10Players", ArrayList<String?>())
+                        localTop10Extras.putIntegerArrayList("Top10Scores", ArrayList<Int?>())
                     } else {
-                        localTop10Extras.putStringArrayList("Top10Players", extras.getStringArrayList("PlayerNames"));
-                        localTop10Extras.putIntegerArrayList("Top10Scores", extras.getIntegerArrayList("PlayerScores"));
+                        localTop10Extras.putStringArrayList(
+                            "Top10Players",
+                            extras.getStringArrayList("PlayerNames")
+                        )
+                        localTop10Extras.putIntegerArrayList(
+                            "Top10Scores",
+                            extras.getIntegerArrayList("PlayerScores")
+                        )
                     }
-                    localTop10Intent.putExtras(localTop10Extras);
-                    // startActivityForResult(localTop10Intent, LocalTop10RequestCode);
-                    otherLauncher.launch(localTop10Intent);
-                    break;
-                case GlobalTop10IntentService.Action_Name:
+                    localTop10Intent.putExtras(localTop10Extras)
+                    otherLauncher.launch(localTop10Intent)
+                }
+
+                GlobalTop10IntentService.Action_Name -> {
                     // dismiss showing message
-                    dismissShowingLoadingMessage();
-                    Intent globalTop10Intent = new Intent(getApplicationContext(), Top10ScoreActivity.class);
-                    Bundle globalTop10Extras = new Bundle();
-                    globalTop10Extras.putString("Top10TitleName", getString(R.string.globalTop10ScoreTitleString));
+                    dismissShowingLoadingMessage()
+                    val globalTop10Intent =
+                        Intent(applicationContext, Top10ScoreActivity::class.java)
+                    val globalTop10Extras = Bundle()
+                    globalTop10Extras.putString(
+                        "Top10TitleName",
+                        getString(R.string.globalTop10ScoreTitleString)
+                    )
                     if (extras == null) {
-                        globalTop10Extras.putStringArrayList("Top10Players", new ArrayList<>());
-                        globalTop10Extras.putIntegerArrayList("Top10Scores", new ArrayList<>());
+                        globalTop10Extras.putStringArrayList("Top10Players", ArrayList<String?>())
+                        globalTop10Extras.putIntegerArrayList("Top10Scores", ArrayList<Int?>())
                     } else {
-                        globalTop10Extras.putStringArrayList("Top10Players", extras.getStringArrayList("PlayerNames"));
-                        globalTop10Extras.putIntegerArrayList("Top10Scores", extras.getIntegerArrayList("PlayerScores"));
+                        globalTop10Extras.putStringArrayList(
+                            "Top10Players",
+                            extras.getStringArrayList("PlayerNames")
+                        )
+                        globalTop10Extras.putIntegerArrayList(
+                            "Top10Scores",
+                            extras.getIntegerArrayList("PlayerScores")
+                        )
                     }
-                    globalTop10Intent.putExtras(globalTop10Extras);
-                    // startActivityForResult(globalTop10Intent, GlobalTop10RequestCode);
-                    otherLauncher.launch(globalTop10Intent);
-                    break;
+                    globalTop10Intent.putExtras(globalTop10Extras)
+                    otherLauncher.launch(globalTop10Intent)
+                }
             }
         }
     }

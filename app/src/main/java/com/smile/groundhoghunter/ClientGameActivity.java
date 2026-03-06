@@ -31,8 +31,8 @@ public class ClientGameActivity extends GroundhogActivity {
         newGameButton.setEnabled(false);
 
         clientGameHandler = new ClientGameHandler(Looper.getMainLooper(), this);
-        if (selectedIoFunctionThread != null) {
-            selectedIoFunctionThread.setHandler(clientGameHandler);
+        if (selectedIoFuncThread != null) {
+            selectedIoFuncThread.setHandler(clientGameHandler);
         } else {
             // selectedIoFunctionThread is null then return to previous
             finish();
@@ -50,35 +50,39 @@ public class ClientGameActivity extends GroundhogActivity {
 
     @Override
     protected void pauseGame() {
+        if (gameView == null) return;
+        if (selectedIoFuncThread == null) return;
         gameView.pauseGame();
         pauseGameButton.setEnabled(false);
         pauseGameButton.setVisibility(View.INVISIBLE);
         resumeGameButton.setEnabled(true);
         resumeGameButton.setVisibility(View.VISIBLE);
-        selectedIoFunctionThread.write(Constants.TWO_PLAY_PAU_GAME_BUT, "");
+        selectedIoFuncThread.write(Constants.TWO_PLAY_PAU_GAME_BUT, "");
     }
 
     @Override
     protected void resumeGame() {
+        if (gameView == null) return;
+        if (selectedIoFuncThread == null) return;
         gameView.resumeGame();
         pauseGameButton.setEnabled(true);
         pauseGameButton.setVisibility(View.VISIBLE);
         resumeGameButton.setEnabled(false);
         resumeGameButton.setVisibility(View.INVISIBLE);
-        selectedIoFunctionThread.write(Constants.TWO_PLAY_RES_GAME_BUT, "");
+        selectedIoFuncThread.write(Constants.TWO_PLAY_RES_GAME_BUT, "");
     }
 
     @Override
     protected void quitGame() {
         super.quitGame();
-        selectedIoFunctionThread.write(Constants.TWO_PLAY_OPPOS_LF_GAME, "");
+        if (gameView == null) return;
+        if (selectedIoFuncThread == null) return;
+        selectedIoFuncThread.write(Constants.TWO_PLAY_OPPOS_LF_GAME, "");
     }
 
     protected class ClientGameHandler extends Handler {
-
         protected final Looper mLooper;
         protected final Context mContext;
-
         public ClientGameHandler(Looper looper, Context context) {
             super(looper);
             mLooper = looper;
@@ -87,21 +91,22 @@ public class ClientGameActivity extends GroundhogActivity {
 
         @Override
         public void handleMessage(@NonNull Message msg) {
+            Log.d(TAG, "Message received: " + msg.what);
+            if (gameView == null) return;
+            if (selectedIoFuncThread == null) return;
             String msgString;
             Bundle data = msg.getData();
             int i;
             int status;
             int hideByte;
             int numOfTimeIntervalShown;
-
-            Log.d(TAG, "Message received: " + msg.what);
             switch (msg.what) {
                 case Constants.TWO_PLAY_OPPOS_LF_GAME:
                     // received by host and client sides
                     msgString = mContext.getString(R.string.oppositePlayerLeftGameString);
                     Toast.makeText(mContext, msgString, Toast.LENGTH_SHORT).show();
                     gameView.setOpposPlayerLeft(true);
-                    selectedIoFunctionThread.setStartRead(true);    // start reading data
+                    selectedIoFuncThread.setStartRead(true);    // start reading data
                     break;
                 case Constants.TWO_PLAY_NEW_GAME_BUT:
                     // received by client side
@@ -110,7 +115,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     pauseGameButton.setVisibility(View.INVISIBLE);
                     resumeGameButton.setEnabled(false);
                     resumeGameButton.setVisibility(View.INVISIBLE);
-                    selectedIoFunctionThread.setStartRead(true);    // start reading data
+                    selectedIoFuncThread.setStartRead(true);    // start reading data
                     break;
                 case Constants.TWO_PLAY_ST_GAME_BUT:
                     // received by client side
@@ -119,7 +124,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     pauseGameButton.setVisibility(View.VISIBLE);
                     resumeGameButton.setEnabled(false);
                     resumeGameButton.setVisibility(View.INVISIBLE);
-                    selectedIoFunctionThread.setStartRead(true);    // start reading data
+                    selectedIoFuncThread.setStartRead(true);    // start reading data
                     break;
                 case Constants.TWO_PLAY_PAU_GAME_BUT:
                     // received by host and client sides
@@ -128,7 +133,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     pauseGameButton.setVisibility(View.INVISIBLE);
                     resumeGameButton.setEnabled(true);
                     resumeGameButton.setVisibility(View.VISIBLE);
-                    selectedIoFunctionThread.setStartRead(true);    // start reading data
+                    selectedIoFuncThread.setStartRead(true);    // start reading data
                     break;
                 case Constants.TWO_PLAY_RES_GAME_BUT:
                     // received by host and client sides
@@ -137,7 +142,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     resumeGameButton.setVisibility(View.INVISIBLE);
                     pauseGameButton.setEnabled(true);
                     pauseGameButton.setVisibility(View.VISIBLE);
-                    selectedIoFunctionThread.setStartRead(true);    // start reading data
+                    selectedIoFuncThread.setStartRead(true);    // start reading data
                     break;
                 case Constants.TWO_PLAY_CL_GAME_TIMER_READ:
                     msgString = data.getString("TimerRemaining", "");
@@ -146,7 +151,7 @@ public class ClientGameActivity extends GroundhogActivity {
                     if (gameTimerThread != null) {
                         gameTimerThread.setTimeRemaining(timeRemaining);
                     }
-                    selectedIoFunctionThread.setStartRead(true);
+                    selectedIoFuncThread.setStartRead(true);
                     break;
                 case Constants.TWO_PLAY_CL_GAME_G_HOG_READ:
                     msgString = data.getString("GroundhogData", "");
@@ -163,12 +168,12 @@ public class ClientGameActivity extends GroundhogActivity {
 
                         i += 4;
                     }
-                    selectedIoFunctionThread.setStartRead(true);
+                    selectedIoFuncThread.setStartRead(true);
                     break;
                 case Constants.TWO_PLAY_GAME_G_HOG_HIT:
                     msgString = data.getString("GroundhogHitData", "");
                     gameView.setGroundhogByMsgString(msgString);
-                    selectedIoFunctionThread.setStartRead(true);
+                    selectedIoFuncThread.setStartRead(true);
                     break;
                 case Constants.TWO_PLAY_GAME_SCORE_RECEIVED:
                     msgString = data.getString("OppositeCurrentScore", "0");
@@ -177,11 +182,11 @@ public class ClientGameActivity extends GroundhogActivity {
                     int oppNumOfHits = Integer.parseInt(msgString.substring(4, 8));
                     gameView.setOpposNumOfHits(oppNumOfHits);
                     gameView.setReceivedScoreFromOppos(true);
-                    selectedIoFunctionThread.setStartRead(true);    // start reading data
+                    selectedIoFuncThread.setStartRead(true);    // start reading data
                     break;
                 case Constants.TWO_PLAY_DEF_READ:
                     // wrong or read error
-                    selectedIoFunctionThread.setStartRead(true);    // start reading data
+                    selectedIoFuncThread.setStartRead(true);    // start reading data
                     break;
             }
         }
