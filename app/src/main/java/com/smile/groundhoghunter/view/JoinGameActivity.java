@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.view;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.smile.groundhoghunter.GHogHunterApp;
+import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.abstract_threads.ClientConnectToThread;
 import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
 import com.smile.groundhoghunter.adapters.TwoPlayerListAdapter;
@@ -81,7 +84,7 @@ public class JoinGameActivity extends AppCompatActivity {
         discoveryWasDismissedString = getString(R.string.discoveryWasDismissedString);
         hasBeenReadString = getString(R.string.hasBeenReadString);
 
-        int colorDarkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed);
+        int colorDarkRed = ContextCompat.getColor(this, R.color.darkRed);
         int colorBlue = Color.BLUE;
 
         super.onCreate(savedInstanceState);
@@ -144,7 +147,7 @@ public class JoinGameActivity extends AppCompatActivity {
         refreshJoinGameButton.setImageBitmap(refreshJoinGameBitmap);
         refreshJoinGameButton.setOnClickListener(view -> {
             startDiscovery();
-            Log.d(TAG, "Refresh --> startDiscovery()");
+            Log.d(TAG, "Refresh.startDiscovery()");
         });
 
         SmileImageButton cancelJoinGameButton = findViewById(R.id.cancelJoinGameButton);
@@ -402,7 +405,7 @@ public class JoinGameActivity extends AppCompatActivity {
                 case Constants.TWO_PLAY_HOST_ST_GAME:
                     Log.d(TAG, "handleMessage.TwoPlayerHostStartGame");
                     if (selectedIoFunctionThread != null) {
-                        GroundhogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
+                        GHogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
                         for (String remoteMac : ioFunctionThreadMap.keySet()) {
                             IoFunctionThread ioFuncThread = ioFunctionThreadMap.get(remoteMac);
                             connectToThread = discoveredDeviceMap.get(remoteMac);

@@ -3,29 +3,32 @@ package com.smile.groundhoghunter.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import com.smile.groundhoghunter.GroundhogHunterApp;
+import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.models.Player;
 import com.smile.smilelibraries.player_record_rest.httpUrl.PlayerRecordRest;
 
 import java.util.ArrayList;
 
-public class LocalTop10IntentService extends IntentService {
-    public final static String Action_Name = "LocalTop10IntentService";
+public class GlobalTop10Service extends IntentService {
 
-    public LocalTop10IntentService() {
+    public final static String TAG = "GlobalTop10Service";
+    public final static String Action_Name = "GlobalTop10Service";
+
+    public GlobalTop10Service() {
         super(Action_Name);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
-        System.out.println("LocalTop10IntentService --> onHandleIntent() is called.");
+        Log.d(TAG, "onHandleIntent");
 
         ArrayList<String> playerNames = new ArrayList<>();
         ArrayList<Integer> playerScores = new ArrayList<>();
 
-        ArrayList<Player> players = PlayerRecordRest.GetLocalTop10(GroundhogHunterApp.ScoreSQLiteDB);
+        ArrayList<Player> players = PlayerRecordRest.GetGlobalTop10(Constants.GROUNDHOG_GAME_ID);
         if (players.isEmpty()) {
             players = new ArrayList<>();
         }
@@ -33,13 +36,15 @@ public class LocalTop10IntentService extends IntentService {
             playerNames.add(p.getPlayerName());
             playerScores.add(p.getScore());
         }
+
         Intent notificationIntent = new Intent(Action_Name);
-        Bundle extras = new Bundle();
-        extras.putStringArrayList("PlayerNames", playerNames);
-        extras.putIntegerArrayList("PlayerScores", playerScores);
-        notificationIntent.putExtras(extras);
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
+        Bundle notificationExtras = new Bundle();
+        notificationExtras.putStringArrayList("PlayerNames", playerNames);
+        notificationExtras.putIntegerArrayList("PlayerScores", playerScores);
+        notificationIntent.putExtras(notificationExtras);
+        LocalBroadcastManager localBroadcastManager =
+                LocalBroadcastManager.getInstance(getApplicationContext());
         localBroadcastManager.sendBroadcast(notificationIntent);
-        System.out.println("LocalTop10IntentService sent result");
+        Log.d(TAG, "Result sent");
     }
 }

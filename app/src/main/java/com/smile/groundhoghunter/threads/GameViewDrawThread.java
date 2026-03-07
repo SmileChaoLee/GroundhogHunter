@@ -1,7 +1,7 @@
 package com.smile.groundhoghunter.threads;
 
-import com.smile.groundhoghunter.GameView;
-import com.smile.groundhoghunter.GroundhogActivity;
+import com.smile.groundhoghunter.view.GameView;
+import com.smile.groundhoghunter.view.GroundhogActivity;
 
 public class GameViewDrawThread extends Thread {
 

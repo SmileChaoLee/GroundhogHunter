@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.view;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,6 +13,7 @@ import android.os.Looper;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         String twoPlayerString = getString(R.string.twoPlayerString);
         String privacyPolicyString = getString(com.smile.smilelibraries.R.string.privacyPolicyString);
         String exitAppString = getString(R.string.exitAppString);
-        int colorDarkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed);
+        int colorDarkRed = ContextCompat.getColor(this, R.color.darkRed);
 
         setContentView(R.layout.activity_main);
 

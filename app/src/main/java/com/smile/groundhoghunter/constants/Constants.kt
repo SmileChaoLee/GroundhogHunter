@@ -1,5 +1,7 @@
 package com.smile.groundhoghunter.constants
 
+import java.util.UUID
+
 object Constants {
     const val NO_HIT_STATUS: Int = 0
     const val SINGLE_PLAY_HIT_STATUS: Int = 1
@@ -40,4 +42,7 @@ object Constants {
     const val CLIENT_SCORE = "ClientScore"
     const val CLIENT_HIT_NUM = "ClientHitNum"
     const val DATABASE_NAME = "groundhog_hunter.db"
+    const val ADMOB_BANNER_ID = "ca-app-pub-8354869049759576/7169443235"
+    @JvmField
+    val APP_UUID: UUID = UUID.fromString("b5af9bad-42e0-4d0d-8546-ebeb97e1abfa")
 }

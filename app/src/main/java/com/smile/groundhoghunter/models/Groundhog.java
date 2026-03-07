@@ -6,7 +6,7 @@ import android.graphics.Color;
 import android.graphics.RectF;
 import android.util.Log;
 
-import com.smile.groundhoghunter.GameView;
+import com.smile.groundhoghunter.view.GameView;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.groundhoghunter.utilities.MathUtil;
@@ -27,10 +27,6 @@ public class Groundhog {
     private int numOfAnimationsShown;
     private int halfOfAnimationTimes;
 
-    /*
-    constructor
-     */
-
     public Groundhog(RectF rectF) {
         float shrinkRatio = 36.0f;
         wholeGroundhogArea = MathUtil.shrinkRectF(rectF, shrinkRatio);
@@ -38,7 +34,6 @@ public class Groundhog {
         wholeGroundhogArea.top = wholeGroundhogArea.top + shift;
         wholeGroundhogArea.bottom = wholeGroundhogArea.bottom + shift;
         drawArea = new RectF(wholeGroundhogArea);
-
         // score position
         // double the area of showing score by reduce the shrinking ratio
         shrinkRatio = 100.0f * ( 1.0f - (wholeGroundhogArea.top - rectF.top) / rectF.height()) * 0.7f;
@@ -47,12 +42,9 @@ public class Groundhog {
         shift = scoreArea.top - rectF.top;
         scoreArea.top = rectF.top;
         scoreArea.bottom = scoreArea.bottom - shift;
-
         status = 0;
         setIsHiding(true);
     }
-
-    // public methods
 
     public int getStatus() {
         return status;
@@ -78,9 +70,6 @@ public class Groundhog {
                     --numOfAnimationsShown;
                 } else if (numOfTimeIntervalShown < halfOfAnimationTimes) {
                     numOfAnimationsShown = numOfTimeIntervalShown + 1;
-                } else {
-                    // when numOfTimeIntervalShown = halfOfAnimationTimes
-                    // then numOfAnimationsShown no changes
                 }
             }
             // calculate the coordinate
@@ -137,9 +126,6 @@ public class Groundhog {
                 // not hit
                 canvas.drawBitmap(GameView.groundhogBitmaps[status], null, drawArea, null);
             }
-        } else {
-            // hiding
-            // canvas.drawBitmap(GameView.GroundhogBitmaps[0], null, scoreArea, eraserPaint);
         }
     }
 }

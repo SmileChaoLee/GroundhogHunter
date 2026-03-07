@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter
+package com.smile.groundhoghunter.view
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -8,6 +8,8 @@ import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -31,19 +33,24 @@ import androidx.core.content.ContextCompat
 import androidx.gridlayout.widget.GridLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.smile.groundhoghunter.GHogHunterApp
+import com.smile.groundhoghunter.R
 import com.smile.groundhoghunter.abstract_threads.IoFunctionThread
 import com.smile.groundhoghunter.constants.Constants
-import com.smile.groundhoghunter.services.GlobalTop10IntentService
-import com.smile.groundhoghunter.services.LocalTop10IntentService
+import com.smile.groundhoghunter.services.GlobalTop10Service
+import com.smile.groundhoghunter.services.LocalTop10Service
 import com.smile.smilelibraries.alertdialogfragment.AlertDialogFragment
 import com.smile.smilelibraries.customized_button.SmileImageButton
+import com.smile.smilelibraries.google_ads_util.AdMobInterstitial
 import com.smile.smilelibraries.interfaces.DismissFunction
 import com.smile.smilelibraries.models.ExitAppTimer
 import com.smile.smilelibraries.player_record_rest.httpUrl.PlayerRecordRest
+import com.smile.smilelibraries.scoresqlite.ScoreSQLite
 import com.smile.smilelibraries.show_banner_ads.SetBannerAdView
 import com.smile.smilelibraries.show_interstitial_ads.ShowInterstitial
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil
 import com.smile.smilelibraries.utilities.ScreenUtil
+import com.smile.smilelibraries.utilities.SoundPoolUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -54,6 +61,7 @@ open class GroundhogActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "GroundhogAct"
+        private const val AD_PROVIDER = 0
         private const val LOAD_DIALOG_TAG = "LoadingDialogTag"
         @JvmField
         var GamePause: Boolean = false
@@ -91,41 +99,41 @@ open class GroundhogActivity : AppCompatActivity() {
     protected var selectedIoFuncThread: IoFunctionThread? = null
     private lateinit var settingLauncher: ActivityResultLauncher<Intent>
     private lateinit var otherLauncher: ActivityResultLauncher<Intent>
+    private lateinit var scoreDB: ScoreSQLite
+    private lateinit var interstitialAd: ShowInterstitial
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate(")
 
-        if ((GroundhogHunterApp.facebookAds != null) || (GroundhogHunterApp.googleInterstitialAd != null)) {
-            GroundhogHunterApp.InterstitialAd = ShowInterstitial(
-                this,
-                GroundhogHunterApp.facebookAds,
-                GroundhogHunterApp.googleInterstitialAd
-            )
-        }
+        scoreDB = ScoreSQLite(this@GroundhogActivity, Constants.DATABASE_NAME)
 
-        if (GroundhogHunterApp.isFirstStartApp) {
-            // first time entering this activity
-            GroundhogHunterApp.isFirstStartApp = false
-            Log.d(TAG, "onCreate.First time entering.")
-        } else {
-            Log.d(TAG, "onCreate.not First time entering.")
+        val adMobInterstitialID = "ca-app-pub-8354869049759576/6595392508"
+        val adMobInterstitial = AdMobInterstitial(this@GroundhogActivity, adMobInterstitialID)
+        adMobInterstitial.loadAd() // load first ad
+        val adHandler = Handler(Looper.getMainLooper())
+        val adRunnable = Runnable {
+            adHandler.removeCallbacksAndMessages(null)
+            adMobInterstitial.loadAd() // load first google ad
         }
+        adHandler.postDelayed(adRunnable, 1000)
+        interstitialAd = ShowInterstitial(this@GroundhogActivity, null, adMobInterstitial)
 
         Log.d(TAG, "onCreate.savedInstanceState = $savedInstanceState")
 
-        selectedIoFuncThread = GroundhogHunterApp.selectedIoFuncThread
+        selectedIoFuncThread = GHogHunterApp.selectedIoFuncThread
         if (selectedIoFuncThread == null) {
             Log.d(TAG, "selectedIoFunctionThread is null.")
         }
 
-        highestScore = GroundhogHunterApp.ScoreSQLiteDB.readHighestScore()
+        highestScore = scoreDB.readHighestScore()
         loadingString = getString(R.string.loadingString)
-        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this)
-        fontScale = ScreenUtil.getPxFontScale(this)
+        textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this@GroundhogActivity)
+        fontScale = ScreenUtil.getPxFontScale(this@GroundhogActivity)
         toastTextSize = textFontSize * 0.8f
         isShowingLoadingMessage = false
         val callingIntent = intent
-        gameType = callingIntent.getIntExtra(Constants.GAME_TYPE, Constants.GAME_BY_SINGLE_PLAY)
+        gameType = callingIntent.getIntExtra(Constants.GAME_TYPE,
+            Constants.GAME_BY_SINGLE_PLAY)
 
         super.onCreate(savedInstanceState)
 
@@ -133,13 +141,11 @@ open class GroundhogActivity : AppCompatActivity() {
 
         GamePause = false
 
-        // int darkOrange = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkOrange);
-        val darkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed)
-        // int darkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
+        val darkRed = ContextCompat.getColor(this@GroundhogActivity, R.color.darkRed)
         val settingString = getString(R.string.settingString)
         settingButton = findViewById(R.id.settingButton)
         val settingBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
-            this,
+            this@GroundhogActivity,
             R.drawable.setting_button,
             settingString,
             Color.BLUE
@@ -164,7 +170,7 @@ open class GroundhogActivity : AppCompatActivity() {
         val localTop10String = getString(R.string.localTop10String)
         top10Button = findViewById(R.id.top10Button)
         val top10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
-            this,
+            this@GroundhogActivity,
             R.drawable.top10_button,
             localTop10String,
             darkRed
@@ -184,7 +190,7 @@ open class GroundhogActivity : AppCompatActivity() {
         val globalTop10String = getString(R.string.globalTop10String)
         globalTop10Button = findViewById(R.id.globalTop10Button)
         val globalTop10Bitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
-            this,
+            this@GroundhogActivity,
             R.drawable.global_top10_button,
             globalTop10String,
             darkRed
@@ -246,7 +252,7 @@ open class GroundhogActivity : AppCompatActivity() {
                 glP.columnSpec = colSpec
 
                 val index = rowNum * i + j
-                val imageView = ImageView(this)
+                val imageView = ImageView(this@GroundhogActivity)
                 imageView.setId(index)
                 imageView.isClickable = true
                 imageView.setBackgroundResource(R.drawable.groundhog_hole)
@@ -255,19 +261,11 @@ open class GroundhogActivity : AppCompatActivity() {
         }
 
         val bannerLinearLayout = findViewById<LinearLayout>(R.id.linearlayout_for_ads_in_myActivity)
-        if (!GroundhogHunterApp.googleAdMobBannerID.isEmpty() || !GroundhogHunterApp.facebookBannerID.isEmpty()) {
-            var testString = ""
-            // for debug mode
-            if (BuildConfig.DEBUG) {
-                testString = "IMG_16_9_APP_INSTALL#"
-            }
-            val facebookBannerID = testString + GroundhogHunterApp.facebookBannerID
-            //
-            val myBannerAdView = SetBannerAdView(
-                this, null, bannerLinearLayout,
-                GroundhogHunterApp.googleAdMobBannerID, facebookBannerID
-            )
-            myBannerAdView.showBannerAdView(GroundhogHunterApp.AdProvider)
+        if (Constants.ADMOB_BANNER_ID.isNotEmpty()) {
+            val myBannerAdView = SetBannerAdView(this@GroundhogActivity, null,
+                bannerLinearLayout,
+                Constants.ADMOB_BANNER_ID, "")
+            myBannerAdView.showBannerAdView(AD_PROVIDER)  // AdMob first
         } else {
             var lp = bannerLinearLayout.layoutParams as ConstraintLayout.LayoutParams
             val tempPercent = lp.matchConstraintPercentHeight
@@ -305,7 +303,7 @@ open class GroundhogActivity : AppCompatActivity() {
 
         startGameButton = findViewById(R.id.startGameButton)
         val startGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
-            this,
+            this@GroundhogActivity,
             R.drawable.start_game_button,
             startString,
             Color.BLUE
@@ -320,7 +318,7 @@ open class GroundhogActivity : AppCompatActivity() {
 
         pauseGameButton = findViewById(R.id.pauseGameButton)
         val pauseGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
-            this,
+            this@GroundhogActivity,
             R.drawable.pause_game_button,
             pauseString,
             Color.BLUE
@@ -335,7 +333,7 @@ open class GroundhogActivity : AppCompatActivity() {
 
         resumeGameButton = findViewById(R.id.resumeGameButton)
         val resumeGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
-            this,
+            this@GroundhogActivity,
             R.drawable.resume_game_button,
             resumeString,
             Color.BLUE
@@ -351,7 +349,7 @@ open class GroundhogActivity : AppCompatActivity() {
         val newGameString = getString(R.string.newString)
         newGameButton = findViewById(R.id.newGameButton)
         val newGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
-            this,
+            this@GroundhogActivity,
             R.drawable.new_game_button,
             newGameString,
             Color.BLUE
@@ -364,7 +362,7 @@ open class GroundhogActivity : AppCompatActivity() {
         val quitGameString = getString(R.string.quitString)
         quitGameButton = findViewById(R.id.quitGameButton)
         val quitGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(
-            this,
+            this@GroundhogActivity,
             R.drawable.quit_game_button,
             quitGameString, Color.YELLOW
         )
@@ -375,13 +373,13 @@ open class GroundhogActivity : AppCompatActivity() {
 
         bReceiver = GhHunterBroadcastReceiver()
         val intentFilter = IntentFilter()
-        intentFilter.addAction(LocalTop10IntentService.Action_Name)
-        intentFilter.addAction(GlobalTop10IntentService.Action_Name)
-        val localBroadcastManager = LocalBroadcastManager.getInstance(this)
+        intentFilter.addAction(LocalTop10Service.Action_Name)
+        intentFilter.addAction(GlobalTop10Service.Action_Name)
+        val localBroadcastManager = LocalBroadcastManager.getInstance(this@GroundhogActivity)
         localBroadcastManager.registerReceiver(bReceiver, intentFilter)
 
         onBackPressedDispatcher.addCallback(
-            this,
+            this@GroundhogActivity,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     exitApp()
@@ -454,11 +452,9 @@ open class GroundhogActivity : AppCompatActivity() {
         super.onDestroy()
         // release and destroy threads and resources before destroy activity
         if (isFinishing) {
-            if (GroundhogHunterApp.ScoreSQLiteDB != null) {
-                GroundhogHunterApp.ScoreSQLiteDB.close()
-            }
+            scoreDB.close()
         }
-        val localBroadcastManager = LocalBroadcastManager.getInstance(this)
+        val localBroadcastManager = LocalBroadcastManager.getInstance(this@GroundhogActivity)
         localBroadcastManager.unregisterReceiver(bReceiver)
         finishApplication()
     }
@@ -477,7 +473,7 @@ open class GroundhogActivity : AppCompatActivity() {
         } else {
             exitAppTimer.start()
             ScreenUtil.showToast(
-                this, getString(R.string.backKeyToExitApp),
+                this@GroundhogActivity, getString(R.string.backKeyToExitApp),
                 toastTextSize, Toast.LENGTH_SHORT
             )
         }
@@ -565,27 +561,21 @@ open class GroundhogActivity : AppCompatActivity() {
         val gv = gameView ?: return
         // close the socket (BluetoothSocket, Wifi socket, or internet socket)
         gv.newGame() // set to new game (refresh the UI and stop threads) before quiting game
-        if (GroundhogHunterApp.InterstitialAd != null) {
-            // free version
-            // int entryPoint = 0; //  no used
-            val showInterstitialAdThread =
-                GroundhogHunterApp.InterstitialAd.ShowAdThread(
-                    object : DismissFunction {
-                        override fun backgroundWork() {
-                        }
-
-                        override fun executeDismiss() {
-                            returnToPrevious()
-                        }
-
-                        override fun afterFinished(isAdShown: Boolean) {
-                            if (!isAdShown) returnToPrevious()
-                        }
-                    })
-            showInterstitialAdThread.startShowAd(GroundhogHunterApp.AdProvider)
-        } else {
-            returnToPrevious()
-        }
+        // free version
+        // int entryPoint = 0; //  no used
+        val showInterstitialAdThread =
+            interstitialAd.ShowAdThread(
+                object : DismissFunction {
+                    override fun backgroundWork() {
+                    }
+                    override fun executeDismiss() {
+                        returnToPrevious()
+                    }
+                    override fun afterFinished(isAdShown: Boolean) {
+                        if (!isAdShown) returnToPrevious()
+                    }
+                })
+        showInterstitialAdThread.startShowAd(AD_PROVIDER)
     }
 
     private fun returnToPrevious() {
@@ -597,7 +587,7 @@ open class GroundhogActivity : AppCompatActivity() {
     private fun getLocalTop10ScoreList() {
         showLoadingMessage()
         val serviceIntent = Intent(this@GroundhogActivity,
-                LocalTop10IntentService::class.java)
+                LocalTop10Service::class.java)
         startService(serviceIntent)
     }
 
@@ -605,7 +595,7 @@ open class GroundhogActivity : AppCompatActivity() {
         // showing loading message
         showLoadingMessage()
         val serviceIntent = Intent(this@GroundhogActivity,
-            GlobalTop10IntentService::class.java)
+            GlobalTop10Service::class.java)
         startService(serviceIntent)
     }
 
@@ -645,98 +635,83 @@ open class GroundhogActivity : AppCompatActivity() {
         return highestScore
     }
 
+    fun getSoundPoolUtil():SoundPoolUtil {
+        return SoundPoolUtil(this@GroundhogActivity, R.raw.ouh)
+    }
+
     fun setTextForHighScoreTextView(text: String) {
-        Log.d(TAG, "setTextForHighScoreTextView.text = $text")
         highScoreTextView.text = text
     }
 
     fun setTextForTimerTextView(text: String) {
-        Log.d(TAG, "setTextForTimerTextView.text = $text")
         timerTextView.text = text
     }
 
     fun setTextForScoreTextView(text: String) {
-        Log.d(TAG, "setTextForScoreTextView.str = $text")
         scoreTextView.text = text
     }
 
     fun setTextForHitNumTextView(text: String) {
-        Log.d(TAG, "setTextForHitNumTextView.text = $text")
         hitNumTextView.text = text
     }
 
     fun recordScore(score: Int) {
-        val et = EditText(this@GroundhogActivity)
-        ScreenUtil.resizeTextSize(et, textFontSize)
-        et.setTextColor(Color.BLUE)
-        et.setHint(getString(R.string.nameString))
-        et.setGravity(Gravity.CENTER)
-        val alertD = AlertDialog.Builder(this@GroundhogActivity).create()
-        alertD.setTitle(null)
-        alertD.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        alertD.setCancelable(false)
-        alertD.setView(et)
-        alertD.setButton(
-            DialogInterface.BUTTON_NEGATIVE,
-            getString(R.string.cancelString)
-        ) { dialog: DialogInterface?, which: Int -> dialog!!.dismiss() }
-        alertD.setButton(
-            DialogInterface.BUTTON_POSITIVE,
-            getString(R.string.submitString)
-        ) { dialog: DialogInterface, which: Int ->
-            dialog.dismiss()
-            // use thread to add a record to database (remote database on cloud)
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    val jsonObject = JSONObject()
-                    jsonObject.put(Constants.PLAYER_NAME, et.getText().toString())
-                    jsonObject.put(Constants.SCORE, score)
-                    jsonObject.put(Constants.GAME_ID, Constants.GROUNDHOG_GAME_ID)
-                    PlayerRecordRest.addOneRecord(jsonObject)
-                } catch (ex: Exception) {
-                    Log.e(TAG, "recordScore.Exception", ex)
-                }
-                delay(200)
-                GroundhogHunterApp.ScoreSQLiteDB.addScore(et.getText().toString(), score)
-                GroundhogHunterApp.ScoreSQLiteDB.deleteAllAfterTop10() // only keep the top 10
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isInTop10 = scoreDB.isInTop10(score)
+            if (isInTop10) {
+                // record the current score
                 withContext(Dispatchers.Main) {
-                    if (score > highestScore) {
-                        highestScore = score
-                        gameView?.setHighestScore(highestScore)
-                        setTextForHighScoreTextView(highestScore.toString())
+                    val et = EditText(this@GroundhogActivity)
+                    ScreenUtil.resizeTextSize(et, textFontSize)
+                    et.setTextColor(Color.BLUE)
+                    et.setHint(getString(R.string.nameString))
+                    et.setGravity(Gravity.CENTER)
+                    val alertD = AlertDialog.Builder(this@GroundhogActivity).create()
+                    alertD.setTitle(null)
+                    alertD.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                    alertD.setCancelable(false)
+                    alertD.setView(et)
+                    alertD.setButton(
+                        DialogInterface.BUTTON_NEGATIVE,
+                        getString(R.string.cancelString)
+                    ) { dialog: DialogInterface?, which: Int -> dialog!!.dismiss() }
+                    alertD.setButton(
+                        DialogInterface.BUTTON_POSITIVE,
+                        getString(R.string.submitString)
+                    ) { dialog: DialogInterface, which: Int ->
+                        dialog.dismiss()
+                        // use thread to add a record to database (remote database on cloud)
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            try {
+                                val jsonObject = JSONObject()
+                                jsonObject.put(Constants.PLAYER_NAME, et.getText().toString())
+                                jsonObject.put(Constants.SCORE, score)
+                                jsonObject.put(Constants.GAME_ID, Constants.GROUNDHOG_GAME_ID)
+                                PlayerRecordRest.addOneRecord(jsonObject)
+                            } catch (ex: Exception) {
+                                Log.e(TAG, "recordScore.Exception", ex)
+                            }
+                            delay(200)
+                            scoreDB.addScore(et.getText().toString(), score)
+                            scoreDB.deleteAllAfterTop10() // only keep the top 10
+                            withContext(Dispatchers.Main) {
+                                if (score > highestScore) {
+                                    highestScore = score
+                                    gameView?.setHighestScore(highestScore)
+                                    setTextForHighScoreTextView(highestScore.toString())
+                                }
+                            }
+                        }
                     }
+                    alertD.setOnShowListener { dialog: DialogInterface ->
+                        setDialogStyle(
+                            dialog
+                        )
+                    }
+                    alertD.show()
                 }
             }
-            /*
-            val restThread: Thread = object : Thread() {
-                override fun run() {
-                    try {
-                        val jsonObject = JSONObject()
-                        jsonObject.put(Constants.PLAYER_NAME, et.getText().toString())
-                        jsonObject.put(Constants.SCORE, score)
-                        jsonObject.put(Constants.GAME_ID, Constants.GROUNDHOG_GAME_ID)
-                        PlayerRecordRest.addOneRecord(jsonObject)
-                    } catch (ex: Exception) {
-                        Log.e(TAG, "recordScore.Exception", ex)
-                    }
-                }
-            }
-            restThread.start()
-            GroundhogHunterApp.ScoreSQLiteDB.addScore(et.getText().toString(), score)
-            GroundhogHunterApp.ScoreSQLiteDB.deleteAllAfterTop10() // only keep the top 10
-            if (score > highestScore) {
-                highestScore = score
-                setTextForHighScoreTextView(highestScore.toString())
-                gameView?.setHighestScore(highestScore)
-            }
-            */
         }
-        alertD.setOnShowListener { dialog: DialogInterface ->
-            setDialogStyle(
-                dialog
-            )
-        }
-        alertD.show()
     }
 
     fun disableAllButtons() {
@@ -756,7 +731,7 @@ open class GroundhogActivity : AppCompatActivity() {
         clientScore: Int,
         clientHitNum: Int
     ) {
-        val resultIntent = Intent(this, TwoPlayerResultActivity::class.java)
+        val resultIntent = Intent(this@GroundhogActivity, TwoPlayerResultActivity::class.java)
         resultIntent.putExtra(Constants.HOST_SCORE, hostScore)
         resultIntent.putExtra(Constants.HOST_HIT_NUM, hostHitNum)
         resultIntent.putExtra(Constants.CLIENT_SCORE, clientScore)
@@ -797,11 +772,11 @@ open class GroundhogActivity : AppCompatActivity() {
             val actionName = intent.action
             if (actionName == null) return
             when (actionName) {
-                LocalTop10IntentService.Action_Name -> {
+                LocalTop10Service.Action_Name -> {
                     // dismiss showing message
                     dismissShowingLoadingMessage()
                     val localTop10Intent =
-                        Intent(applicationContext, Top10ScoreActivity::class.java)
+                        Intent(this@GroundhogActivity, Top10ScoreActivity::class.java)
                     val localTop10Extras = Bundle()
                     localTop10Extras.putString(
                         "Top10TitleName",
@@ -824,11 +799,11 @@ open class GroundhogActivity : AppCompatActivity() {
                     otherLauncher.launch(localTop10Intent)
                 }
 
-                GlobalTop10IntentService.Action_Name -> {
+                GlobalTop10Service.Action_Name -> {
                     // dismiss showing message
                     dismissShowingLoadingMessage()
                     val globalTop10Intent =
-                        Intent(applicationContext, Top10ScoreActivity::class.java)
+                        Intent(this@GroundhogActivity, Top10ScoreActivity::class.java)
                     val globalTop10Extras = Bundle()
                     globalTop10Extras.putString(
                         "Top10TitleName",

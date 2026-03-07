@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.view;
 
 import android.content.Context;
 import android.os.Handler;
@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.groundhoghunter.models.Groundhog;
 import com.smile.groundhoghunter.threads.GameTimerThread;

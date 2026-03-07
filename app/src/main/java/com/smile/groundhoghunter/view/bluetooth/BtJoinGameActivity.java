@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter.bluetooth_view;
+package com.smile.groundhoghunter.view.bluetooth;
 
 import android.Manifest;
 import android.app.Activity;
@@ -15,8 +15,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresPermission;
 import android.util.Log;
 
-import com.smile.groundhoghunter.GroundhogHunterApp;
-import com.smile.groundhoghunter.JoinGameActivity;
+import com.smile.groundhoghunter.GHogHunterApp;
+import com.smile.groundhoghunter.view.JoinGameActivity;
 import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.groundhoghunter.models.BtConnectDevice;
@@ -155,7 +155,8 @@ public class BtJoinGameActivity extends JoinGameActivity {
                     if (!discoveredDeviceMap.containsKey(remoteMacAddress)) {
                         Log.d(TAG, logStr + ".discoveredDeviceMap.not contains " + remoteMacAddress);
                         showMessage.showMessageInTextView(megString, MessageDuration);
-                        BtConnectToThread connectToThread = new BtConnectToThread(joinGameHandler, btDevice, GroundhogHunterApp.ApplicationUUID);
+                        BtConnectToThread connectToThread = new BtConnectToThread(joinGameHandler, btDevice,
+                                Constants.APP_UUID);
                         discoveredDeviceMap.put(remoteMacAddress, connectToThread);
                     }
                     break;

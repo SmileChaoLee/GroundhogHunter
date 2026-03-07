@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter.bluetooth_view;
+package com.smile.groundhoghunter.view.bluetooth;
 
 import android.Manifest;
 import android.app.Activity;
@@ -15,8 +15,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresPermission;
 
-import com.smile.groundhoghunter.CreateGameActivity;
-import com.smile.groundhoghunter.GroundhogHunterApp;
+import com.smile.groundhoghunter.view.CreateGameActivity;
+import com.smile.groundhoghunter.GHogHunterApp;
 import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.groundhoghunter.threads.BluetoothAcceptThread;
@@ -65,7 +65,8 @@ public class BtCreateGameActivity extends CreateGameActivity {
                         // succeeded
                         showMessage.showMessageInTextView(bluetoothVisibilityForPeriodString, MessageDuration);
                         // create a BluetoothSocket for listening for connection using a thread
-                        mServerAcceptThread = new BluetoothAcceptThread(createGameHandler, mBtAdapter, playerName, GroundhogHunterApp.ApplicationUUID);
+                        mServerAcceptThread = new BluetoothAcceptThread(createGameHandler, mBtAdapter, playerName,
+                                Constants.APP_UUID);
                         mServerAcceptThread.start();
                     } else {
                         showMessage.showMessageInTextView(bluetoothCannotBeVisibleString, MessageDuration);

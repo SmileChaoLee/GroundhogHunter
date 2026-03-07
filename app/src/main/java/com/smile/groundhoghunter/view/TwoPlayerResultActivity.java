@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.view;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.utilities.ScreenUtil;
 

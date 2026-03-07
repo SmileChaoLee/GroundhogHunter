@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.view;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.constants.Constants;
 
 public class HostGameActivity extends GroundhogActivity {

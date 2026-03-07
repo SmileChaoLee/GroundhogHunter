@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.view;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -15,6 +15,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.smile.groundhoghunter.GHogHunterApp;
+import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
 import com.smile.groundhoghunter.abstract_threads.ServerAcceptThread;
 import com.smile.groundhoghunter.adapters.TwoPlayerListAdapter;
@@ -78,8 +81,8 @@ public class CreateGameActivity extends AppCompatActivity {
         clientLeftGameString = getString(R.string.clientLeftGameString);
         noOppositePlayerString = getString(R.string.noOppositePlayerString);
 
-        int colorDarkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed);
-        int colorDarkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
+        int colorDarkRed = ContextCompat.getColor(this, R.color.darkRed);
+        int colorDarkGreen = ContextCompat.getColor(this, R.color.darkGreen);
         int colorBlue = Color.BLUE;
 
         super.onCreate(savedInstanceState);
@@ -152,7 +155,7 @@ public class CreateGameActivity extends AppCompatActivity {
             }
             // Notify client to start game
             if (selectedIoFunctionThread != null) {
-                GroundhogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
+                GHogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
                 stopServerAcceptThread();
                 for (String remoteMacAddress : ioFunctionThreadMap.keySet()) {
                     IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);

@@ -2,8 +2,8 @@ package com.smile.groundhoghunter.threads;
 
 import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
 import com.smile.groundhoghunter.constants.Constants;
-import com.smile.groundhoghunter.GameView;
-import com.smile.groundhoghunter.GroundhogActivity;
+import com.smile.groundhoghunter.view.GameView;
+import com.smile.groundhoghunter.view.GroundhogActivity;
 import com.smile.groundhoghunter.models.Groundhog;
 
 import java.util.Random;

@@ -1,9 +1,9 @@
-package com.smile.groundhoghunter.bluetooth_view;
+package com.smile.groundhoghunter.view.bluetooth;
 
 import android.os.Bundle;
 import android.util.Log;
 
-import com.smile.groundhoghunter.HostGameActivity;
+import com.smile.groundhoghunter.view.HostGameActivity;
 import com.smile.groundhoghunter.threads.BluetoothFunctionThread;
 import com.smile.groundhoghunter.utilities.BluetoothUtil;
 

@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.view;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -32,8 +32,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.smile.groundhoghunter.bluetooth_view.BtCreateGameActivity;
-import com.smile.groundhoghunter.bluetooth_view.BtJoinGameActivity;
+import com.smile.groundhoghunter.GHogHunterApp;
+import com.smile.groundhoghunter.R;
+import com.smile.groundhoghunter.view.bluetooth.BtCreateGameActivity;
+import com.smile.groundhoghunter.view.bluetooth.BtJoinGameActivity;
 import com.smile.groundhoghunter.utilities.BluetoothUtil;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
@@ -59,8 +61,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
         toastTextSize = textFontSize * 0.8f;
         // String bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
         playerNameCannotBeEmptyString = getString(R.string.playerNameCannotBeEmptyString);
-        int colorDarkRed = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkRed);
-        int colorDarkGreen = ContextCompat.getColor(GroundhogHunterApp.AppContext, R.color.darkGreen);
+        int colorDarkRed = ContextCompat.getColor(this, R.color.darkRed);
+        int colorDarkGreen = ContextCompat.getColor(this, R.color.darkGreen);
 
         super.onCreate(savedInstanceState);
 

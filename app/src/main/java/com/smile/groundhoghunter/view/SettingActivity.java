@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter;
+package com.smile.groundhoghunter.view;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -9,10 +9,11 @@ import android.os.Build;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+
+import com.smile.groundhoghunter.R;
 import com.smile.smilelibraries.utilities.ScreenUtil;
 
 public class SettingActivity extends AppCompatActivity {

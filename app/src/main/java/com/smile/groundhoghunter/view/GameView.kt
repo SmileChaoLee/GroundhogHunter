@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter
+package com.smile.groundhoghunter.view
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
@@ -12,6 +12,8 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.lifecycle.lifecycleScope
+import com.smile.groundhoghunter.GHogHunterApp
+import com.smile.groundhoghunter.R
 import com.smile.groundhoghunter.abstract_threads.IoFunctionThread
 import com.smile.groundhoghunter.constants.Constants
 import com.smile.groundhoghunter.models.Groundhog
@@ -58,51 +60,24 @@ class GameView(
         )
         @JvmField
         val groundhogBitmaps: Array<Bitmap> = arrayOf(
-            BitmapFactory.decodeResource(
-                GroundhogHunterApp.AppResources,
-                R.drawable.groundhog_0
-            ),
-            BitmapFactory.decodeResource(
-                GroundhogHunterApp.AppResources,
-                R.drawable.groundhog_1
-            ),
-            BitmapFactory.decodeResource(
-                GroundhogHunterApp.AppResources,
-                R.drawable.groundhog_2
-            ),
-            BitmapFactory.decodeResource(
-                GroundhogHunterApp.AppResources,
-                R.drawable.groundhog_3
-            )
+            BitmapFactory.decodeResource(GHogHunterApp.appResources, R.drawable.groundhog_0),
+            BitmapFactory.decodeResource(GHogHunterApp.appResources, R.drawable.groundhog_1),
+            BitmapFactory.decodeResource(GHogHunterApp.appResources, R.drawable.groundhog_2),
+            BitmapFactory.decodeResource(GHogHunterApp.appResources, R.drawable.groundhog_3)
         )
-
         @JvmField
         val groundhogHitBitmaps: Array<Bitmap> = arrayOf(
-            BitmapFactory.decodeResource(
-                GroundhogHunterApp.AppResources,
-                R.drawable.groundhog_0
-            ),
-            BitmapFactory.decodeResource(
-                GroundhogHunterApp.AppResources,
-                R.drawable.groundhog_1
-            ),
-            BitmapFactory.decodeResource(
-                GroundhogHunterApp.AppResources,
-                R.drawable.groundhog_2
-            ),
-            BitmapFactory.decodeResource(
-                GroundhogHunterApp.AppResources,
-                R.drawable.groundhog_3
-            )
+            BitmapFactory.decodeResource(GHogHunterApp.appResources, R.drawable.groundhog_0),
+            BitmapFactory.decodeResource(GHogHunterApp.appResources, R.drawable.groundhog_1),
+            BitmapFactory.decodeResource(GHogHunterApp.appResources, R.drawable.groundhog_2),
+            BitmapFactory.decodeResource(GHogHunterApp.appResources, R.drawable.groundhog_3)
         )
-
         @JvmField
         val hitScores = intArrayOf(40, 30, 20, 10)
-
         @JvmField
         val score_board: Array<Bitmap> = arrayOf(
-            BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.red_score_board),
-            BitmapFactory.decodeResource(GroundhogHunterApp.AppResources, R.drawable.yellow_score_board)
+            BitmapFactory.decodeResource(GHogHunterApp.appResources, R.drawable.red_score_board),
+            BitmapFactory.decodeResource(GHogHunterApp.appResources, R.drawable.yellow_score_board)
         )
     }
 
@@ -122,7 +97,7 @@ class GameView(
     private var mGTimerTh: GameTimerThread? = null
     private var isSFViewCreated: Boolean
     private var mRunningStatus: Int
-    private var hasSound: Boolean
+    private var mHasSound: Boolean
     private val mSNDPoolUtil: SoundPoolUtil
     private lateinit var mGHogArray: Array<Groundhog>
 
@@ -143,9 +118,9 @@ class GameView(
         isSFViewCreated = false // surfaceView has not been created yet
         mRunningStatus = 0 // game is not running
         mTimeRemaining = TIMER_INTERVAL
-        hasSound = true // default is having sound
+        mHasSound = true // default is having sound
         // create sound pool
-        mSNDPoolUtil = SoundPoolUtil(mActivity, R.raw.ouh)
+        mSNDPoolUtil = mActivity.getSoundPoolUtil()
         // Creating groundhogs' object
         // start to initialize groundhogArray array
         createGroundhogs()
@@ -156,11 +131,11 @@ class GameView(
     }
 
     fun hasSound(): Boolean {
-        return hasSound()
+        return mHasSound
     }
 
     fun setHasSound(hasSound: Boolean) {
-        this.hasSound = hasSound
+        mHasSound = hasSound
     }
 
     fun setHighestScore(hScore: Int) {
@@ -246,7 +221,7 @@ class GameView(
                             val newHitStatus: Int
                             if (groundhog.drawArea.contains(x.toFloat(), y.toFloat())) {
                                 // hit
-                                if (hasSound) {
+                                if (mHasSound) {
                                     // needs to play sound for hitting
                                     // SoundUtil.playSound(groundhogActivity, R.raw.ouh);
                                     mSNDPoolUtil.playSound()
@@ -526,28 +501,13 @@ class GameView(
         mRunningStatus = 2
         if (mGType == Constants.GAME_BY_SINGLE_PLAY) {
             // single player then record the score
-            mActivity.lifecycleScope.launch(Dispatchers.IO) {
-                val isInTop10 = GroundhogHunterApp.ScoreSQLiteDB.isInTop10(mCurrentScore)
-                if (isInTop10) {
-                    // record the current score
-                    withContext(Dispatchers.Main) {
-                        mActivity.recordScore(mCurrentScore)
-                    }
-                }
-            }
+            mActivity.recordScore(mCurrentScore)
         } else {
             // display the competition result
             val mIO = mIoFuncThread ?: return
             var scoreString = String.format(Locale.ENGLISH, "%04d", mCurrentScore)
             scoreString += String.format(Locale.ENGLISH, "%04d", mNumOfHits)
             mIO.write(Constants.TWO_PLAY_GAME_SCORE_RECEIVED, scoreString)
-            /*
-            mPresentView.getGHogActivity().runOnUiThread {
-                val displayResultAsyncTask: AsyncTask<Void?, Void?, Void?> =
-                    DisplayResultAsyncTask()
-                displayResultAsyncTask.execute()
-            }
-            */
             mActivity.lifecycleScope.launch(Dispatchers.Main) {
                 mActivity.disableAllButtons()
                 if (isOpposPlayerLeft) {
