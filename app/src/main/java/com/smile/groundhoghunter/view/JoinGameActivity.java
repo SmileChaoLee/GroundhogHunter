@@ -3,6 +3,7 @@ package com.smile.groundhoghunter.view;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -324,7 +325,11 @@ public class JoinGameActivity extends AppCompatActivity {
                     break;
                 case Constants.CL_CONN_TO_TH_NO_CL_SOCKET:
                     Log.d(TAG, "handleMessage.ClientConnectToThreadNoClientSocket");
-                    connectDevice = data.getParcelable("ConnectDevice");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+                    } else {
+                        connectDevice = data.getParcelable("ConnectDevice");
+                    }
                     if (connectDevice == null) break;
                     remoteMacAddress = connectDevice.getAddress();
                     deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
@@ -336,7 +341,11 @@ public class JoinGameActivity extends AppCompatActivity {
                     break;
                 case Constants.CL_CONN_TO_TH_CONNECTED:
                     Log.d(TAG, "handleMessage.ClientConnectToThreadConnected");
-                    connectDevice = data.getParcelable("ConnectDevice");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+                    } else {
+                        connectDevice = data.getParcelable("ConnectDevice");
+                    }
                     if (connectDevice == null) break;
                     remoteMacAddress = connectDevice.getAddress();
                     deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
@@ -354,7 +363,11 @@ public class JoinGameActivity extends AppCompatActivity {
                     break;
                 case Constants.OPPOS_PLAYER_NAME_READ:
                     Log.d(TAG, "handleMessage.OppositePlayerNameHasBeenRead");
-                    connectDevice = data.getParcelable("ConnectDevice");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+                    } else {
+                        connectDevice = data.getParcelable("ConnectDevice");
+                    }
                     if (connectDevice == null) break;
                     remoteMacAddress = connectDevice.getAddress();
                     String oppositeName = data.getString("OppositePlayerName");
@@ -376,7 +389,11 @@ public class JoinGameActivity extends AppCompatActivity {
                     break;
                 case Constants.CL_CONN_TO_TH_FAILED_CONNECT:
                     Log.d(TAG, "handleMessage.ClientConnectToThreadFailedToConnect");
-                    connectDevice = data.getParcelable("ConnectDevice");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+                    } else {
+                        connectDevice = data.getParcelable("ConnectDevice");
+                    }
                     if (connectDevice == null) break;
                     remoteMacAddress = connectDevice.getAddress();
                     deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
@@ -389,7 +406,11 @@ public class JoinGameActivity extends AppCompatActivity {
                     break;
                 case Constants.TWO_PLAY_HOST_EX_CODE:
                     Log.d(TAG, "handleMessage.TwoPlayerHostExitCode");
-                    connectDevice = data.getParcelable("ConnectDevice");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+                    } else {
+                        connectDevice = data.getParcelable("ConnectDevice");
+                    }
                     if (connectDevice == null) break;
                     remoteMacAddress = connectDevice.getAddress();
                     showMessage.showMessageInTextView(hostLeftGameString, MessageDuration);
@@ -435,7 +456,11 @@ public class JoinGameActivity extends AppCompatActivity {
                 case Constants.TWO_PLAY_DEF_READ:
                     Log.d(TAG, "handleMessage.TwoPlayerDefaultReading");
                     // read the next data
-                    connectDevice = data.getParcelable("ConnectDevice");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+                    } else {
+                        connectDevice = data.getParcelable("ConnectDevice");
+                    }
                     if (connectDevice != null) {
                         remoteMacAddress = connectDevice.getAddress();
                         ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);

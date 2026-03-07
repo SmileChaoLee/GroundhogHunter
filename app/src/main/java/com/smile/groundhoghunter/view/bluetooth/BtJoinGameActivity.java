@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -146,7 +147,11 @@ public class BtJoinGameActivity extends JoinGameActivity {
                     Log.d(TAG, logStr);
                     // Discovery has found a device. Get the BluetoothDevice
                     // object and its info from the Intent.
-                    btDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        btDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice.class);
+                    } else {
+                        btDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    }
                     if (btDevice == null) break;
                     megString = foundDeviceString + ": " + BluetoothUtil.getBluetoothDeviceName(btDevice);
                     Log.d(TAG, logStr + "." + megString);

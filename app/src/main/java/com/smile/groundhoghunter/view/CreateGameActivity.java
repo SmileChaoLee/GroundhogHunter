@@ -3,6 +3,7 @@ package com.smile.groundhoghunter.view;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -303,7 +304,11 @@ public class CreateGameActivity extends AppCompatActivity {
                     megString = oppositeName + " " + megString;
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView(megString, MessageDuration);
-                    connectDevice = data.getParcelable("ConnectDevice");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+                    } else {
+                        connectDevice = data.getParcelable("ConnectDevice");
+                    }
                     remoteMacAddress = "";
                     if (connectDevice != null) {
                         remoteMacAddress = connectDevice.getAddress();
@@ -329,7 +334,11 @@ public class CreateGameActivity extends AppCompatActivity {
                     showMessage.showMessageInTextView(cannotCreateServerSocketString, MessageDuration);
                     break;
                 case Constants.SER_ACCEPT_TH_CONNECTED:
-                    connectDevice = data.getParcelable("ConnectDevice");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+                    } else {
+                        connectDevice = data.getParcelable("ConnectDevice");
+                    }
                     if (connectDevice == null) break;
                     deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
                     remoteMacAddress = connectDevice.getAddress();
@@ -347,7 +356,11 @@ public class CreateGameActivity extends AppCompatActivity {
                     showMessage.showMessageInTextView(waitingStoppedCancelledString, MessageDuration);
                     break;
                 case Constants.TWO_PLAY_CLIENT_EX_CODE:
-                    connectDevice = data.getParcelable("ConnectDevice");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+                    } else {
+                        connectDevice = data.getParcelable("ConnectDevice");
+                    }
                     if (connectDevice == null) break;
                     remoteMacAddress = connectDevice.getAddress();
                     ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
@@ -373,7 +386,11 @@ public class CreateGameActivity extends AppCompatActivity {
                     break;
                 case Constants.TWO_PLAY_DEF_READ:
                     Log.d(TAG, "Default reading.");
-                    connectDevice = data.getParcelable("ConnectDevice");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+                    } else {
+                        connectDevice = data.getParcelable("ConnectDevice");
+                    }
                     if (connectDevice != null) {
                         remoteMacAddress = connectDevice.getAddress();
                         // read the next data
