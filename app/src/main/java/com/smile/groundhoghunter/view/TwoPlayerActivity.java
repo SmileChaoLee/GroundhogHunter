@@ -32,7 +32,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.smile.groundhoghunter.GHogHunterApp;
 import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.view.bluetooth.BtCreateGameActivity;
 import com.smile.groundhoghunter.view.bluetooth.BtJoinGameActivity;
@@ -87,13 +86,13 @@ public class TwoPlayerActivity extends AppCompatActivity {
             thisDeviceName = btDeviceName;
             setPlayerName();
         });
-        AppCompatRadioButton intRadioButton = findViewById(R.id.internetRadioButton);
-        intRadioButton.setVisibility(View.GONE);
-        ScreenUtil.resizeTextSize(intRadioButton, textFontSize);
-        intRadioButton.setChecked(false);
-        intRadioButton.setOnClickListener(view -> {
+        AppCompatRadioButton wifiRadioButton = findViewById(R.id.wifiRadioButton);
+        wifiRadioButton.setVisibility(View.GONE);
+        ScreenUtil.resizeTextSize(wifiRadioButton, textFontSize);
+        wifiRadioButton.setChecked(false);
+        wifiRadioButton.setOnClickListener(view -> {
             explainProblemTextView.setText(getString(R.string.explainProblemForWifiString));
-            intRadioButton.setChecked(true);
+            wifiRadioButton.setChecked(true);
             mediaType = GameView.WIFI_MEDIA_TYPE;
             thisDeviceName = btDeviceName;
             setPlayerName();
@@ -122,7 +121,8 @@ public class TwoPlayerActivity extends AppCompatActivity {
         LinearLayout.LayoutParams buttonLp;
 
         final SmileImageButton createGameButton = findViewById(R.id.createTwoPlayerGameButton);
-        Bitmap createGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.createString), colorDarkGreen);
+        Bitmap createGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this,
+                R.drawable.normal_button_image, getString(R.string.createString), colorDarkGreen);
         createGameButton.setImageBitmap(createGameBitmap);
         buttonLp = (LinearLayout.LayoutParams) createGameButton.getLayoutParams();
         buttonLp.leftMargin = buttonLeftMargin;

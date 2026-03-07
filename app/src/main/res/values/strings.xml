@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">GroundhogHunter</string>
-    <string name="app_name_pro">GroundhogHunter_pro</string>
 
     <string-array name="stageLevels">
         <item>Start</item>
@@ -46,7 +45,7 @@
     <string name="exitAppString">Exit Game</string>
 
     <string name="bluetoothString">Bluetooth</string>
-    <string name="wifiString">Wifi-Direct</string>
+    <string name="wifiString">Local Wi-Fi</string>
     <string name="internetString">Internet</string>
     <string name="createString">Create</string>
     <string name="joinString">Join</string>
@@ -69,11 +68,11 @@
     <string name="bluetoothRefusedByUserString">Refused by user.</string>
     <string name="scanBluetoothStartedString">Scanning Bluetooth devices started.</string>
     <string name="scanBluetoothFinishedString">Scanning Bluetooth devices finished.</string>
-    <string name="stopScanningBluetoothString">Stop scaning Bluetooth devices.</string>
+    <string name="stopScanningBluetoothString">Stop scanning Bluetooth devices.</string>
     <string name="deviceNameString">Device name:</string>
     <string name="playerNameString">Player name:</string>
     <string name="waitingForConnectionString">Waiting for connection.</string>
-    <string name="waitingStoppedCancelledString">Waiting for connection stopped or cancelled.</string>
+    <string name="waitingStoppedCancelledString">Waiting for connection stopped or canceled.</string>
     <string name="cannotCreateServerSocketString">Cannot create server socket.</string>
     <string name="serverAcceptedConnectionString">Server accepted connection.</string>
     <string name="cannotCreateClientSocketString">Cannot create client socket.</string>
@@ -82,7 +81,7 @@
     <string name="connectToHostFailedString">Failed to connect to Host.</string>
     <string name="cancelledConnectingToHostString">Cancelled connecting to Host.</string>
     <string name="explainProblemForBluetoothString">If you have any problem with connecting, please reboot Bluetooth.</string>
-    <string name="explainProblemForWifiString">If you have any problem with connecting, please reconnect to Wifi.</string>
+    <string name="explainProblemForWifiString">If you have any problem with connecting, please reconnect to Wi-Fi.</string>
     <string name="explainProblemForInternetString">If you have any problem with connecting, please reconnect to internet.</string>
     <string name="createBluetoothGameString">Create Bluetooth Game</string>
     <string name="joinBluetoothGameString">Join Bluetooth Game</string>

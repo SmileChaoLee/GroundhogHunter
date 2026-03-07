@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">土拨鼠猎人</string>
-    <string name="app_name_pro">土拨鼠猎人_专业版</string>
 
     <string-array name="stageLevels">
         <item>开始</item>
@@ -48,7 +47,7 @@
     <string name="exitAppString">离开游戏</string>
 
     <string name="bluetoothString">蓝芽</string>
-    <string name="wifiString">无线网络直接互联</string>
+    <string name="wifiString">區域無線網路</string>
     <string name="internetString">网际网络</string>
     <string name="createString">创立</string>
     <string name="joinString">加入</string>

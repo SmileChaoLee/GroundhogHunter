@@ -47,7 +47,7 @@
                 android:enabled="true">
             </androidx.appcompat.widget.AppCompatRadioButton>
             <androidx.appcompat.widget.AppCompatRadioButton
-                android:id="@+id/internetRadioButton"
+                android:id="@+id/wifiRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20sp"
@@ -87,6 +87,8 @@
             android:id="@+id/playerNameEditText"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:autofillHints=""
+            android:inputType="textMultiLine"
             android:textAllCaps="false"
             android:cursorVisible="true"
             android:textColor="@android:color/black"
@@ -95,7 +97,8 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="0dp"
             android:gravity="start|center_vertical"
-            android:layout_weight="60">
+            android:layout_weight="60"
+            tools:ignore="LabelFor">
         </EditText>
     </LinearLayout>
 
