@@ -23,7 +23,7 @@ class GHogHunterApp : Application() {
         // val googleAdMobAppID = getString(R.string.google_AdMobAppID)
         MobileAds.initialize(
             applicationContext
-        ) { initializationStatus: InitializationStatus? ->
+        ) { _: InitializationStatus? ->
             Log.d(TAG, "Google AdMob was initialized successfully.")
         }
     }

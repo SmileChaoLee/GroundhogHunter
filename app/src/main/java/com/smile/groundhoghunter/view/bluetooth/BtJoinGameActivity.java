@@ -16,7 +16,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresPermission;
 import android.util.Log;
 
-import com.smile.groundhoghunter.GHogHunterApp;
 import com.smile.groundhoghunter.view.JoinGameActivity;
 import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.constants.Constants;
@@ -36,7 +35,7 @@ public class BtJoinGameActivity extends JoinGameActivity {
     private BluetoothAdapter mBtAdapter;
     private ActivityResultLauncher<Intent> enableBtLauncher;
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
+    @RequiresPermission(allOf = {Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // BroadcastReceiver and register it
