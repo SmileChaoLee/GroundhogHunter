@@ -9,7 +9,7 @@ import android.util.Log;
 
 import androidx.annotation.RequiresPermission;
 
-import com.smile.groundhoghunter.threads.BluetoothFunctionThread;
+import com.smile.groundhoghunter.threads.bluetooth.BtFunctionThread;
 import java.util.ArrayList;
 
 public class BluetoothUtil {
@@ -36,7 +36,7 @@ public class BluetoothUtil {
         return deviceName;
     }
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    @RequiresPermission(allOf = {Manifest.permission.BLUETOOTH_CONNECT, "android.permission.LOCAL_MAC_ADDRESS"})
     public static String getBluetoothDeviceName(BluetoothAdapter mBluetoothAdapter) {
         String deviceName = mBluetoothAdapter.getName();
         // mBluetoothAdapter.getAddress() is deprecated and restricted.
@@ -72,13 +72,13 @@ public class BluetoothUtil {
         }
     }
 
-    public static void stopBluetoothFunctionThreads(ArrayList<BluetoothFunctionThread> btFunctionThreadList) {
-        for (BluetoothFunctionThread btFunctionThread : btFunctionThreadList) {
+    public static void stopBluetoothFunctionThreads(ArrayList<BtFunctionThread> btFunctionThreadList) {
+        for (BtFunctionThread btFunctionThread : btFunctionThreadList) {
             stopBluetoothFunctionThread(btFunctionThread);
         }
     }
 
-    public static void stopBluetoothFunctionThread(BluetoothFunctionThread btFunctionThread) {
+    public static void stopBluetoothFunctionThread(BtFunctionThread btFunctionThread) {
         if (btFunctionThread == null) {
             Log.d(TAG, "stopBluetoothFunctionThread.btFunctionThread is null");
             return;

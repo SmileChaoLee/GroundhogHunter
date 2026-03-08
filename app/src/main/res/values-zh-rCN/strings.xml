@@ -65,6 +65,7 @@
     <string name="deviceNameCannotBeEmptyString">设备名称不可以是空白.</string>
     <string name="playerNameCannotBeEmptyString">玩家名称不可以是空白.</string>
     <string name="bluetoothVisibilityForPeriodString">蓝芽在短时间内可被侦测</string>
+    <string name="bluetoothVisibilityAlways">蓝芽一直可被侦测</string>
     <string name="bluetoothCannotBeVisibleString">蓝芽被侦测功能无法启动</string>
     <string name="bluetoothVisibilityIsDisabledString">蓝芽被侦测的功能已关闭.</string>
     <string name="bluetoothRefusedByUserString">被使用者拒绝.</string>

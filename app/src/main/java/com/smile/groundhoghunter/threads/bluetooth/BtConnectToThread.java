@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter.threads;
+package com.smile.groundhoghunter.threads.bluetooth;
 
 import android.Manifest;
 import android.bluetooth.BluetoothDevice;
@@ -22,7 +22,7 @@ public class BtConnectToThread extends ClientConnectToThread {
     private final BluetoothDevice mBluetoothDevice;
 
     private BluetoothSocket mBluetoothSocket;
-    private BluetoothFunctionThread btFunctionThread;
+    private BtFunctionThread btFunctionThread;
 
     public BtConnectToThread(Handler handler, BluetoothDevice bluetoothDevice, java.util.UUID appUUID) {
         super(handler);
@@ -32,7 +32,8 @@ public class BtConnectToThread extends ClientConnectToThread {
         // Get a BluetoothSocket to connect with the given BluetoothDevice.
         // MY_UUID is the app's UUID string, also used in the server code.
         try {
-            mBluetoothSocket = mBluetoothDevice.createRfcommSocketToServiceRecord(appUUID);
+            // mBluetoothSocket = mBluetoothDevice.createRfcommSocketToServiceRecord(appUUID);
+            mBluetoothSocket = mBluetoothDevice.createInsecureRfcommSocketToServiceRecord(appUUID);
             if (mBluetoothSocket.isConnected()) {
                 BluetoothUtil.closeBluetoothSocket(mBluetoothSocket);
             }
@@ -68,7 +69,7 @@ public class BtConnectToThread extends ClientConnectToThread {
             mBluetoothSocket.connect();
             Log.e(TAG, "run.Connected to server socket.");
             // start reading the opposite player's name
-            btFunctionThread = new BluetoothFunctionThread(mHandler, mBluetoothSocket);
+            btFunctionThread = new BtFunctionThread(mHandler, mBluetoothSocket);
             btFunctionThread.start();   // default is not reading input stream (startRead = false)
             msg = mHandler.obtainMessage(Constants.CL_CONN_TO_TH_CONNECTED);
         } catch (Exception ex) {

@@ -42,7 +42,6 @@ import com.smile.groundhoghunter.services.LocalTop10Service
 import com.smile.smilelibraries.alertdialogfragment.AlertDialogFragment
 import com.smile.smilelibraries.customized_button.SmileImageButton
 import com.smile.smilelibraries.google_ads_util.AdMobInterstitial
-import com.smile.smilelibraries.interfaces.DismissFunction
 import com.smile.smilelibraries.models.ExitAppTimer
 import com.smile.smilelibraries.player_record_rest.httpUrl.PlayerRecordRest
 import com.smile.smilelibraries.scoresqlite.ScoreSQLite
@@ -481,6 +480,7 @@ open class GroundhogActivity : AppCompatActivity() {
 
     // private methods
     private fun finishApplication() {
+        Log.d(TAG, "finishApplication");
         // release resources and threads
         gameView?.apply {
             releaseSynchronizations()
@@ -561,8 +561,8 @@ open class GroundhogActivity : AppCompatActivity() {
         val gv = gameView ?: return
         // close the socket (BluetoothSocket, Wifi socket, or internet socket)
         gv.newGame() // set to new game (refresh the UI and stop threads) before quiting game
-        // free version
         // int entryPoint = 0; //  no used
+        /*
         val showInterstitialAdThread =
             interstitialAd.ShowAdThread(
                 object : DismissFunction {
@@ -576,6 +576,9 @@ open class GroundhogActivity : AppCompatActivity() {
                     }
                 })
         showInterstitialAdThread.startShowAd(AD_PROVIDER)
+        */
+        interstitialAd.ShowAdThread().startShowAd(AD_PROVIDER)
+        returnToPrevious()
     }
 
     private fun returnToPrevious() {
@@ -600,6 +603,7 @@ open class GroundhogActivity : AppCompatActivity() {
     }
 
     fun enableAllButtons() {
+        Log.d(TAG, "enableAllButtons");
         startGameButton.isEnabled = true
         pauseGameButton.isEnabled = true
         resumeGameButton.isEnabled = true
@@ -715,6 +719,7 @@ open class GroundhogActivity : AppCompatActivity() {
     }
 
     fun disableAllButtons() {
+        Log.d(TAG, "disableAllButtons");
         startGameButton.isEnabled = false
         pauseGameButton.isEnabled = false
         resumeGameButton.isEnabled = false

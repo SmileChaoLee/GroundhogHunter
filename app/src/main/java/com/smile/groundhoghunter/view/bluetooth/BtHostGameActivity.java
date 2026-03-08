@@ -4,20 +4,20 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.smile.groundhoghunter.view.HostGameActivity;
-import com.smile.groundhoghunter.threads.BluetoothFunctionThread;
+import com.smile.groundhoghunter.threads.bluetooth.BtFunctionThread;
 import com.smile.groundhoghunter.utilities.BluetoothUtil;
 
 public class BtHostGameActivity extends HostGameActivity {
 
-    private final static String TAG = "BTHostGameAct";
-    private BluetoothFunctionThread selectedBtFunctionThread;
+    private final static String TAG = "BtHostGameAct";
+    private BtFunctionThread selectedBtFunctionThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate() is called.");
         super.onCreate(savedInstanceState);
         if (selectedIoFuncThread != null) {
-            selectedBtFunctionThread = (BluetoothFunctionThread) selectedIoFuncThread;
+            selectedBtFunctionThread = (BtFunctionThread) selectedIoFuncThread;
             selectedBtFunctionThread.setStartRead(true);    // start reading data
         } else {
             // selectedIoFunctionThread is null then return to previous

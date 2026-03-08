@@ -20,7 +20,7 @@ import com.smile.groundhoghunter.view.JoinGameActivity;
 import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.groundhoghunter.models.BtConnectDevice;
-import com.smile.groundhoghunter.threads.BtConnectToThread;
+import com.smile.groundhoghunter.threads.bluetooth.BtConnectToThread;
 import com.smile.groundhoghunter.utilities.BluetoothUtil;
 
 public class BtJoinGameActivity extends JoinGameActivity {
@@ -83,7 +83,7 @@ public class BtJoinGameActivity extends JoinGameActivity {
                     } else {
                         megString = "enableBtLauncher." + bluetoothCannotBeTurnedOnString;
                         Log.d(TAG, megString);
-                        showMessage.showMessageInTextView(bluetoothCannotBeTurnedOnString, MessageDuration);
+                        showMessage.showMessageInTextView(bluetoothCannotBeTurnedOnString, MSG_DURATION);
                     }
                 }
         );
@@ -121,11 +121,11 @@ public class BtJoinGameActivity extends JoinGameActivity {
 
     @Override
     protected void startClientGame() {
+        Log.d(TAG, "startClientGame");
         super.startClientGame();
         Intent gameIntent = new Intent(this, BtClientGameActivity.class);
         gameIntent.putExtra(Constants.GAME_TYPE, Constants.TWO_PLAY_GAME_BY_CLIENT);
-        // startActivityForResult(gameIntent, CommonConstants.TwoPlayerGameByClient);
-        startActivity(gameIntent);
+        clientGameLauncher.launch(gameIntent);
     }
 
     private class BtJoinGameBroadcastReceiver extends BroadcastReceiver {
@@ -158,7 +158,7 @@ public class BtJoinGameActivity extends JoinGameActivity {
                     remoteMacAddress = btDevice.getAddress();
                     if (!discoveredDeviceMap.containsKey(remoteMacAddress)) {
                         Log.d(TAG, logStr + ".discoveredDeviceMap.not contains " + remoteMacAddress);
-                        showMessage.showMessageInTextView(megString, MessageDuration);
+                        showMessage.showMessageInTextView(megString, MSG_DURATION);
                         BtConnectToThread connectToThread = new BtConnectToThread(joinGameHandler, btDevice,
                                 Constants.APP_UUID);
                         discoveredDeviceMap.put(remoteMacAddress, connectToThread);
@@ -169,14 +169,14 @@ public class BtJoinGameActivity extends JoinGameActivity {
                     Log.d(TAG, logStr);
                     megString = scanBluetoothStartedString;
                     Log.d(TAG, logStr + "." + megString);
-                    showMessage.showMessageInTextView(scanBluetoothStartedString, MessageDuration);
+                    showMessage.showMessageInTextView(scanBluetoothStartedString, MSG_DURATION);
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
                     logStr = "onReceive.ACTION_DISCOVERY_FINISHED";
                     Log.d(TAG, logStr);
                     megString = scanBluetoothFinishedString;
                     Log.d(TAG, logStr + "." + megString);
-                    showMessage.showMessageInTextView(scanBluetoothFinishedString, MessageDuration);
+                    showMessage.showMessageInTextView(scanBluetoothFinishedString, MSG_DURATION);
                     break;
             }
         }

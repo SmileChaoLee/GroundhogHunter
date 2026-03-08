@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class ConnectDeviceUtil {
 
-    private static final String TAG = new String(".Utilities.ConnectDeviceUtil");
+    private static final String TAG = "ConnectDeviceUtil";
 
     public static String getConnectDeviceName(ConnectDevice mDevice) {
         String deviceName = mDevice.getName();
@@ -28,24 +28,25 @@ public class ConnectDeviceUtil {
     }
 
     public static void closeConnectIoSocket(Socket mSocket ) {
-
         if (mSocket != null) {
             // close connection
             try {
                 mSocket.close();
             } catch (Exception ex) {
-                ex.printStackTrace();
+                Log.e(TAG, "closeConnectIoSocket.Exception: ", ex);
             }
         }
     }
 
     public static void stopIoFunctionThreads(ArrayList<IoFunctionThread> btFunctionThreadList) {
+        Log.d(TAG, "stopIoFunctionThreads");
         for (IoFunctionThread ioFunctionThread : btFunctionThreadList) {
             stopIoFunctionThread(ioFunctionThread);
         }
     }
 
     public static void stopIoFunctionThread(IoFunctionThread ioFunctionThread) {
+        Log.d(TAG, "stopIoFunctionThread");
         if (ioFunctionThread != null) {
             synchronized (ioFunctionThread) {
                 ioFunctionThread.setKeepRunning(false);
@@ -57,12 +58,12 @@ public class ConnectDeviceUtil {
             while (retry) {
                 try {
                     ioFunctionThread.join();
-                    Log.d(TAG, "ioFunctionThread.Join()........\n");
+                    Log.d(TAG, "stopIoFunctionThread.ioFunctionThread.Join()");
                     retry = false;
-                    ioFunctionThread = null;
+                    // ioFunctionThread = null;
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }// continue processing until the thread ends
+                    Log.e(TAG, "stopIoFunctionThread.InterruptedException: ", ex);
+                }
             }
         }
     }

@@ -64,6 +64,7 @@
     <string name="wifiDirectNotSupportedString">沒有支援無線網路互聯</string>
     <string name="deviceNameCannotBeEmptyString">設備名稱不可以是空白.</string>
     <string name="playerNameCannotBeEmptyString">玩家名稱不可以是空白.</string>
+    <string name="bluetoothVisibilityAlways">藍芽一直可被偵測</string>
     <string name="bluetoothVisibilityForPeriodString">藍芽在短時間內可被偵測</string>
     <string name="bluetoothCannotBeVisibleString">藍芽被偵測功能無法啟動</string>
     <string name="bluetoothVisibilityIsDisabledString">藍芽被偵測的功能已關閉.</string>

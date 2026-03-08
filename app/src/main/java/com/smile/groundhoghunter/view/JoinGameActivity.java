@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
@@ -38,7 +40,8 @@ public class JoinGameActivity extends AppCompatActivity {
     // private properties
     private static final String TAG = "JoinGameAct";
     // 20 seconds one time
-    private static final int DurationForBluetoothDiscovery = 20000;
+    private static final int DURATION_BT_DISCOVER = 20000;
+    protected static final int MSG_DURATION = 1000;    // 1 second
     private String oppositePlayerName;
     private LinkedHashMap<String, String> oppositePlayerNameMap;
     private String cannotCreateClientSocketString;
@@ -49,7 +52,6 @@ public class JoinGameActivity extends AppCompatActivity {
     private String discoveryWasDismissedString;
     private String hasBeenReadString;
     private TwoPlayerListAdapter twoPlayerListAdapter;
-    protected static final int MessageDuration = 1000;    // 1 second
     protected String playerName;
     protected MessageShowingUtil showMessage;
     protected Handler joinGameHandler;
@@ -58,6 +60,7 @@ public class JoinGameActivity extends AppCompatActivity {
     protected HashMap<String, ClientConnectToThread> discoveredDeviceMap;
     protected HashMap<String, IoFunctionThread> ioFunctionThreadMap;
     protected IoFunctionThread selectedIoFunctionThread;
+    protected ActivityResultLauncher<Intent> clientGameLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +90,22 @@ public class JoinGameActivity extends AppCompatActivity {
 
         int colorDarkRed = ContextCompat.getColor(this, R.color.darkRed);
         int colorBlue = Color.BLUE;
+
+        clientGameLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    int resultCode = result.getResultCode();
+                    Log.d(TAG, "clientGameLauncher.resultCode = " + resultCode);
+                    Log.d(TAG, "clientGameLauncher.Came back from BtClientGameActivity.");
+                    oppositePlayerName = "";
+                    discoveredDeviceMap = new HashMap<>();
+                    ioFunctionThreadMap = new HashMap<>();
+                    selectedIoFunctionThread = null;
+                    oppositePlayerNameMap = new LinkedHashMap<>();
+                    // update list view
+                    ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
+                    twoPlayerListAdapter.updateData(oppNameList);
+                });
 
         super.onCreate(savedInstanceState);
 
@@ -160,47 +179,25 @@ public class JoinGameActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "JoinGameActivity --> Came back from BtJoinGameActivity.");
-        if (requestCode == Constants.TWO_PLAY_GAME_BY_CLIENT) {
-            oppositePlayerName = "";
-            discoveredDeviceMap = new HashMap<>();
-            ioFunctionThreadMap = new HashMap<>();
-            selectedIoFunctionThread = null;
-            oppositePlayerNameMap = new LinkedHashMap<>();
-            // update list view
-            ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
-            twoPlayerListAdapter.updateData(oppNameList);
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        Log.d(TAG, "onDestroy");
         clientLeavingNotification();
         ArrayList<IoFunctionThread> threadList = new ArrayList<>(ioFunctionThreadMap.values());
         ConnectDeviceUtil.stopIoFunctionThreads(threadList);
         ioFunctionThreadMap.clear();
-        ioFunctionThreadMap = null;
-
+        // ioFunctionThreadMap = null;
         stopClientConnectToThreadAndClearClientDiscoveredMap();
-        discoveredDeviceMap = null;
-
+        // discoveredDeviceMap = null;
         oppositePlayerNameMap.clear();
-        oppositePlayerNameMap = null;
-
-        selectedIoFunctionThread = null;
-
+        // oppositePlayerNameMap = null;
+        // selectedIoFunctionThread = null;
         twoPlayerListAdapter.clear();
-        twoPlayerListAdapter = null;
-
+        // twoPlayerListAdapter = null;
         stopClientDiscoveryTimerThread();
-
         if (joinGameHandler != null) {
             joinGameHandler.removeCallbacksAndMessages(null);
-            joinGameHandler = null;
+            // joinGameHandler = null;
         }
     }
 
@@ -227,9 +224,11 @@ public class JoinGameActivity extends AppCompatActivity {
     }
 
     protected void startClientGame() {
+        Log.d(TAG, "startClientGame.do nothing");
     }
 
     private void clientLeavingNotification() {
+        Log.d(TAG, "clientLeavingNotification.ioFunctionThreadMap = " + ioFunctionThreadMap);
         if (clientConnectDevice != null) {
             for (IoFunctionThread btFunctionThread : ioFunctionThreadMap.values()) {
                 btFunctionThread.write(Constants.TWO_PLAY_CLIENT_EX_CODE, "");
@@ -239,7 +238,7 @@ public class JoinGameActivity extends AppCompatActivity {
 
     private void startClientDiscoveryTimerThread() {
         discoveryTimerThread = new ClientDiscoveryTimerThread(joinGameHandler,
-                DurationForBluetoothDiscovery);
+                DURATION_BT_DISCOVER);
         discoveryTimerThread.start();
     }
 
@@ -288,143 +287,158 @@ public class JoinGameActivity extends AppCompatActivity {
     }
 
     private class JoinGameHandler extends Handler {
+
+        private int curIndex = 0;
+        private ArrayList<ClientConnectToThread> threadList = new ArrayList<>();
+
         public JoinGameHandler(Looper looper) {
             super(looper);
         }
+
+        private void connectToNextDiscoveredDevice() {
+            Log.d(TAG, "connectToNextDiscoveredDevice.curIndex = " + curIndex);
+            if (threadList == null || threadList.isEmpty()) return;
+            if (curIndex >= threadList.size()) return;
+            ClientConnectToThread thread = threadList.get(curIndex);
+            if (thread.getState() == Thread.State.NEW) {
+                thread.start();
+            }
+            curIndex++;
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
             // super.handleMessage(msg);
+            Log.d(TAG, "handleMessage.Message = " + msg.what);
+            Bundle data = msg.getData();
             String megString;
             String deviceName;
             ClientConnectToThread connectToThread;
             IoFunctionThread ioFunctionThread;
-            Log.d(TAG, "handleMessage.Message = " + msg.what);
-            Bundle data = msg.getData();
-            ConnectDevice connectDevice;
             String remoteMacAddress;
-
+            ConnectDevice connectDevice;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+            } else {
+                connectDevice = data.getParcelable("ConnectDevice");
+            }
             switch (msg.what) {
                 case Constants.CL_DISCOVER_TIMER_END:
-                    Log.d(TAG, "handleMessage.ClientDiscoveryTimerHasReached");
+                    Log.d(TAG, "handleMessage.CL_DISCOVER_TIMER_END");
                     megString = discoveryTimeHasReachedString;
                     Log.d(TAG, megString);
                     if (clientConnectDevice.isDiscovering()) {
                         clientConnectDevice.cancelDiscovery();
                     }
-                    showMessage.showMessageInTextView(megString, MessageDuration);
+                    showMessage.showMessageInTextView(megString, MSG_DURATION);
                     // start to connect all the device that were found
+                    /*
                     for (ClientConnectToThread connectThread : discoveredDeviceMap.values()) {
                         connectThread.start();
                     }
+                    */
+                    threadList = new ArrayList<>(discoveredDeviceMap.values());
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        curIndex = 0;
+                        connectToNextDiscoveredDevice();
+                    }, 1000);
                     break;
                 case Constants.CL_DISCOVER_TIMER_DISMISSED:
-                    Log.d(TAG, "handleMessage.ClientDiscoveryTimerHasBeenDismissed");
+                    Log.d(TAG, "handleMessage.CL_DISCOVER_TIMER_END");
                     megString = discoveryWasDismissedString;
                     Log.d(TAG, megString);
-                    showMessage.showMessageInTextView(megString, MessageDuration);
+                    showMessage.showMessageInTextView(megString, MSG_DURATION);
                     break;
                 case Constants.CL_CONN_TO_TH_NO_CL_SOCKET:
-                    Log.d(TAG, "handleMessage.ClientConnectToThreadNoClientSocket");
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
-                    } else {
-                        connectDevice = data.getParcelable("ConnectDevice");
-                    }
-                    if (connectDevice == null) break;
-                    remoteMacAddress = connectDevice.getAddress();
-                    deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
-                    megString = cannotCreateClientSocketString + "(" + deviceName +")";
-                    Log.d(TAG, megString);
-                    showMessage.showMessageInTextView(megString, MessageDuration);
-                    connectToThread = discoveredDeviceMap.get(remoteMacAddress);
-                    stopClientConnectToThread(connectToThread,true);
-                    break;
-                case Constants.CL_CONN_TO_TH_CONNECTED:
-                    Log.d(TAG, "handleMessage.ClientConnectToThreadConnected");
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
-                    } else {
-                        connectDevice = data.getParcelable("ConnectDevice");
-                    }
-                    if (connectDevice == null) break;
-                    remoteMacAddress = connectDevice.getAddress();
-                    deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
-                    megString = connectToHostSucceededString + "(" + deviceName + ")";
-                    Log.d(TAG, megString);
-                    // start reading data from the other device and writing data to the other device
-                    connectToThread = discoveredDeviceMap.get(remoteMacAddress);
-                    if (connectToThread == null) break;
-                    ioFunctionThread = connectToThread.getIoFunctionThread();
-                    ioFunctionThread.setStartRead(true);    // start reading data
-                    if (!ioFunctionThreadMap.containsKey(remoteMacAddress)) {
-                        ioFunctionThreadMap.put(remoteMacAddress, ioFunctionThread);
-                    }
-                    stopClientConnectToThread(connectToThread, false);
-                    break;
-                case Constants.OPPOS_PLAYER_NAME_READ:
-                    Log.d(TAG, "handleMessage.OppositePlayerNameHasBeenRead");
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
-                    } else {
-                        connectDevice = data.getParcelable("ConnectDevice");
-                    }
-                    if (connectDevice == null) break;
-                    remoteMacAddress = connectDevice.getAddress();
-                    String oppositeName = data.getString("OppositePlayerName");
-                    megString = oppositeName + " " + hasBeenReadString + ".";
-                    showMessage.showMessageInTextView(megString , MessageDuration);
-                    Log.d(TAG, megString);
-                    if (oppositeName != null) {
-                        if (!oppositeName.isEmpty()) {
-                            if (!oppositePlayerNameMap.containsKey(remoteMacAddress)) {
-                                oppositePlayerNameMap.put(remoteMacAddress, oppositeName);
-                                ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
-                                twoPlayerListAdapter.updateData(oppNameList);
-                            }
-                        }
-                    }
-                    ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                    if (ioFunctionThread == null) break;
-                    ioFunctionThread.setStartRead(true);    // read next data data
-                    break;
-                case Constants.CL_CONN_TO_TH_FAILED_CONNECT:
-                    Log.d(TAG, "handleMessage.ClientConnectToThreadFailedToConnect");
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
-                    } else {
-                        connectDevice = data.getParcelable("ConnectDevice");
-                    }
-                    if (connectDevice == null) break;
-                    remoteMacAddress = connectDevice.getAddress();
-                    deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
-                    megString = connectToHostFailedString + "(" + deviceName + ")";
-                    Log.d(TAG, megString);
-                    if (discoveredDeviceMap != null) {
+                    Log.d(TAG, "handleMessage.CL_CONN_TO_TH_NO_CL_SOCKET");
+                    if (connectDevice != null) {
+                        remoteMacAddress = connectDevice.getAddress();
+                        deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
+                        megString = cannotCreateClientSocketString + "(" + deviceName + ")";
+                        Log.d(TAG, megString);
+                        showMessage.showMessageInTextView(megString, MSG_DURATION);
                         connectToThread = discoveredDeviceMap.get(remoteMacAddress);
                         stopClientConnectToThread(connectToThread, true);
                     }
+                    connectToNextDiscoveredDevice();
+                    break;
+                case Constants.CL_CONN_TO_TH_CONNECTED:
+                    Log.d(TAG, "handleMessage.CL_CONN_TO_TH_CONNECTED");
+                    if (connectDevice != null) {
+                        remoteMacAddress = connectDevice.getAddress();
+                        deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
+                        megString = connectToHostSucceededString + "(" + deviceName + ")";
+                        Log.d(TAG, megString);
+                        // start reading data from the other device and writing data to the other device
+                        connectToThread = discoveredDeviceMap.get(remoteMacAddress);
+                        if (connectToThread != null) {
+                            ioFunctionThread = connectToThread.getIoFunctionThread();
+                            if (ioFunctionThread != null) {
+                                ioFunctionThread.setStartRead(true);    // start reading data
+                            }
+                            if (!ioFunctionThreadMap.containsKey(remoteMacAddress)) {
+                                ioFunctionThreadMap.put(remoteMacAddress, ioFunctionThread);
+                            }
+                        }
+                        stopClientConnectToThread(connectToThread, false);
+                    }
+                    connectToNextDiscoveredDevice();
+                    break;
+                case Constants.OPPOS_PLAYER_NAME_READ:
+                    Log.d(TAG, "handleMessage.OPPOS_PLAYER_NAME_READ");
+                    if (connectDevice != null) {
+                        remoteMacAddress = connectDevice.getAddress();
+                        String oppositeName = data.getString("OppositePlayerName");
+                        megString = oppositeName + " " + hasBeenReadString + ".";
+                        showMessage.showMessageInTextView(megString, MSG_DURATION);
+                        Log.d(TAG, megString);
+                        if (oppositeName != null) {
+                            if (!oppositeName.isEmpty()) {
+                                if (!oppositePlayerNameMap.containsKey(remoteMacAddress)) {
+                                    oppositePlayerNameMap.put(remoteMacAddress, oppositeName);
+                                    ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
+                                    twoPlayerListAdapter.updateData(oppNameList);
+                                }
+                            }
+                        }
+                        ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
+                        if (ioFunctionThread != null) {
+                            ioFunctionThread.setStartRead(true);    // read next data data
+                        }
+                    }
+                    break;
+                case Constants.CL_CONN_TO_TH_FAILED_CONNECT:
+                    Log.d(TAG, "handleMessage.CL_CONN_TO_TH_FAILED_CONNECT");
+                    if (connectDevice != null) {
+                        remoteMacAddress = connectDevice.getAddress();
+                        deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
+                        megString = connectToHostFailedString + "(" + deviceName + ")";
+                        Log.d(TAG, megString);
+                        if (discoveredDeviceMap != null) {
+                            connectToThread = discoveredDeviceMap.get(remoteMacAddress);
+                            stopClientConnectToThread(connectToThread, true);
+                        }
+                    }
+                    connectToNextDiscoveredDevice();
                     break;
                 case Constants.TWO_PLAY_HOST_EX_CODE:
-                    Log.d(TAG, "handleMessage.TwoPlayerHostExitCode");
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
-                    } else {
-                        connectDevice = data.getParcelable("ConnectDevice");
+                    Log.d(TAG, "handleMessage.TWO_PLAY_HOST_EX_CODE");
+                    if (connectDevice != null) {
+                        remoteMacAddress = connectDevice.getAddress();
+                        showMessage.showMessageInTextView(hostLeftGameString, MSG_DURATION);
+                        ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
+                        if (ioFunctionThread != null) {
+                            ioFunctionThread.setStartRead(true);    // start reading data
+                        }
+                        // remove the remote connected device from oppositePlayerNameList
+                        oppositePlayerNameMap.remove(remoteMacAddress);
+                        // update list view
+                        ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
+                        twoPlayerListAdapter.updateData(oppNameList);
                     }
-                    if (connectDevice == null) break;
-                    remoteMacAddress = connectDevice.getAddress();
-                    showMessage.showMessageInTextView(hostLeftGameString, MessageDuration);
-                    ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                    if (ioFunctionThread == null) break;
-                    ioFunctionThread.setStartRead(true);    // start reading data
-                    // remove the remote connected device from oppositePlayerNameList
-                    oppositePlayerNameMap.remove(remoteMacAddress);
-                    // update list view
-                    ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
-                    twoPlayerListAdapter.updateData(oppNameList);
                     break;
                 case Constants.TWO_PLAY_HOST_ST_GAME:
-                    Log.d(TAG, "handleMessage.TwoPlayerHostStartGame");
+                    Log.d(TAG, "handleMessage.TWO_PLAY_HOST_ST_GAME");
                     if (selectedIoFunctionThread != null) {
                         GHogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
                         for (String remoteMac : ioFunctionThreadMap.keySet()) {
@@ -440,7 +454,6 @@ public class JoinGameActivity extends AppCompatActivity {
                                 }
                             }
                         }
-
                         // clear HashMaps
                         discoveredDeviceMap = null;
                         ioFunctionThreadMap.clear();
@@ -454,13 +467,8 @@ public class JoinGameActivity extends AppCompatActivity {
                     }
                     break;
                 case Constants.TWO_PLAY_DEF_READ:
-                    Log.d(TAG, "handleMessage.TwoPlayerDefaultReading");
+                    Log.d(TAG, "handleMessage.TWO_PLAY_DEF_READ");
                     // read the next data
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
-                    } else {
-                        connectDevice = data.getParcelable("ConnectDevice");
-                    }
                     if (connectDevice != null) {
                         remoteMacAddress = connectDevice.getAddress();
                         ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);

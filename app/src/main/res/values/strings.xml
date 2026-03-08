@@ -63,6 +63,7 @@
     <string name="deviceNameCannotBeEmptyString">Device name cannot be empty.</string>
     <string name="playerNameCannotBeEmptyString">Player name cannot be empty.</string>
     <string name="bluetoothVisibilityForPeriodString">Bluetooth will is visible for</string>
+    <string name="bluetoothVisibilityAlways">Bluetooth is always visible</string>
     <string name="bluetoothCannotBeVisibleString">Bluetooth visibility cannot be enabled.</string>
     <string name="bluetoothVisibilityIsDisabledString">Bluetooth visibility was disabled.</string>
     <string name="bluetoothRefusedByUserString">Refused by user.</string>

@@ -16,15 +16,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresPermission;
 
 import com.smile.groundhoghunter.view.CreateGameActivity;
-import com.smile.groundhoghunter.GHogHunterApp;
 import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.constants.Constants;
-import com.smile.groundhoghunter.threads.BluetoothAcceptThread;
+import com.smile.groundhoghunter.threads.bluetooth.BtAcceptThread;
 
 public class BtCreateGameActivity extends CreateGameActivity {
 
     private static final String TAG = "BtCreateGameAct";
-    private static final int DurationForBluetoothVisible = 120;  // 120 seconds
+    private static final int DURATION_BT_VISIBLE = 0;  // Forever
     private String bluetoothVisibilityIsDisabledString;
     private String bluetoothCannotBeTurnedOnString;
     private String bluetoothVisibilityForPeriodString;
@@ -35,7 +34,8 @@ public class BtCreateGameActivity extends CreateGameActivity {
     private ActivityResultLauncher<Intent> discoverableLauncher;
     private ActivityResultLauncher<Intent> enableBtLauncher;
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
+    @RequiresPermission(allOf = {Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_CONNECT})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -54,8 +54,12 @@ public class BtCreateGameActivity extends CreateGameActivity {
 
         bluetoothVisibilityIsDisabledString = getString(R.string.bluetoothVisibilityIsDisabledString);
         bluetoothCannotBeTurnedOnString = getString(R.string.bluetoothCannotBeTurnedOnString);
-        bluetoothVisibilityForPeriodString = getString(R.string.bluetoothVisibilityForPeriodString)
-                + "(" + DurationForBluetoothVisible + " " + getString(R.string.secondString) + ")";
+        if (DURATION_BT_VISIBLE == 0) {
+            bluetoothVisibilityForPeriodString = getString(R.string.bluetoothVisibilityAlways);
+        } else {
+            bluetoothVisibilityForPeriodString = getString(R.string.bluetoothVisibilityForPeriodString)
+                    + "(" + DURATION_BT_VISIBLE + " " + getString(R.string.secondString) + ")";
+        }
         bluetoothCannotBeVisibleString = getString(R.string.bluetoothCannotBeVisibleString);
         discoverableLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -63,13 +67,13 @@ public class BtCreateGameActivity extends CreateGameActivity {
                     int resultCode = result.getResultCode();
                     if (resultCode != Activity.RESULT_CANCELED) {
                         // succeeded
-                        showMessage.showMessageInTextView(bluetoothVisibilityForPeriodString, MessageDuration);
+                        showMessage.showMessageInTextView(bluetoothVisibilityForPeriodString, MSG_DURATION);
                         // create a BluetoothSocket for listening for connection using a thread
-                        mServerAcceptThread = new BluetoothAcceptThread(createGameHandler, mBtAdapter, playerName,
+                        mServerAcceptThread = new BtAcceptThread(createGameHandler, mBtAdapter, playerName,
                                 Constants.APP_UUID);
                         mServerAcceptThread.start();
                     } else {
-                        showMessage.showMessageInTextView(bluetoothCannotBeVisibleString, MessageDuration);
+                        showMessage.showMessageInTextView(bluetoothCannotBeVisibleString, MSG_DURATION);
                     }
                 });
         enableBtLauncher = registerForActivityResult(
@@ -80,13 +84,13 @@ public class BtCreateGameActivity extends CreateGameActivity {
                     if (resultCode == Activity.RESULT_OK) {
                         // succeeded to enable bluetooth. Start enabling discoverability
                         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-                        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, DurationForBluetoothVisible);
+                        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, DURATION_BT_VISIBLE);
                         // startActivityForResult(discoverableIntent, Request_Enable_Bluetooth_Discoverability);
                         Log.d(TAG, "enableBtLauncher.discoverableLauncher");
                         discoverableLauncher.launch(discoverableIntent);
                     } else {
                         Log.d(TAG, "enableBtLauncher.Not Activity.RESULT_OK");
-                        showMessage.showMessageInTextView(bluetoothCannotBeTurnedOnString, MessageDuration);
+                        showMessage.showMessageInTextView(bluetoothCannotBeTurnedOnString, MSG_DURATION);
                     }
                 });
 
@@ -121,10 +125,10 @@ public class BtCreateGameActivity extends CreateGameActivity {
     @Override
     protected void startHostGame() {
         super.startHostGame();
+        Log.d(TAG, "startHostGame");
         Intent gameIntent = new Intent(this, BtHostGameActivity.class);
         gameIntent.putExtra(Constants.GAME_TYPE, Constants.TWO_PLAY_GAME_BY_HOST);
-        // startActivityForResult(gameIntent, CommonConstants.TwoPlayerGameByHost);
-        startActivity(gameIntent);
+        hostGameLauncher.launch(gameIntent);
     }
 
     private class BtCreateGameBroadcastReceiver extends BroadcastReceiver {
@@ -139,7 +143,7 @@ public class BtCreateGameActivity extends CreateGameActivity {
                 int extraScanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
                 if (extraPreviousScanMode != extraScanMode) {
                     if ((extraScanMode == BluetoothAdapter.SCAN_MODE_CONNECTABLE) || (extraScanMode == BluetoothAdapter.SCAN_MODE_NONE)) {
-                        showMessage.showMessageInTextView(bluetoothVisibilityIsDisabledString, MessageDuration);
+                        showMessage.showMessageInTextView(bluetoothVisibilityIsDisabledString, MSG_DURATION);
                     }
                 }
             }

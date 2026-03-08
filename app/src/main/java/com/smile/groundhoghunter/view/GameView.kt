@@ -46,7 +46,7 @@ class GameView(
         const val TIMER_INTERVAL: Int = 60 // 60 seconds
         const val DRAWING_INTERVAL: Int = 80
         const val NUM_G_HOG_TYPES: Int = 4 // including hiding
-        const val TIMER_INTERVAL_SHOWN: Int = 300 // 300 milli seconds
+        const val TIMER_INTERVAL_SHOWN: Int = 300 // 300 milliseconds
         @JvmField
         var gViewPause: Boolean = false // for synchronizing
         @JvmField
@@ -346,6 +346,7 @@ class GameView(
     }
 
     fun releaseSynchronizations() {
+        Log.d(TAG, "releaseSynchronizations")
         if (GroundhogActivity.GamePause) {
             // in pause status
             synchronized(GroundhogActivity.activityLocker) {
@@ -353,7 +354,6 @@ class GameView(
                 GroundhogActivity.activityLocker.notifyAll()
             }
         }
-
         if (gViewPause) {
             // GameView in pause status
             synchronized(gViewLocker) {
@@ -364,6 +364,7 @@ class GameView(
     }
 
     fun stopThreads() {
+        Log.d(TAG, "stopThreads")
         var retry: Boolean
         val mGH = mGHogRandomTh ?: return
         val mGD = mGDrawTh ?: return
@@ -389,24 +390,24 @@ class GameView(
                 retry = false
             } catch (ex: InterruptedException) {
                 Log.e(TAG, "stopThreads.Exception: ", ex)
-            } // continue processing until the thread ends
+            }
         }
 
         mGT.setKeepRunning(false) // stop the gameTimerThread
         retry = true
         while (retry) {
             try {
-                mGT.join()
                 Log.d(TAG, "gameTimerThread.Join()")
+                mGT.join()
                 retry = false
             } catch (ex: InterruptedException) {
                 Log.e(TAG, "stopThreads.Exception: ", ex)
-            } // continue processing until the thread ends
+            }
         }
     }
 
     fun releaseResources() {
-        Log.d(TAG, "releaseResources() is called.")
+        Log.d(TAG, "releaseResources")
         mSNDPoolUtil.release() // release SoundPool
     }
 
@@ -509,7 +510,7 @@ class GameView(
             scoreString += String.format(Locale.ENGLISH, "%04d", mNumOfHits)
             mIO.write(Constants.TWO_PLAY_GAME_SCORE_RECEIVED, scoreString)
             mActivity.lifecycleScope.launch(Dispatchers.Main) {
-                mActivity.disableAllButtons()
+                // mActivity.disableAllButtons()
                 if (isOpposPlayerLeft) {
                     // opposite player has left game then show result
                     mOpposCurrentScore = 0

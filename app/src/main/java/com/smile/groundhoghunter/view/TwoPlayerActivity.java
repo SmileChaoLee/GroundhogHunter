@@ -130,7 +130,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
         buttonLp.rightMargin = buttonLeftMargin;
         buttonLp.bottomMargin = buttonTopMargin;
         createGameButton.setOnClickListener(view -> {
-            // Host game. Turn on Bluetooth and make this device visible to others
+            Log.d(TAG, "createGameButton.setOnClickListener");
             if (playerName.isEmpty()) {
                 ScreenUtil.showToast(TwoPlayerActivity.this,
                         playerNameCannotBeEmptyString, toastTextSize, Toast.LENGTH_SHORT);
@@ -138,6 +138,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
             }
             Intent gameIntent;
             if (mediaType == GameView.BT_MEDIA_TYPE) {
+                Log.d(TAG, "createGameButton.setOnClickListener.BtCreateGameActivity");
                 gameIntent = new Intent(TwoPlayerActivity.this,
                         BtCreateGameActivity.class);
                 gameIntent.putExtra(Constants.PLAYER_NAME, playerName);
@@ -155,6 +156,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
         buttonLp.rightMargin = buttonLeftMargin;
         buttonLp.bottomMargin = buttonTopMargin;
         joinGameButton.setOnClickListener(view -> {
+            Log.d(TAG, "joinGameButton.setOnClickListener");
             if (playerName.isEmpty()) {
                 ScreenUtil.showToast(TwoPlayerActivity.this,
                         playerNameCannotBeEmptyString, toastTextSize, Toast.LENGTH_SHORT);
@@ -162,6 +164,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
             }
             Intent gameIntent;
             if (mediaType == GameView.BT_MEDIA_TYPE) {
+                Log.d(TAG, "joinGameButton.setOnClickListener.BtJoinGameActivity");
                 gameIntent = new Intent(TwoPlayerActivity.this,
                         BtJoinGameActivity.class);
                 gameIntent.putExtra(Constants.PLAYER_NAME, playerName);

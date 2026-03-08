@@ -9,8 +9,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
@@ -36,6 +37,7 @@ import java.util.LinkedHashMap;
 public class CreateGameActivity extends AppCompatActivity {
 
     private static final String TAG ="CreateGameAct";
+    protected static final int MSG_DURATION = 1000;    // 1 seconds
     private String oppositePlayerName;
     private LinkedHashMap<String, String> oppositePlayerNameMap;
     private String playerNameCannotBeEmptyString;
@@ -45,15 +47,13 @@ public class CreateGameActivity extends AppCompatActivity {
     private String clientLeftGameString;
     private String noOppositePlayerString;
     private TwoPlayerListAdapter twoPlayerListAdapter;
-
-    protected static final int MessageDuration = 1000;    // 1 seconds
-
     protected String playerName;
     protected MessageShowingUtil showMessage;
     protected Handler createGameHandler;
     protected HashMap<String, IoFunctionThread> ioFunctionThreadMap;
     protected ServerAcceptThread mServerAcceptThread;
     protected IoFunctionThread selectedIoFunctionThread;
+    protected ActivityResultLauncher<Intent> hostGameLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +85,22 @@ public class CreateGameActivity extends AppCompatActivity {
         int colorDarkRed = ContextCompat.getColor(this, R.color.darkRed);
         int colorDarkGreen = ContextCompat.getColor(this, R.color.darkGreen);
         int colorBlue = Color.BLUE;
+
+        hostGameLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    int resultCode = result.getResultCode();
+                    Log.d(TAG, "hostGameLauncher.resultCode = " + resultCode);
+                    Log.d(TAG, "hostGameLauncher.Came back from BtHostGameActivity.");
+                    oppositePlayerName = "";
+                    oppositePlayerNameMap = new LinkedHashMap<>();
+                    mServerAcceptThread = null;
+                    ioFunctionThreadMap = new HashMap<>();
+                    selectedIoFunctionThread = null;
+                    // update list view
+                    ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
+                    twoPlayerListAdapter.updateData(oppNameList);
+                });
 
         super.onCreate(savedInstanceState);
 
@@ -147,11 +163,11 @@ public class CreateGameActivity extends AppCompatActivity {
         startCreateGameButton.setImageBitmap(startCreateGameBitmap);
         startCreateGameButton.setOnClickListener(view -> {
             if (playerName.isEmpty()) {
-                showMessage.showMessageInTextView(playerNameCannotBeEmptyString, MessageDuration);
+                showMessage.showMessageInTextView(playerNameCannotBeEmptyString, MSG_DURATION);
                 return;
             }
             if (oppositePlayerName.isEmpty()) {
-                showMessage.showMessageInTextView(noOppositePlayerString, MessageDuration);
+                showMessage.showMessageInTextView(noOppositePlayerString, MSG_DURATION);
                 return;
             }
             // Notify client to start game
@@ -185,43 +201,20 @@ public class CreateGameActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "CreateGameActivity --> Came back from BtHostGameActivity.");
-
-        if (requestCode == Constants.TWO_PLAY_GAME_BY_HOST) {
-            oppositePlayerName = "";
-            oppositePlayerNameMap = new LinkedHashMap<>();
-            mServerAcceptThread = null;
-            ioFunctionThreadMap = new HashMap<>();
-            selectedIoFunctionThread = null;
-            // update list view
-            ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
-            twoPlayerListAdapter.updateData(oppNameList);
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
 
         hostLeavingNotification();
-
         oppositePlayerNameMap.clear();
         oppositePlayerNameMap = null;
-
         stopServerAcceptThread();
-
         ArrayList<IoFunctionThread> threadList = new ArrayList<>(ioFunctionThreadMap.values());
         ConnectDeviceUtil.stopIoFunctionThreads(threadList);
         ioFunctionThreadMap.clear();
         ioFunctionThreadMap = null;
-
         selectedIoFunctionThread = null;
-
         twoPlayerListAdapter.clear();
         twoPlayerListAdapter = null;
-
         if (createGameHandler != null) {
             createGameHandler.removeCallbacksAndMessages(null);
             createGameHandler = null;
@@ -229,32 +222,25 @@ public class CreateGameActivity extends AppCompatActivity {
     }
 
     protected void returnToPrevious() {
-
         // if it Still is connecting to other device
         // then notify the other device leaving
-
         finish();
     }
 
     protected void startDiscoverability() {
-
         hostLeavingNotification();
-
         stopServerAcceptThread();
-
         ArrayList<IoFunctionThread> threadList = new ArrayList<>(ioFunctionThreadMap.values());
         ConnectDeviceUtil.stopIoFunctionThreads(threadList);
         ioFunctionThreadMap.clear();
-
         createGameHandler.removeCallbacksAndMessages(null); // added on 2019-05-14
-
         oppositePlayerNameMap.clear();
         twoPlayerListAdapter.clear();
         twoPlayerListAdapter.notifyDataSetChanged();
     }
 
     protected void startHostGame() {
-
+        Log.d(TAG, "startHostGame.do nothing");
     }
 
     private void hostLeavingNotification() {
@@ -290,25 +276,26 @@ public class CreateGameActivity extends AppCompatActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             // super.handleMessage(msg);
+            Bundle data = msg.getData();
+            Log.d(TAG, "handleMessage.Message = " + msg.what);
             String megString;
             String deviceName;
             String remoteMacAddress;
-            ConnectDevice connectDevice;
             IoFunctionThread ioFunctionThread;
-            Bundle data = msg.getData();
-
+            ConnectDevice connectDevice;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
+            } else {
+                connectDevice = data.getParcelable("ConnectDevice");
+            }
             switch (msg.what) {
                 case Constants.OPPOS_PLAYER_NAME_READ:
+                    Log.d(TAG, "handleMessage.OPPOS_PLAYER_NAME_READ");
                     megString = "has been read.";
                     String oppositeName = data.getString("OppositePlayerName");
                     megString = oppositeName + " " + megString;
                     Log.d(TAG, megString);
-                    showMessage.showMessageInTextView(megString, MessageDuration);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
-                    } else {
-                        connectDevice = data.getParcelable("ConnectDevice");
-                    }
+                    showMessage.showMessageInTextView(megString, MSG_DURATION);
                     remoteMacAddress = "";
                     if (connectDevice != null) {
                         remoteMacAddress = connectDevice.getAddress();
@@ -331,20 +318,17 @@ public class CreateGameActivity extends AppCompatActivity {
                     }
                     break;
                 case Constants.SER_ACCEPT_TH_NO_SER_SOCKET:
-                    showMessage.showMessageInTextView(cannotCreateServerSocketString, MessageDuration);
+                    Log.d(TAG, "handleMessage.SER_ACCEPT_TH_NO_SER_SOCKET");
+                    showMessage.showMessageInTextView(cannotCreateServerSocketString, MSG_DURATION);
                     break;
                 case Constants.SER_ACCEPT_TH_CONNECTED:
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
-                    } else {
-                        connectDevice = data.getParcelable("ConnectDevice");
-                    }
+                    Log.d(TAG, "handleMessage.SER_ACCEPT_TH_CONNECTED");
                     if (connectDevice == null) break;
                     deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
                     remoteMacAddress = connectDevice.getAddress();
                     megString = serverAcceptedConnectionString + "(" + deviceName+ ")";
                     Log.d(TAG, megString);
-                    showMessage.showMessageInTextView(serverAcceptedConnectionString, MessageDuration);
+                    showMessage.showMessageInTextView(serverAcceptedConnectionString, MSG_DURATION);
                     // start reading data from the other device and writing data to the other device
                     ioFunctionThread = mServerAcceptThread.getIoFunctionThread(connectDevice);
                     ioFunctionThread.setStartRead(true);    // start reading data
@@ -353,14 +337,11 @@ public class CreateGameActivity extends AppCompatActivity {
                     }
                     break;
                 case Constants.SER_ACCEPT_TH_STOPPED:
-                    showMessage.showMessageInTextView(waitingStoppedCancelledString, MessageDuration);
+                    Log.d(TAG, "handleMessage.SER_ACCEPT_TH_STOPPED");
+                    showMessage.showMessageInTextView(waitingStoppedCancelledString, MSG_DURATION);
                     break;
                 case Constants.TWO_PLAY_CLIENT_EX_CODE:
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
-                    } else {
-                        connectDevice = data.getParcelable("ConnectDevice");
-                    }
+                    Log.d(TAG, "handleMessage.TWO_PLAY_CLIENT_EX_CODE");
                     if (connectDevice == null) break;
                     remoteMacAddress = connectDevice.getAddress();
                     ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
@@ -368,7 +349,7 @@ public class CreateGameActivity extends AppCompatActivity {
                     ioFunctionThread.setStartRead(true);    // start reading data
                     // remove the remote connected device from oppositePlayerNameList
                     if (oppositePlayerNameMap.containsKey(remoteMacAddress)) {
-                        showMessage.showMessageInTextView(clientLeftGameString, MessageDuration);
+                        showMessage.showMessageInTextView(clientLeftGameString, MSG_DURATION);
                         // added on 2019-06-08 to fix bugs
                         String removedOppName = oppositePlayerNameMap.get(remoteMacAddress);
                         if (removedOppName != null){
@@ -385,12 +366,7 @@ public class CreateGameActivity extends AppCompatActivity {
                     twoPlayerListAdapter.updateData(oppNameList);
                     break;
                 case Constants.TWO_PLAY_DEF_READ:
-                    Log.d(TAG, "Default reading.");
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
-                    } else {
-                        connectDevice = data.getParcelable("ConnectDevice");
-                    }
+                    Log.d(TAG, "handleMessage.TWO_PLAY_DEF_READ");
                     if (connectDevice != null) {
                         remoteMacAddress = connectDevice.getAddress();
                         // read the next data
