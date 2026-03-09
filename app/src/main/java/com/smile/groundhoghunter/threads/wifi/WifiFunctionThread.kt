@@ -47,7 +47,7 @@ class WifiFunctionThread(handler: Handler, private val mSocket: Socket) : IoFunc
                 while (!startRead) {
                     try {
                         Log.d(TAG, "run().Waiting for notification to read data.")
-                        ioFunctionThread.wait()
+                        (ioFunctionThread as java.lang.Object).wait()
                     } catch (ex: InterruptedException) {
                         ex.printStackTrace()
                     }
