@@ -51,6 +51,8 @@ class WifiJoinGameActivity : JoinGameActivity() {
         }
 
         super.onCreate(savedInstanceState)
+
+        joinGameTitleTextView?.text = getString(R.string.joinWifiDirectGameString)
     }
 
     override fun onResume() {

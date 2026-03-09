@@ -102,7 +102,10 @@
     <string name="wifiDirectNotEnabledString">Wi-Fi直連未啟用</string>
     <string name="wifiDirectVisibilityActiveString">Wi-Fi直連探索可用</string>
     <string name="wifiDirectCannotStartString">Wi-Fi直連無法被啟用</string>
+    <string name="wifiDirectScanStartedString">Wi-Fi直連探索已啟用</string>
+    <string name="wifiDirectScanFinishedString">Wi-Fi直連探索已結束</string>
     <string name="createWifiDirectGameString">建立Wi-Fi直連遊戲</string>
+    <string name="joinWifiDirectGameString">加入Wi-Fi直連遊戲</string>
 
     <string name="companyNameString">微笑資訊有限公司</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>

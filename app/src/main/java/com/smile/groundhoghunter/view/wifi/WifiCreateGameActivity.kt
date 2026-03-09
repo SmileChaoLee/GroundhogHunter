@@ -37,6 +37,8 @@ class WifiCreateGameActivity : CreateGameActivity() {
         mWifiDirectReceiver = WifiDirectBroadcastReceiver()
 
         super.onCreate(savedInstanceState)
+
+        createGameTitleTextView?.text = getString(R.string.createWifiDirectGameString)
     }
 
     override fun onResume() {

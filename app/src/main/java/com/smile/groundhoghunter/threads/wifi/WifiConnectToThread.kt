@@ -37,7 +37,7 @@ class WifiConnectToThread(
     }
 
     override fun run() {
-        val msg: Message
+        var msg: Message
         val data = Bundle()
         data.putParcelable("ConnectDevice", wifiConnectDevice)
 
@@ -48,18 +48,19 @@ class WifiConnectToThread(
             return
         }
 
+        val socket = mSocket!!
         try {
             Log.d(TAG, "run().Started to connect to host: ${hostAddress.hostAddress}:$port")
-            mSocket!!.connect(InetSocketAddress(hostAddress, port), CONNECT_TIMEOUT_MS)
+            socket.connect(InetSocketAddress(hostAddress, port), CONNECT_TIMEOUT_MS)
             Log.d(TAG, "run().Connected to host.")
-            wifiFunctionThread = WifiFunctionThread(mHandler, mSocket!!)
+            wifiFunctionThread = WifiFunctionThread(mHandler, socket)
             wifiFunctionThread!!.start()
             msg = mHandler.obtainMessage(Constants.CL_CONN_TO_TH_CONNECTED)
         } catch (ex: Exception) {
             Log.e(TAG, "run().Failed to connect.", ex)
             msg = mHandler.obtainMessage(Constants.CL_CONN_TO_TH_FAILED_CONNECT)
             try {
-                mSocket!!.close()
+                socket.close()
             } catch (closeEx: Exception) {
                 Log.e(TAG, "run().close socket exception", closeEx)
             }
