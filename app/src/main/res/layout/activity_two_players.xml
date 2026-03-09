@@ -55,7 +55,7 @@
                 android:textColor="@color/blue"
                 android:textAllCaps="false"
                 android:textStyle="normal"
-                android:text="@string/internetString"
+                android:text="@string/wifiString"
                 android:enabled="true"
                 android:visibility="visible">
             </androidx.appcompat.widget.AppCompatRadioButton>

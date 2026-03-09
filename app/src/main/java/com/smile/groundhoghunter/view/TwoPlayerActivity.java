@@ -50,7 +50,6 @@ public class TwoPlayerActivity extends AppCompatActivity {
     private int mediaType;
     private EditText playerNameEditText;
     private String playerName;
-    private String playerNameCannotBeEmptyString;
     private String btDeviceName;
     private String thisDeviceName;
 
@@ -58,8 +57,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         float textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
         toastTextSize = textFontSize * 0.8f;
-        // String bluetoothNotSupportedString = getString(R.string.bluetoothNotSupportedString);
-        playerNameCannotBeEmptyString = getString(R.string.playerNameCannotBeEmptyString);
+        String playerNameCannotBeEmptyString = getString(R.string.playerNameCannotBeEmptyString);
         int colorDarkRed = ContextCompat.getColor(this, R.color.darkRed);
         int colorDarkGreen = ContextCompat.getColor(this, R.color.darkGreen);
 
@@ -87,7 +85,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
             setPlayerName();
         });
         AppCompatRadioButton wifiRadioButton = findViewById(R.id.wifiRadioButton);
-        wifiRadioButton.setVisibility(View.GONE);
+        wifiRadioButton.setVisibility(View.VISIBLE);
         ScreenUtil.resizeTextSize(wifiRadioButton, textFontSize);
         wifiRadioButton.setChecked(false);
         wifiRadioButton.setOnClickListener(view -> {

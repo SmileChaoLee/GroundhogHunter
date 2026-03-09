@@ -36,7 +36,7 @@ public class BluetoothUtil {
         return deviceName;
     }
 
-    @RequiresPermission(allOf = {Manifest.permission.BLUETOOTH_CONNECT, "android.permission.LOCAL_MAC_ADDRESS"})
+    @RequiresPermission(allOf = {Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN})
     public static String getBluetoothDeviceName(BluetoothAdapter mBluetoothAdapter) {
         String deviceName = mBluetoothAdapter.getName();
         // mBluetoothAdapter.getAddress() is deprecated and restricted.
