@@ -1,8 +1,5 @@
 package com.smile.groundhoghunter.view.wifi
 
-// TODO: Register WifiCreateGameActivity and WifiHostGameActivity in AndroidManifest.xml,
-//  and add ACCESS_WIFI_STATE and CHANGE_WIFI_STATE permissions for Wi-Fi Direct.
-
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent

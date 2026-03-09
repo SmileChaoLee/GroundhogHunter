@@ -38,6 +38,7 @@ import com.smile.groundhoghunter.view.bluetooth.BtJoinGameActivity;
 import com.smile.groundhoghunter.utilities.BluetoothUtil;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.groundhoghunter.view.wifi.WifiCreateGameActivity;
+import com.smile.groundhoghunter.view.wifi.WifiJoinGameActivity;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.smilelibraries.utilities.ScreenUtil;
@@ -174,8 +175,9 @@ public class TwoPlayerActivity extends AppCompatActivity {
                 gameIntent = new Intent(TwoPlayerActivity.this,
                         BtJoinGameActivity.class);
             } else if (mediaType == GameView.WIFI_MEDIA_TYPE) {
-                // gameIntent = new Intent(TwoPlayerActivity.this,
-                //         WifiJoinGameActivity.class);
+                Log.d(TAG, "joinGameButton.setOnClickListener.WifiJoinGameActivity");
+                gameIntent = new Intent(TwoPlayerActivity.this,
+                        WifiJoinGameActivity.class);
             }
             assert gameIntent != null;
             gameIntent.putExtra(Constants.PLAYER_NAME, playerName);
