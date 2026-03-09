@@ -37,6 +37,7 @@ import com.smile.groundhoghunter.view.bluetooth.BtCreateGameActivity;
 import com.smile.groundhoghunter.view.bluetooth.BtJoinGameActivity;
 import com.smile.groundhoghunter.utilities.BluetoothUtil;
 import com.smile.groundhoghunter.constants.Constants;
+import com.smile.groundhoghunter.view.wifi.WifiCreateGameActivity;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.smilelibraries.utilities.ScreenUtil;
@@ -87,7 +88,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
             setPlayerName();
         });
         AppCompatRadioButton wifiRadioButton = findViewById(R.id.wifiRadioButton);
-        wifiRadioButton.setVisibility(View.GONE);
+        wifiRadioButton.setVisibility(View.VISIBLE);
         ScreenUtil.resizeTextSize(wifiRadioButton, textFontSize);
         wifiRadioButton.setChecked(false);
         wifiRadioButton.setOnClickListener(view -> {
@@ -136,14 +137,19 @@ public class TwoPlayerActivity extends AppCompatActivity {
                         playerNameCannotBeEmptyString, toastTextSize, Toast.LENGTH_SHORT);
                 return;
             }
-            Intent gameIntent;
+            Intent gameIntent = null;
             if (mediaType == GameView.BT_MEDIA_TYPE) {
                 Log.d(TAG, "createGameButton.setOnClickListener.BtCreateGameActivity");
                 gameIntent = new Intent(TwoPlayerActivity.this,
                         BtCreateGameActivity.class);
-                gameIntent.putExtra(Constants.PLAYER_NAME, playerName);
-                startActivity(gameIntent);
+            } else if (mediaType == GameView.WIFI_MEDIA_TYPE) {
+                Log.d(TAG, "createGameButton.setOnClickListener.WifiCreateGameActivity");
+                gameIntent = new Intent(TwoPlayerActivity.this,
+                        WifiCreateGameActivity.class);
             }
+            assert gameIntent != null;
+            gameIntent.putExtra(Constants.PLAYER_NAME, playerName);
+            startActivity(gameIntent);
         });
 
         final SmileImageButton joinGameButton = findViewById(R.id.joinTwoPlayerGameButton);
@@ -162,14 +168,18 @@ public class TwoPlayerActivity extends AppCompatActivity {
                         playerNameCannotBeEmptyString, toastTextSize, Toast.LENGTH_SHORT);
                 return;
             }
-            Intent gameIntent;
+            Intent gameIntent = null;
             if (mediaType == GameView.BT_MEDIA_TYPE) {
                 Log.d(TAG, "joinGameButton.setOnClickListener.BtJoinGameActivity");
                 gameIntent = new Intent(TwoPlayerActivity.this,
                         BtJoinGameActivity.class);
-                gameIntent.putExtra(Constants.PLAYER_NAME, playerName);
-                startActivity(gameIntent);
+            } else if (mediaType == GameView.WIFI_MEDIA_TYPE) {
+                // gameIntent = new Intent(TwoPlayerActivity.this,
+                //         WifiJoinGameActivity.class);
             }
+            assert gameIntent != null;
+            gameIntent.putExtra(Constants.PLAYER_NAME, playerName);
+            startActivity(gameIntent);
         });
 
         final SmileImageButton cancelButton = findViewById(R.id.exitTwoPlayerActivityButton);
