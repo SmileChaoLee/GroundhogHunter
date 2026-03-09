@@ -95,6 +95,8 @@ public class BtCreateGameActivity extends CreateGameActivity {
                 });
 
         super.onCreate(savedInstanceState);
+
+        createGameTitleTextView.setText(getString(R.string.createBluetoothGameString));
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)

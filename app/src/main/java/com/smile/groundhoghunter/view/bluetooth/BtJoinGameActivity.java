@@ -87,7 +87,10 @@ public class BtJoinGameActivity extends JoinGameActivity {
                     }
                 }
         );
+
         super.onCreate(savedInstanceState);
+
+        joinGameTitleTextView.setText(getString(R.string.joinBluetoothGameString));
     }
 
     @RequiresPermission(allOf = {Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT})

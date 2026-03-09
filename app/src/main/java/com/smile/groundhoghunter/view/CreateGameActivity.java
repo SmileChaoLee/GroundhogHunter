@@ -38,6 +38,7 @@ public class CreateGameActivity extends AppCompatActivity {
 
     private static final String TAG ="CreateGameAct";
     protected static final int MSG_DURATION = 1000;    // 1 seconds
+    protected TextView createGameTitleTextView;
     private String oppositePlayerName;
     private LinkedHashMap<String, String> oppositePlayerNameMap;
     private String playerNameCannotBeEmptyString;
@@ -111,7 +112,7 @@ public class CreateGameActivity extends AppCompatActivity {
         ScreenUtil.resizeTextSize(toastMessageTextView, toastTextSize);
         showMessage = new MessageShowingUtil(this, toastMessageTextView);
 
-        TextView createGameTitleTextView = findViewById(R.id.createGameTitleTextView);
+        createGameTitleTextView = findViewById(R.id.createGameTitleTextView);
         createGameTitleTextView.setText(getString(R.string.createBluetoothGameString));
         ScreenUtil.resizeTextSize(createGameTitleTextView, textFontSize * 1.2f);
 

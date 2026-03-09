@@ -42,6 +42,7 @@ public class JoinGameActivity extends AppCompatActivity {
     // 20 seconds one time
     private static final int DURATION_BT_DISCOVER = 20000;
     protected static final int MSG_DURATION = 1000;    // 1 second
+    protected TextView joinGameTitleTextView;
     private String oppositePlayerName;
     private LinkedHashMap<String, String> oppositePlayerNameMap;
     private String cannotCreateClientSocketString;
@@ -116,7 +117,7 @@ public class JoinGameActivity extends AppCompatActivity {
         ScreenUtil.resizeTextSize(toastMessageTextView, toastTextSize);
         showMessage = new MessageShowingUtil(this, toastMessageTextView);
 
-        TextView joinGameTitleTextView = findViewById(R.id.joinGameTitleTextView);
+        joinGameTitleTextView = findViewById(R.id.joinGameTitleTextView);
         joinGameTitleTextView.setText(getString(R.string.joinBluetoothGameString));
         ScreenUtil.resizeTextSize(joinGameTitleTextView, textFontSize * 1.2f);
 

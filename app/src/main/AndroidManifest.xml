@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -13,6 +14,13 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- Required for Wi-Fi Direct -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <!-- Required for Wi-Fi Direct peer discovery on Android 13+ (API 33+) -->
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" />
 
     <application
         android:name=".GHogHunterApp"
@@ -67,6 +75,22 @@
 
         <activity
             android:name=".view.JoinGameActivity">
+        </activity>
+
+        <activity
+            android:name=".view.wifi.WifiCreateGameActivity">
+        </activity>
+
+        <activity
+            android:name=".view.wifi.WifiJoinGameActivity">
+        </activity>
+
+        <activity
+            android:name=".view.wifi.WifiHostGameActivity">
+        </activity>
+
+        <activity
+            android:name=".view.wifi.WifiClientGameActivity">
         </activity>
 
         <activity
