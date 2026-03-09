@@ -97,6 +97,11 @@
     <string name="gameCreatorString">Creator</string>
     <string name="gameJoinerString">Joiner</string>
 
+    <string name="wifiDirectNotEnabledString">Wi-Fi Direct is not enabled.</string>
+    <string name="wifiDirectVisibilityActiveString">Wi-Fi Direct peer discovery is active.</string>
+    <string name="wifiDirectCannotStartString">Wi-Fi Direct peer discovery cannot be started.</string>
+    <string name="createWifiDirectGameString">Create Wi-Fi Direct Game</string>
+
     <string name="companyNameString">Smile Information Inc.</string>
     <string name="companyContactEmailString">leechao1959@gmail.com</string>
 
