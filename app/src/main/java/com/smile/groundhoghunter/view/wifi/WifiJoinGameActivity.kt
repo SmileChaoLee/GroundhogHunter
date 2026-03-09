@@ -1,5 +1,6 @@
 package com.smile.groundhoghunter.view.wifi
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -9,6 +10,7 @@ import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import com.smile.groundhoghunter.R
 import com.smile.groundhoghunter.constants.Constants
 import com.smile.groundhoghunter.models.WifiConnectDevice
@@ -37,7 +39,7 @@ class WifiJoinGameActivity : JoinGameActivity() {
         wifiDirectScanStartedString = getString(R.string.wifiDirectScanStartedString)
         foundDeviceString = getString(R.string.foundDeviceString)
 
-        mWifiP2pManager = getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
+        mWifiP2pManager = getSystemService(WIFI_P2P_SERVICE) as WifiP2pManager
         mChannel = mWifiP2pManager.initialize(this, mainLooper, null)
 
         mWifiDirectReceiver = WifiDirectBroadcastReceiver()
@@ -76,6 +78,7 @@ class WifiJoinGameActivity : JoinGameActivity() {
         mWifiP2pManager.removeGroup(mChannel, null)
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
     override fun startDiscovery() {
         super.startDiscovery()
         connectingPeers.clear()
@@ -100,6 +103,7 @@ class WifiJoinGameActivity : JoinGameActivity() {
         clientGameLauncher.launch(gameIntent)
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
     private fun connectToPeer(peer: WifiP2pDevice) {
         val config = WifiP2pConfig().apply {
             deviceAddress = peer.deviceAddress
@@ -117,6 +121,7 @@ class WifiJoinGameActivity : JoinGameActivity() {
     }
 
     private inner class WifiDirectBroadcastReceiver : BroadcastReceiver() {
+        @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
         override fun onReceive(context: Context, intent: Intent?) {
             if (intent == null) return
             when (intent.action) {

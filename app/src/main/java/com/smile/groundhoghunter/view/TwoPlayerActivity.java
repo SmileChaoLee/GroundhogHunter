@@ -47,8 +47,11 @@ public class TwoPlayerActivity extends AppCompatActivity {
 
     private static final String TAG = "TwoPlayerAct";
     private static final int REQUEST_BLUETOOTH_PERMISSIONS = 101;
+    private static final int REQUEST_NEARBY_WIFI_PERMISSIONS = 102;
     private boolean isBluetoothPermitted = false;
     private float toastTextSize;
+    private AppCompatRadioButton btRadioButton;
+    private AppCompatRadioButton wifiRadioButton;
     private int mediaType;
     private EditText playerNameEditText;
     private String playerName;
@@ -77,7 +80,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
 
         btDeviceName = "";
         mediaType = GameView.BT_MEDIA_TYPE;
-        AppCompatRadioButton btRadioButton = findViewById(R.id.bluetoothRadioButton);
+        btRadioButton = findViewById(R.id.bluetoothRadioButton);
         btRadioButton.setVisibility(View.VISIBLE);
         ScreenUtil.resizeTextSize(btRadioButton, textFontSize);
         btRadioButton.setChecked(true);
@@ -88,7 +91,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
             thisDeviceName = btDeviceName;
             setPlayerName();
         });
-        AppCompatRadioButton wifiRadioButton = findViewById(R.id.wifiRadioButton);
+        wifiRadioButton = findViewById(R.id.wifiRadioButton);
         wifiRadioButton.setVisibility(View.VISIBLE);
         ScreenUtil.resizeTextSize(wifiRadioButton, textFontSize);
         wifiRadioButton.setChecked(false);
@@ -98,6 +101,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
             mediaType = GameView.WIFI_MEDIA_TYPE;
             thisDeviceName = btDeviceName;
             setPlayerName();
+            askNearbyWifiDevicesPermission();
         });
 
         TextView playerNameStringTextView = findViewById(R.id.playerNameStringTextView);
@@ -264,6 +268,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
         }
         isBluetoothPermitted = true;
         initBluetooth();
+        askNearbyWifiDevicesPermission();
     }
 
     private void initBluetooth() {
@@ -312,6 +317,22 @@ public class TwoPlayerActivity extends AppCompatActivity {
         }
     }
 
+    private void askNearbyWifiDevicesPermission() {
+        String logStr = "askNearbyWifiDevicesPermission";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, logStr + ".checkSelfPermission.NEARBY_WIFI_DEVICES.not PERMISSION_GRANTED");
+                boolean shouldShow = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NEARBY_WIFI_DEVICES);
+                Log.d(TAG, logStr + ".shouldShow=" + shouldShow);
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.NEARBY_WIFI_DEVICES},
+                        REQUEST_NEARBY_WIFI_PERMISSIONS);
+            } else {
+                Log.d(TAG, logStr + ".checkSelfPermission.NEARBY_WIFI_DEVICES.already GRANTED");
+            }
+        }
+    }
+
     // Handle the user's response to the permission popup
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -331,11 +352,28 @@ public class TwoPlayerActivity extends AppCompatActivity {
             Log.d(TAG, logStr + ".isBluetoothPermitted = " + isBluetoothPermitted);
             if (isBluetoothPermitted) {
                 initBluetooth();
+                askNearbyWifiDevicesPermission();
             } else {
                 ScreenUtil.showToast(this,
                         "Bluetooth permissions are required for multiplayer.",
                         toastTextSize, Toast.LENGTH_SHORT);
                 returnToPrevious(); // unable to do 2 players
+            }
+        } else if (requestCode == REQUEST_NEARBY_WIFI_PERMISSIONS) {
+            boolean isNearbyWifiPermitted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    isNearbyWifiPermitted = false;
+                    break;
+                }
+            }
+            Log.d(TAG, logStr + ".isNearbyWifiPermitted = " + isNearbyWifiPermitted);
+            if (!isNearbyWifiPermitted) {
+                ScreenUtil.showToast(this,
+                        "NEARBY_WIFI_DEVICES permission is required for multiplayer.",
+                        toastTextSize, Toast.LENGTH_SHORT);
+                // fallback to Bluetooth
+                btRadioButton.callOnClick();
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.smile.groundhoghunter.view.wifi
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -7,6 +8,7 @@ import android.content.IntentFilter
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import com.smile.groundhoghunter.R
 import com.smile.groundhoghunter.constants.Constants
 import com.smile.groundhoghunter.threads.wifi.WifiAcceptThread
@@ -31,7 +33,7 @@ class WifiCreateGameActivity : CreateGameActivity() {
         wifiDirectVisibilityActiveString = getString(R.string.wifiDirectVisibilityActiveString)
         wifiDirectCannotStartString = getString(R.string.wifiDirectCannotStartString)
 
-        mWifiP2pManager = getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
+        mWifiP2pManager = getSystemService(WIFI_P2P_SERVICE) as WifiP2pManager
         mChannel = mWifiP2pManager.initialize(this, mainLooper, null)
 
         mWifiDirectReceiver = WifiDirectBroadcastReceiver()
@@ -61,6 +63,7 @@ class WifiCreateGameActivity : CreateGameActivity() {
         mWifiP2pManager.removeGroup(mChannel, null)
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
     override fun startDiscoverability() {
         super.startDiscoverability()
         mWifiP2pManager.discoverPeers(mChannel, object : WifiP2pManager.ActionListener {
