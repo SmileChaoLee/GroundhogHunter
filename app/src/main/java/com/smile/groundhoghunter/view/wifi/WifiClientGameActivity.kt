@@ -17,8 +17,8 @@ class WifiClientGameActivity : ClientGameActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate() is called.")
         super.onCreate(savedInstanceState)
-        if (selectedIoFuncThread != null) {
-            selectedWifiFunctionThread = selectedIoFuncThread as WifiFunctionThread
+        if (mIoFuncThread != null) {
+            selectedWifiFunctionThread = mIoFuncThread as WifiFunctionThread
             selectedWifiFunctionThread!!.setStartRead(true)
         } else {
             finish()

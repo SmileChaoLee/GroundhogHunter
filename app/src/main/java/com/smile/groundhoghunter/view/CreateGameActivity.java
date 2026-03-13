@@ -14,8 +14,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
+
 import android.util.Log;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.smile.groundhoghunter.GHogHunterApp;
@@ -30,13 +33,17 @@ import com.smile.groundhoghunter.utilities.MessageShowingUtil;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.smilelibraries.utilities.ScreenUtil;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class CreateGameActivity extends AppCompatActivity {
+public class CreateGameActivity extends AppCompatActivity
+        implements TwoPlayerListAdapter.OnItemClickListener {
 
-    private static final String TAG ="CreateGameAct";
+    private static final String TAG = "CreateGameAct";
     protected static final int MSG_DURATION = 1000;    // 1 seconds
     protected TextView createGameTitleTextView;
     private String oppositePlayerName;
@@ -53,7 +60,7 @@ public class CreateGameActivity extends AppCompatActivity {
     protected Handler createGameHandler;
     protected HashMap<String, IoFunctionThread> ioFunctionThreadMap;
     protected ServerAcceptThread mServerAcceptThread;
-    protected IoFunctionThread selectedIoFunctionThread;
+    protected IoFunctionThread mIoFuncThread;
     protected ActivityResultLauncher<Intent> hostGameLauncher;
 
     @Override
@@ -68,7 +75,7 @@ public class CreateGameActivity extends AppCompatActivity {
         createGameHandler = new CreateGameHandler(Looper.getMainLooper());
         ioFunctionThreadMap = new HashMap<>();
         mServerAcceptThread = null;
-        selectedIoFunctionThread = null;
+        mIoFuncThread = null;
 
         oppositePlayerName = "";    // empty
         oppositePlayerNameMap = new LinkedHashMap<>();
@@ -93,14 +100,16 @@ public class CreateGameActivity extends AppCompatActivity {
                     int resultCode = result.getResultCode();
                     Log.d(TAG, "hostGameLauncher.resultCode = " + resultCode);
                     Log.d(TAG, "hostGameLauncher.Came back from BtHostGameActivity.");
+                    startDiscoverability();
+                    /*
                     oppositePlayerName = "";
                     oppositePlayerNameMap = new LinkedHashMap<>();
                     mServerAcceptThread = null;
                     ioFunctionThreadMap = new HashMap<>();
-                    selectedIoFunctionThread = null;
+                    mIoFuncThread = null;
                     // update list view
-                    ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
-                    twoPlayerListAdapter.updateData(oppNameList);
+                    twoPlayerListAdapter.clear();
+                    */
                 });
 
         super.onCreate(savedInstanceState);
@@ -123,46 +132,28 @@ public class CreateGameActivity extends AppCompatActivity {
         playerNameTextView.setText(playerName);
         ScreenUtil.resizeTextSize(playerNameTextView, textFontSize);
 
-        ListView oppositePlayerNameListView = findViewById(R.id.oppositePlayerNameListView);
-        ArrayList<String> oppNameList = new ArrayList<>();
-        twoPlayerListAdapter = new TwoPlayerListAdapter(this, R.layout.player_list_item_layout, R.id.playerNameTextView, oppNameList, textFontSize);
-        twoPlayerListAdapter.setNotifyOnChange(false);  // do not call notifyDataSetChanged() method automatically
+        RecyclerView oppositePlayerNameListView = findViewById(R.id.oppositePlayerNameListView);
+        twoPlayerListAdapter = new TwoPlayerListAdapter(oppositePlayerNameMap, textFontSize, this);
+        SimpleItemAnimator animator = (SimpleItemAnimator)(oppositePlayerNameListView.getItemAnimator());
+        if (animator != null) {
+            animator.setSupportsChangeAnimations(false);
+        }
+        oppositePlayerNameListView.setLayoutManager(new LinearLayoutManager(this));
         oppositePlayerNameListView.setAdapter(twoPlayerListAdapter);
-        oppositePlayerNameListView.setOnItemClickListener((adapterView,
-                                                           view, position, rowId) -> {
-            if (adapterView != null) {
-                Object item = adapterView.getItemAtPosition(position);
-                if (item != null) {
-                    String temp = item.toString();
-                    Log.d(TAG, "adapterView.getItemAtPosition(position) = " + temp);
-                    oppositePlayerName = temp;
-                    for (String remoteMacAddress : oppositePlayerNameMap.keySet()) {
-                        IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                        if (ioFunctionThread != null) {
-                            String oppName = oppositePlayerNameMap.get(remoteMacAddress);
-                            if (oppName != null && oppName.equals(oppositePlayerName)) {
-                                // found
-                                selectedIoFunctionThread = ioFunctionThread;
-                                view.setSelected(true);
-                            }
-                        }
-                    }
-                }
-            }
-        });
 
         SmileImageButton refreshCreateGameButton = findViewById(R.id.refreshCreateGameButton);
         Bitmap refreshCreateGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.refreshString), colorBlue);
         refreshCreateGameButton.setImageBitmap(refreshCreateGameBitmap);
         refreshCreateGameButton.setOnClickListener(view -> {
+            Log.d(TAG, "refreshCreateGameButton.startDiscoverability()");
             startDiscoverability();
-            Log.d(TAG, "Refresh --> startDiscoverability()");
         });
 
         SmileImageButton startCreateGameButton = findViewById(R.id.startCreateGameButton);
         Bitmap startCreateGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.startString), colorDarkGreen);
         startCreateGameButton.setImageBitmap(startCreateGameBitmap);
         startCreateGameButton.setOnClickListener(view -> {
+            Log.d(TAG, "startCreateGameButton");
             if (playerName.isEmpty()) {
                 showMessage.showMessageInTextView(playerNameCannotBeEmptyString, MSG_DURATION);
                 return;
@@ -172,23 +163,23 @@ public class CreateGameActivity extends AppCompatActivity {
                 return;
             }
             // Notify client to start game
-            if (selectedIoFunctionThread != null) {
-                GHogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
+            Log.d(TAG, "startCreateGameButton.mIoFuncThread = " + mIoFuncThread);
+            if (mIoFuncThread != null) {
+                GHogHunterApp.selectedIoFuncThread = mIoFuncThread;
                 stopServerAcceptThread();
                 for (String remoteMacAddress : ioFunctionThreadMap.keySet()) {
                     IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                    if (ioFunctionThread != null && ioFunctionThread != selectedIoFunctionThread) {
+                    if (ioFunctionThread != null && ioFunctionThread != mIoFuncThread) {
                         ioFunctionThread.write(Constants.TWO_PLAY_HOST_EX_CODE, "");
                         ConnectDeviceUtil.stopIoFunctionThread(ioFunctionThread);
                     }
                 }
                 // clear HashMaps
                 ioFunctionThreadMap.clear();
-                ioFunctionThreadMap = null;
                 oppositePlayerNameMap.clear();
-                oppositePlayerNameMap = null;
                 createGameHandler.removeCallbacksAndMessages(null);
-                selectedIoFunctionThread.write(Constants.TWO_PLAY_HOST_ST_GAME, "");
+                Log.d(TAG, "startCreateGameButton.mIoFuncThread.write(TWO_PLAY_HOST_ST_GAME)");
+                mIoFuncThread.write(Constants.TWO_PLAY_HOST_ST_GAME, "");
                 startHostGame();
             }
         });
@@ -202,23 +193,34 @@ public class CreateGameActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onItemClick(int position, @NotNull String key, @NotNull String value) {
+        Log.d(TAG, "onItemClick.position = " + position);
+        Log.d(TAG, "onItemClick.key = " + key + ", value = " + value);
+        if (ioFunctionThreadMap == null) return;
+        oppositePlayerName = value;
+        mIoFuncThread = ioFunctionThreadMap.get(key);
+        Log.d(TAG, "onItemClick.mIoFuncThread = " + mIoFuncThread);
+        twoPlayerListAdapter.myNotifyItemChanged(position);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-
         hostLeavingNotification();
-        oppositePlayerNameMap.clear();
-        oppositePlayerNameMap = null;
+        if (oppositePlayerNameMap != null) {
+            oppositePlayerNameMap.clear();
+        }
         stopServerAcceptThread();
-        ArrayList<IoFunctionThread> threadList = new ArrayList<>(ioFunctionThreadMap.values());
-        ConnectDeviceUtil.stopIoFunctionThreads(threadList);
-        ioFunctionThreadMap.clear();
-        ioFunctionThreadMap = null;
-        selectedIoFunctionThread = null;
-        twoPlayerListAdapter.clear();
-        twoPlayerListAdapter = null;
+        if (ioFunctionThreadMap != null) {
+            ArrayList<IoFunctionThread> threadList = new ArrayList<>(ioFunctionThreadMap.values());
+            ConnectDeviceUtil.stopIoFunctionThreads(threadList);
+            ioFunctionThreadMap.clear();
+        }
+        if (twoPlayerListAdapter != null) {
+            twoPlayerListAdapter.clear();
+        }
         if (createGameHandler != null) {
             createGameHandler.removeCallbacksAndMessages(null);
-            createGameHandler = null;
         }
     }
 
@@ -231,13 +233,20 @@ public class CreateGameActivity extends AppCompatActivity {
     protected void startDiscoverability() {
         hostLeavingNotification();
         stopServerAcceptThread();
-        ArrayList<IoFunctionThread> threadList = new ArrayList<>(ioFunctionThreadMap.values());
-        ConnectDeviceUtil.stopIoFunctionThreads(threadList);
-        ioFunctionThreadMap.clear();
-        createGameHandler.removeCallbacksAndMessages(null); // added on 2019-05-14
-        oppositePlayerNameMap.clear();
-        twoPlayerListAdapter.clear();
-        twoPlayerListAdapter.notifyDataSetChanged();
+        if (ioFunctionThreadMap != null) {
+            ArrayList<IoFunctionThread> threadList = new ArrayList<>(ioFunctionThreadMap.values());
+            ConnectDeviceUtil.stopIoFunctionThreads(threadList);
+            ioFunctionThreadMap.clear();
+        }
+        if (createGameHandler != null) {
+            createGameHandler.removeCallbacksAndMessages(null); // added on 2019-05-14
+        }
+        if (oppositePlayerNameMap != null) {
+            oppositePlayerNameMap.clear();
+        }
+        if (twoPlayerListAdapter != null) {
+            twoPlayerListAdapter.clear();
+        }
     }
 
     protected void startHostGame() {
@@ -245,19 +254,22 @@ public class CreateGameActivity extends AppCompatActivity {
     }
 
     private void hostLeavingNotification() {
+        Log.d(TAG, "hostLeavingNotification.ioFunctionThreadMap = " + ioFunctionThreadMap);
+        if (ioFunctionThreadMap == null) return;
         for (IoFunctionThread ioFunctionThread : ioFunctionThreadMap.values()) {
             ioFunctionThread.write(Constants.TWO_PLAY_HOST_EX_CODE, "");
         }
     }
 
     private void stopServerAcceptThread() {
+        Log.d(TAG, "stopServerAcceptThread");
         if (mServerAcceptThread != null) {
             mServerAcceptThread.setKeepRunning(false);
             mServerAcceptThread.closeServerSocket();
             boolean retry = true;
             while (retry) {
                 try {
-                    Log.d(TAG, "stopServerAcceptThread.mServerAcceptThread.Join90");
+                    Log.d(TAG, "stopServerAcceptThread.mServerAcceptThread.Join()");
                     mServerAcceptThread.join();
                     retry = false;
                     mServerAcceptThread = null;
@@ -304,8 +316,7 @@ public class CreateGameActivity extends AppCompatActivity {
                             if (!oppositeName.isEmpty()) {
                                 if (!oppositePlayerNameMap.containsKey(remoteMacAddress)) {
                                     oppositePlayerNameMap.put(remoteMacAddress, oppositeName);
-                                    ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
-                                    twoPlayerListAdapter.updateData(oppNameList);
+                                    twoPlayerListAdapter.addItem(remoteMacAddress, oppositeName);
                                 }
                             }
                         }
@@ -357,14 +368,14 @@ public class CreateGameActivity extends AppCompatActivity {
                             if (removedOppName.equals(oppositePlayerName)) {
                                 // selected client has been removed, then changed to no selection
                                 oppositePlayerName = "";
-                                selectedIoFunctionThread = null;
+                                mIoFuncThread = null;
                             }
                             oppositePlayerNameMap.remove(remoteMacAddress);
                         }
                     }
                     // update list view
-                    ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
-                    twoPlayerListAdapter.updateData(oppNameList);
+                    twoPlayerListAdapter.removeItem(remoteMacAddress);
+
                     break;
                 case Constants.TWO_PLAY_DEF_READ:
                     Log.d(TAG, "handleMessage.TWO_PLAY_DEF_READ");

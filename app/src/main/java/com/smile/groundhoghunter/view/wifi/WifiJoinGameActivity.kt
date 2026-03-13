@@ -57,6 +57,39 @@ class WifiJoinGameActivity : JoinGameActivity() {
         joinGameTitleTextView?.text = getString(R.string.joinWifiDirectGameString)
     }
 
+    override fun onItemClick(position: Int, key: String, value: String) {
+        Log.d(TAG, "onItemClick.position = $position")
+        Log.d(TAG, "onItemClick.key = $key, value = $value")
+        Log.d(TAG, "onItemClick.isDiscoveryFinished = $isDiscoveryFinished")
+        if (!isDiscoveryFinished) {
+            showMessage.showMessageInTextView(
+                getString(R.string.discoverPlayerString),
+                TEMP_MSG_DURATION
+            )
+            return
+        }
+        Log.d(TAG, "onItemClick.isConnectingFinished = $isConnectingFinished")
+        if (!isConnectingFinished) {
+            showMessage.showMessageInTextView(
+                getString(R.string.connectingPlayerString),
+                TEMP_MSG_DURATION
+            )
+            return
+        }
+        val hostAddress = discoveredDeviceMap.get(key)
+        // mClConnToThread = WifiConnectToThread(joinGameHandler, hostAddress, port)
+        Log.d(TAG, "onItemClick.mClConnToThread = $mClConnToThread")
+        if (mClConnToThread != null) {
+            val state = mClConnToThread.state
+            Log.d(TAG, "onItemClick.connectToThread.state = $state")
+            if (state == Thread.State.NEW) {
+                isConnectingFinished = false
+                mClConnToThread.start()
+            }
+        }
+        twoPlayerListAdapter.myNotifyItemChanged(position)
+    }
+
     override fun onResume() {
         super.onResume()
         val intentFilter = IntentFilter().apply {
@@ -85,12 +118,12 @@ class WifiJoinGameActivity : JoinGameActivity() {
         mWifiP2pManager.discoverPeers(mChannel, object : WifiP2pManager.ActionListener {
             override fun onSuccess() {
                 Log.d(TAG, "startDiscovery.discoverPeers.onSuccess")
-                showMessage.showMessageInTextView(wifiDirectScanStartedString, MSG_DURATION)
+                showMessage.showMessageInTextView(wifiDirectScanStartedString, TEMP_MSG_DURATION)
             }
 
             override fun onFailure(reason: Int) {
                 Log.d(TAG, "startDiscovery.discoverPeers.onFailure: reason=$reason")
-                showMessage.showMessageInTextView(wifiDirectNotEnabledString, MSG_DURATION)
+                showMessage.showMessageInTextView(wifiDirectNotEnabledString, TEMP_MSG_DURATION)
             }
         })
     }
@@ -133,7 +166,7 @@ class WifiJoinGameActivity : JoinGameActivity() {
                     } else {
                         Log.d(TAG, "WifiP2p is not enabled")
                         isWifiP2pEnabled = false
-                        showMessage.showMessageInTextView(wifiDirectNotEnabledString, MSG_DURATION)
+                        showMessage.showMessageInTextView(wifiDirectNotEnabledString, TEMP_MSG_DURATION)
                     }
                 }
                 WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {
@@ -147,7 +180,7 @@ class WifiJoinGameActivity : JoinGameActivity() {
                                 connectingPeers.add(peerAddress)
                                 val megString = "$foundDeviceString: ${peer.deviceName}"
                                 Log.d(TAG, megString)
-                                showMessage.showMessageInTextView(megString, MSG_DURATION)
+                                showMessage.showMessageInTextView(megString, TEMP_MSG_DURATION)
                                 connectToPeer(peer)
                             }
                         }
@@ -165,7 +198,8 @@ class WifiJoinGameActivity : JoinGameActivity() {
                                 val connectToThread = WifiConnectToThread(
                                     joinGameHandler, groupOwnerAddress, WifiAcceptThread.WIFI_PORT
                                 )
-                                discoveredDeviceMap[addressKey] = connectToThread
+                                // discoveredDeviceMap[addressKey] = connectToThread
+                                // discoveredDeviceMap[addressKey] = groupOwnerAddress
                                 connectToThread.start()
                             }
                         }

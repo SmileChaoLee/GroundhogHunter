@@ -9,7 +9,7 @@ import android.util.Log;
 
 import androidx.annotation.RequiresPermission;
 
-import com.smile.groundhoghunter.threads.bluetooth.BtFunctionThread;
+import com.smile.groundhoghunter.threads.bluetooth.BtIoFunctionThread;
 import java.util.ArrayList;
 
 public class BluetoothUtil {
@@ -72,13 +72,13 @@ public class BluetoothUtil {
         }
     }
 
-    public static void stopBluetoothFunctionThreads(ArrayList<BtFunctionThread> btFunctionThreadList) {
-        for (BtFunctionThread btFunctionThread : btFunctionThreadList) {
+    public static void stopBluetoothFunctionThreads(ArrayList<BtIoFunctionThread> btFunctionThreadList) {
+        for (BtIoFunctionThread btFunctionThread : btFunctionThreadList) {
             stopBluetoothFunctionThread(btFunctionThread);
         }
     }
 
-    public static void stopBluetoothFunctionThread(BtFunctionThread btFunctionThread) {
+    public static void stopBluetoothFunctionThread(BtIoFunctionThread btFunctionThread) {
         if (btFunctionThread == null) {
             Log.d(TAG, "stopBluetoothFunctionThread.btFunctionThread is null");
             return;

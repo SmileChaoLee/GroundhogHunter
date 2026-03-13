@@ -23,13 +23,11 @@ import com.smile.groundhoghunter.models.BtConnectDevice;
 import com.smile.groundhoghunter.threads.bluetooth.BtConnectToThread;
 import com.smile.groundhoghunter.utilities.BluetoothUtil;
 
+import org.jetbrains.annotations.NotNull;
+
 public class BtJoinGameActivity extends JoinGameActivity {
 
     private static final String TAG = "BtJoinGameAct";
-    private String bluetoothCannotBeTurnedOnString;
-    private String scanBluetoothStartedString;
-    private String scanBluetoothFinishedString;
-    private String foundDeviceString;
     private BtJoinGameBroadcastReceiver btJoinGameReceiver;
     private boolean isDefaultBluetoothEnabled;
     private BluetoothAdapter mBtAdapter;
@@ -56,11 +54,6 @@ public class BtJoinGameActivity extends JoinGameActivity {
         }
         clientConnectDevice = new BtConnectDevice(mBtAdapter);
 
-        bluetoothCannotBeTurnedOnString = getString(R.string.bluetoothCannotBeTurnedOnString);
-        scanBluetoothStartedString = getString(R.string.scanBluetoothStartedString);
-        scanBluetoothFinishedString = getString(R.string.scanBluetoothFinishedString);
-        foundDeviceString = getString(R.string.foundDeviceString);
-
         enableBtLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -81,9 +74,10 @@ public class BtJoinGameActivity extends JoinGameActivity {
                         boolean isOK = mBtAdapter.startDiscovery();
                         Log.d(TAG, "enableBtLauncher.startDiscovery.isOK = " + isOK);
                     } else {
-                        megString = "enableBtLauncher." + bluetoothCannotBeTurnedOnString;
+                        megString = "enableBtLauncher." +
+                                getString(R.string.bluetoothCannotBeTurnedOnString);
                         Log.d(TAG, megString);
-                        showMessage.showMessageInTextView(bluetoothCannotBeTurnedOnString, MSG_DURATION);
+                        showMessage.showMessageInTextView(megString, TEMP_MSG_DURATION);
                     }
                 }
         );
@@ -91,6 +85,54 @@ public class BtJoinGameActivity extends JoinGameActivity {
         super.onCreate(savedInstanceState);
 
         joinGameTitleTextView.setText(getString(R.string.joinBluetoothGameString));
+    }
+
+    @Override
+    public void onItemClick(int position, @NotNull String key, @NotNull String value) {
+        Log.d(TAG, "onItemClick.position = " + position);
+        Log.d(TAG, "onItemClick.key = " + key + ", value = " + value);
+        Log.d(TAG, "onItemClick.isDiscoveryFinished = " + isDiscoveryFinished);
+        if (!isDiscoveryFinished) {
+            showMessage.showMessageInTextView(getString(R.string.discoverPlayerString),
+                    TEMP_MSG_DURATION);
+            return;
+        }
+        Log.d(TAG, "onItemClick.isConnectingFinished = " + isConnectingFinished);
+        if (!isConnectingFinished) {
+            showMessage.showMessageInTextView(getString(R.string.connectingPlayerString),
+                    CONNECTING_MSG_DURATION);
+            return;
+        }
+        Log.d(TAG, "onItemClick.previous.mConnectedMacAddress = " + mConnectedMacAddress);
+        BtConnectDevice btConnDevice = (BtConnectDevice)discoveredDeviceMap.get(key);
+        if (btConnDevice == null) {
+            Log.d(TAG, "onItemClick.btConnDevice is null");
+            return;
+        }
+        BluetoothDevice btDevice = btConnDevice.getBluetoothDevice();
+        if (btDevice == null) {
+            Log.d(TAG, "onItemClick.btDevice is null");
+            return;
+        }
+
+        // close previous one
+        Log.d(TAG, "onItemClick.mClConnToThread = " + mClConnToThread);
+        if (mClConnToThread != null) {
+            stopClientConnectToThread(mClConnToThread, true);
+        }
+        // mIoFuncThread = null;    // might be a bug
+
+        mConnectedMacAddress = key;
+        mClConnToThread = new BtConnectToThread(joinGameHandler, btDevice,
+                Constants.APP_UUID);
+        Log.d(TAG, "onItemClick.mClConnToThread = " + mClConnToThread);
+        if (mClConnToThread != null) {
+            isConnectingFinished = false;
+            mClConnToThread.start();
+            showMessage.showMessageInTextView(getString(R.string.connectingPlayerString),
+                    CONNECTING_MSG_DURATION);
+        }
+        twoPlayerListAdapter.myNotifyItemChanged(position);
     }
 
     @RequiresPermission(allOf = {Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT})
@@ -154,32 +196,32 @@ public class BtJoinGameActivity extends JoinGameActivity {
                     } else {
                         btDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     }
-                    if (btDevice == null) break;
-                    megString = foundDeviceString + ": " + BluetoothUtil.getBluetoothDeviceName(btDevice);
-                    Log.d(TAG, logStr + "." + megString);
-                    // start to connect to host game
-                    remoteMacAddress = btDevice.getAddress();
-                    if (!discoveredDeviceMap.containsKey(remoteMacAddress)) {
-                        Log.d(TAG, logStr + ".discoveredDeviceMap.not contains " + remoteMacAddress);
-                        showMessage.showMessageInTextView(megString, MSG_DURATION);
-                        BtConnectToThread connectToThread = new BtConnectToThread(joinGameHandler, btDevice,
-                                Constants.APP_UUID);
-                        discoveredDeviceMap.put(remoteMacAddress, connectToThread);
+                    if (btDevice != null) {
+                        String btDeviceName = BluetoothUtil.getBluetoothDeviceName(btDevice);
+                        megString = getString(R.string.foundDeviceString) + ": " + btDeviceName;
+                        Log.d(TAG, logStr + "." + megString);
+                        remoteMacAddress = btDevice.getAddress();
+                        Log.d(TAG, logStr + ".remoteMacAddress = " + remoteMacAddress);
+                        // discoveredDeviceMap.put(remoteMacAddress, btDevice);
+                        discoveredDeviceMap.put(remoteMacAddress, new BtConnectDevice(btDevice));
+                        // update list view
+                        oppositePlayerNameMap.put(remoteMacAddress, btDeviceName);
+                        twoPlayerListAdapter.addItem(remoteMacAddress, btDeviceName);
                     }
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
                     logStr = "onReceive.ACTION_DISCOVERY_STARTED";
                     Log.d(TAG, logStr);
-                    megString = scanBluetoothStartedString;
+                    megString = getString(R.string.scanBluetoothStartedString);
                     Log.d(TAG, logStr + "." + megString);
-                    showMessage.showMessageInTextView(scanBluetoothStartedString, MSG_DURATION);
+                    showMessage.showMessageInTextView(megString, TEMP_MSG_DURATION);
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
                     logStr = "onReceive.ACTION_DISCOVERY_FINISHED";
                     Log.d(TAG, logStr);
-                    megString = scanBluetoothFinishedString;
+                    megString = getString(R.string.scanBluetoothFinishedString);
                     Log.d(TAG, logStr + "." + megString);
-                    showMessage.showMessageInTextView(scanBluetoothFinishedString, MSG_DURATION);
+                    showMessage.showMessageInTextView(megString, TEMP_MSG_DURATION);
                     break;
             }
         }

@@ -47,7 +47,7 @@
     <string name="exitAppString">离开游戏</string>
 
     <string name="bluetoothString">蓝芽</string>
-    <string name="wifiString">區域無線網路</string>
+    <string name="wifiString">Wi-Fi直連</string>
     <string name="internetString">网际网络</string>
     <string name="createString">创立</string>
     <string name="joinString">加入</string>
@@ -90,6 +90,7 @@
     <string name="joinBluetoothGameString">加入蓝芽遊戏</string>
     <string name="clientLeftGameString">客户端已经离开游戏.</string>
     <string name="hostLeftGameString">主游戏端已经离开游戏.</string>
+    <string name="hostStartGameString">主游戏端已经啟動游戏.</string>
     <string name="discoveryTimeHasReachedString">侦测时间已结束.</string>
     <string name="discoveryWasDismissedString">侦测动作已经被取消.</string>
     <string name="foundDeviceString">侦测到设备</string>
@@ -98,6 +99,8 @@
     <string name="oppositePlayerLeftGameString">对手已离开游戏.</string>
     <string name="gameCreatorString">创立者</string>
     <string name="gameJoinerString">加入者</string>
+    <string name="discoverPlayerString">尋找玩家中</string>
+    <string name="connectingPlayerString">連線到玩家中</string>
 
     <string name="wifiDirectNotEnabledString">Wi-Fi直連未啟用</string>
     <string name="wifiDirectVisibilityActiveString">Wi-Fi直連探索可用</string>

@@ -13,6 +13,8 @@ public abstract class IoFunctionThread extends Thread {
     protected String mBuffer;
     protected boolean keepRunning;
     protected boolean startRead;
+    // ✅ Dedicated lock — completely separate from Thread's JVM-internal monitor
+    public final Object startReadLock = new Object();
 
     private final IoFunctionThread ioFunctionThread;
 
@@ -27,7 +29,9 @@ public abstract class IoFunctionThread extends Thread {
 
     public void write(int headByte, String data) {
         try {
-            Log.d(TAG, "Started to write data to the other.");
+            Log.d(TAG, "write().Started to write data to the other.");
+            Log.d(TAG, "write().outputStream = " + outputStream);
+            if (outputStream == null) return;
 
             int dataLength = data.length();
             byte[] byteWrite = new byte[dataLength + 3];
@@ -41,9 +45,9 @@ public abstract class IoFunctionThread extends Thread {
 
             outputStream.write(byteWrite);
 
-            Log.d(TAG, "Succeeded to write data to the other.");
+            Log.d(TAG, "write().Succeeded to write data to the other.");
         } catch (Exception ex) {
-            Log.d(TAG, "Failed to write data.", ex);
+            Log.e(TAG, "write().Exception: ", ex);
         }
     }
 
@@ -52,9 +56,11 @@ public abstract class IoFunctionThread extends Thread {
     }
 
     public void setStartRead(boolean startRead) {
-        synchronized (ioFunctionThread) {
+        Log.d(TAG, "setStartRead.startRead = " + startRead);
+        synchronized (startReadLock) {
             ioFunctionThread.startRead = startRead;
-            ioFunctionThread.notify();
+            Log.d(TAG, "setStartRead.notify()");
+            startReadLock.notify();
         }
     }
 

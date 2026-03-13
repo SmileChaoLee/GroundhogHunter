@@ -47,7 +47,7 @@
     <string name="exitAppString">離開遊戲</string>
 
     <string name="bluetoothString">藍芽</string>
-    <string name="wifiString">區域無線網路</string>
+    <string name="wifiString">Wi-Fi直連</string>
     <string name="internetString">網際網路</string>
     <string name="createString">創立</string>
     <string name="joinString">加入</string>
@@ -90,6 +90,7 @@
     <string name="joinBluetoothGameString">加入藍芽游戲</string>
     <string name="clientLeftGameString">客戶端已經離開遊戲.</string>
     <string name="hostLeftGameString">主遊戲端已經離開遊戲.</string>
+    <string name="hostStartGameString">主遊戲端已經啟動遊戲.</string>
     <string name="discoveryTimeHasReachedString">偵測時間已結束.</string>
     <string name="discoveryWasDismissedString">偵測動作已經被取消.</string>
     <string name="foundDeviceString">偵測到設備</string>
@@ -98,6 +99,8 @@
     <string name="oppositePlayerLeftGameString">對手已離開遊戲.</string>
     <string name="gameCreatorString">創立者</string>
     <string name="gameJoinerString">加入者</string>
+    <string name="discoverPlayerString">尋找玩家中</string>
+    <string name="connectingPlayerString">連線到玩家中</string>
 
     <string name="wifiDirectNotEnabledString">Wi-Fi直連未啟用</string>
     <string name="wifiDirectVisibilityActiveString">Wi-Fi直連探索可用</string>

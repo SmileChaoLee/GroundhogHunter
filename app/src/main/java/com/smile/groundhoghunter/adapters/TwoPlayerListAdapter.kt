@@ -1,56 +1,102 @@
-package com.smile.groundhoghunter.adapters;
+package com.smile.groundhoghunter.adapters
 
-import android.content.Context;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.smile.smilelibraries.utilities.ScreenUtil;
-import java.util.List;
+import android.annotation.SuppressLint
+import android.graphics.Color
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.smile.groundhoghunter.R
+import com.smile.smilelibraries.utilities.ScreenUtil
 
-public class TwoPlayerListAdapter extends ArrayAdapter {
-    private final int mTextViewResourceId;
-    private final float textFontSize;
+class TwoPlayerListAdapter(
+    dataMap: LinkedHashMap<String, String>,
+    private val textFontSize: Float,
+    private val listener: OnItemClickListener
+) : RecyclerView.Adapter<TwoPlayerListAdapter.ViewHolder>() {
 
-    @SuppressWarnings("unchecked")
-    public TwoPlayerListAdapter(@NonNull Context context, int resource,
-                                int textViewResourceId, @NonNull List objects,
-                                float textSize) {
-        super(context, resource, textViewResourceId, objects);
-        mTextViewResourceId = textViewResourceId;
-        textFontSize = textSize;
+    companion object {
+        private const val TAG = "TwoPlayerAdapter"
     }
 
-    @Nullable
-    @Override
-    public Object getItem(int position) {
-        return super.getItem(position);
+    private var selectedPosition: Int = -1
+
+    interface OnItemClickListener {
+        fun onItemClick(position: Int, key: String, value: String)
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public int getPosition(@Nullable Object item) {
-        return super.getPosition(item);
+    private var dataMap: LinkedHashMap<String, String> = LinkedHashMap(dataMap)
+
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val playerNameTextView: TextView = itemView.findViewById(R.id.playerNameTextView)
     }
 
-    @NonNull
-    @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        View view = super.getView(position, convertView, parent);
-        if (getCount() == 0) {
-            return view;
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.player_list_item_layout, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        Log.d(TAG, "onBindViewHolder.position = $position")
+        val entry = dataMap.entries.elementAt(position)
+        holder.apply {
+            playerNameTextView.text = entry.value
+            ScreenUtil.resizeTextSize(playerNameTextView, textFontSize)
+            itemView.setOnClickListener {
+                listener.onItemClick(position, entry.key, entry.value)
+            }
+            Log.d(TAG, "onBindViewHolder.selectedPosition = $selectedPosition")
+            if (position == selectedPosition) {
+                playerNameTextView.setBackgroundColor(Color.RED)
+            } else {
+                playerNameTextView.setBackgroundColor(Color.argb(0x0, 0x0, 0x0, 0x0))
+            }
         }
-        TextView itemTextView = view.findViewById(mTextViewResourceId);
-        ScreenUtil.resizeTextSize(itemTextView, textFontSize);
-        return view;
     }
 
-    @SuppressWarnings("unchecked")
-    public void updateData(List newData) {
-        clear();
-        addAll(newData);
-        notifyDataSetChanged();
+    override fun getItemCount(): Int = dataMap.size
+
+    fun addItem(key: String, value: String) {
+        Log.d(TAG, "addItem.key = $key, value = $value")
+        dataMap[key] = value
+        notifyItemInserted(dataMap.size - 1)
+    }
+
+    fun removeItem(key: String) {
+        Log.d(TAG, "removeItem")
+        val position = dataMap.keys.indexOf(key)
+        if (position >= 0) {
+            dataMap.remove(key)
+            notifyItemRemoved(position)
+        }
+    }
+
+    fun myNotifyItemChanged(position: Int) {
+        Log.d(TAG, "myNotifyItemChanged.selectedPosition = $selectedPosition")
+        val prevPosition = selectedPosition
+        selectedPosition = position          // update state BEFORE notifying
+        if (prevPosition != -1) {
+            notifyItemChanged(prevPosition)  // tells old item to redraw (will be transparent)
+        }
+        notifyItemChanged(position)          // tells new item to redraw (will be RED)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateData(newData: LinkedHashMap<String, String>) {
+        Log.d(TAG, "updateData")
+        dataMap = LinkedHashMap(newData)
+        selectedPosition = -1
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun clear() {
+        Log.d(TAG, "clear")
+        dataMap.clear()
+        selectedPosition = -1
+        notifyDataSetChanged()
     }
 }

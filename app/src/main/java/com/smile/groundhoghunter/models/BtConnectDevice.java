@@ -21,9 +21,18 @@ public class BtConnectDevice implements ConnectDevice {
         mBtDevice = mBtAdapter.getRemoteDevice(mBtAdapter.getAddress());
 
     }
+
     public BtConnectDevice(BluetoothDevice btDevice) {
         mBtAdapter = null;
         mBtDevice = btDevice;
+    }
+
+    public BluetoothAdapter getBluetoothAdapter() {
+        return mBtAdapter;
+    }
+
+    public BluetoothDevice getBluetoothDevice() {
+        return mBtDevice;
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)

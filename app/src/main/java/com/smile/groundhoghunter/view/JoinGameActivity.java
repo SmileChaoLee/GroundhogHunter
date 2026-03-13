@@ -14,8 +14,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
+
 import android.util.Log;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.smile.groundhoghunter.GHogHunterApp;
@@ -31,36 +34,34 @@ import com.smile.groundhoghunter.utilities.MessageShowingUtil;
 import com.smile.smilelibraries.customized_button.SmileImageButton;
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil;
 import com.smile.smilelibraries.utilities.ScreenUtil;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class JoinGameActivity extends AppCompatActivity {
+abstract public class JoinGameActivity extends AppCompatActivity
+        implements TwoPlayerListAdapter.OnItemClickListener {
 
     // private properties
     private static final String TAG = "JoinGameAct";
     // 20 seconds one time
     private static final int DURATION_BT_DISCOVER = 20000;
-    protected static final int MSG_DURATION = 1000;    // 1 second
+    protected static final int TEMP_MSG_DURATION = 1000;    // 1 second
+    protected static final int CONNECTING_MSG_DURATION = 30000;    // 30 seconds
+    protected boolean isDiscoveryFinished = false;
+    protected boolean isConnectingFinished = true;
+    protected TwoPlayerListAdapter twoPlayerListAdapter;
     protected TextView joinGameTitleTextView;
-    private String oppositePlayerName;
-    private LinkedHashMap<String, String> oppositePlayerNameMap;
-    private String cannotCreateClientSocketString;
-    private String connectToHostSucceededString;
-    private String connectToHostFailedString;
-    private String hostLeftGameString;
-    private String discoveryTimeHasReachedString;
-    private String discoveryWasDismissedString;
-    private String hasBeenReadString;
-    private TwoPlayerListAdapter twoPlayerListAdapter;
+    // (Mac address, device name)
+    protected LinkedHashMap<String, String> oppositePlayerNameMap = new LinkedHashMap<>();
     protected String playerName;
     protected MessageShowingUtil showMessage;
     protected Handler joinGameHandler;
     protected ConnectDevice clientConnectDevice;
     protected ClientDiscoveryTimerThread discoveryTimerThread;
-    protected HashMap<String, ClientConnectToThread> discoveredDeviceMap;
-    protected HashMap<String, IoFunctionThread> ioFunctionThreadMap;
-    protected IoFunctionThread selectedIoFunctionThread;
+    protected HashMap<String, ConnectDevice> discoveredDeviceMap = new HashMap<>();
+    protected ClientConnectToThread mClConnToThread = null;
+    protected IoFunctionThread mIoFuncThread = null;
+    protected String mConnectedMacAddress = "";
     protected ActivityResultLauncher<Intent> clientGameLauncher;
 
     @Override
@@ -72,22 +73,11 @@ public class JoinGameActivity extends AppCompatActivity {
         }
 
         joinGameHandler = new JoinGameHandler(Looper.getMainLooper());
-        discoveredDeviceMap = new HashMap<>();
-        ioFunctionThreadMap = new HashMap<>();
-        selectedIoFunctionThread = null;
-
-        oppositePlayerNameMap = new LinkedHashMap<>();
+        mIoFuncThread = null;
+        mConnectedMacAddress = "";
 
         float textFontSize = ScreenUtil.getPxTextFontSizeNeeded(this);
         float toastTextSize = textFontSize * 0.8f;
-
-        cannotCreateClientSocketString = getString(R.string.cannotCreateClientSocketString);
-        connectToHostSucceededString = getString(R.string.connectToHostSucceededString);
-        connectToHostFailedString = getString(R.string.connectToHostFailedString);
-        hostLeftGameString = getString(R.string.hostLeftGameString);
-        discoveryTimeHasReachedString = getString(R.string.discoveryTimeHasReachedString);
-        discoveryWasDismissedString = getString(R.string.discoveryWasDismissedString);
-        hasBeenReadString = getString(R.string.hasBeenReadString);
 
         int colorDarkRed = ContextCompat.getColor(this, R.color.darkRed);
         int colorBlue = Color.BLUE;
@@ -98,14 +88,15 @@ public class JoinGameActivity extends AppCompatActivity {
                     int resultCode = result.getResultCode();
                     Log.d(TAG, "clientGameLauncher.resultCode = " + resultCode);
                     Log.d(TAG, "clientGameLauncher.Came back from BtClientGameActivity.");
-                    oppositePlayerName = "";
+                    startDiscovery();
+                    /*
                     discoveredDeviceMap = new HashMap<>();
-                    ioFunctionThreadMap = new HashMap<>();
-                    selectedIoFunctionThread = null;
+                    mIoFuncThread = null;
+                    mConnectedMacAddress = "";
                     oppositePlayerNameMap = new LinkedHashMap<>();
                     // update list view
-                    ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
-                    twoPlayerListAdapter.updateData(oppNameList);
+                    twoPlayerListAdapter.clear();
+                    */
                 });
 
         super.onCreate(savedInstanceState);
@@ -128,47 +119,21 @@ public class JoinGameActivity extends AppCompatActivity {
         playerNameTextView.setText(playerName);
         ScreenUtil.resizeTextSize(playerNameTextView, textFontSize);
 
-        ListView oppositePlayerNameListView = findViewById(R.id.oppositePlayerNameListView);
-        ArrayList<String> oppNameList = new ArrayList<>();
-        twoPlayerListAdapter = new TwoPlayerListAdapter(this,
-                R.layout.player_list_item_layout, R.id.playerNameTextView, oppNameList, textFontSize);
-        // do not call notifyDataSetChanged() method automatically
-        twoPlayerListAdapter.setNotifyOnChange(false);
+        RecyclerView oppositePlayerNameListView = findViewById(R.id.oppositePlayerNameListView);
+        twoPlayerListAdapter = new TwoPlayerListAdapter(oppositePlayerNameMap, textFontSize, this);
+        SimpleItemAnimator animator = (SimpleItemAnimator)(oppositePlayerNameListView.getItemAnimator());
+        if (animator != null) {
+            animator.setSupportsChangeAnimations(false);
+        }
+        oppositePlayerNameListView.setLayoutManager(new LinearLayoutManager(this));
         oppositePlayerNameListView.setAdapter(twoPlayerListAdapter);
-        oppositePlayerNameListView.setOnItemClickListener((adapterView, view, position, rowId) -> {
-            String temp;
-            if (adapterView != null) {
-                Object item = adapterView.getItemAtPosition(position);
-                if (item != null) {
-                    temp = item.toString();
-                    oppositePlayerName = temp;
-                    String oppName;
-                    // get remote mac address of remote device
-                    for (String remoteMacAddress : oppositePlayerNameMap.keySet()) {
-                        IoFunctionThread ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                        if (ioFunctionThread != null) {
-                            oppName = oppositePlayerNameMap.get(remoteMacAddress);
-                            if (oppName != null) {
-                                if (oppName.equals(oppositePlayerName)) {
-                                    selectedIoFunctionThread = ioFunctionThread;
-                                    selectedIoFunctionThread.write(Constants.OPPOS_PLAYER_NAME_READ, playerName);
-                                    view.setSelected(true);
-                                } else {
-                                    ioFunctionThread.write(Constants.TWO_PLAY_CLIENT_EX_CODE, remoteMacAddress);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
 
         SmileImageButton refreshJoinGameButton = findViewById(R.id.refreshJoinGameButton);
         Bitmap refreshJoinGameBitmap = FontAndBitmapUtil.getBitmapFromResourceWithText(this, R.drawable.normal_button_image, getString(R.string.refreshString), colorBlue);
         refreshJoinGameButton.setImageBitmap(refreshJoinGameBitmap);
         refreshJoinGameButton.setOnClickListener(view -> {
-            startDiscovery();
             Log.d(TAG, "Refresh.startDiscovery()");
+            startDiscovery();
         });
 
         SmileImageButton cancelJoinGameButton = findViewById(R.id.cancelJoinGameButton);
@@ -184,21 +149,13 @@ public class JoinGameActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
         clientLeavingNotification();
-        ArrayList<IoFunctionThread> threadList = new ArrayList<>(ioFunctionThreadMap.values());
-        ConnectDeviceUtil.stopIoFunctionThreads(threadList);
-        ioFunctionThreadMap.clear();
-        // ioFunctionThreadMap = null;
+        ConnectDeviceUtil.stopIoFunctionThread(mIoFuncThread);
         stopClientConnectToThreadAndClearClientDiscoveredMap();
-        // discoveredDeviceMap = null;
         oppositePlayerNameMap.clear();
-        // oppositePlayerNameMap = null;
-        // selectedIoFunctionThread = null;
         twoPlayerListAdapter.clear();
-        // twoPlayerListAdapter = null;
         stopClientDiscoveryTimerThread();
         if (joinGameHandler != null) {
             joinGameHandler.removeCallbacksAndMessages(null);
-            // joinGameHandler = null;
         }
     }
 
@@ -211,17 +168,17 @@ public class JoinGameActivity extends AppCompatActivity {
     }
 
     protected void startDiscovery() {
+        isDiscoveryFinished = false;
         stopClientDiscoveryTimerThread();  // stop discovering devices (servers)
         clientLeavingNotification();
-        ArrayList<IoFunctionThread> threadList = new ArrayList<>(ioFunctionThreadMap.values());
-        ConnectDeviceUtil.stopIoFunctionThreads(threadList);
-        ioFunctionThreadMap.clear();
+        ConnectDeviceUtil.stopIoFunctionThread(mIoFuncThread);
         stopClientConnectToThreadAndClearClientDiscoveredMap();
         joinGameHandler.removeCallbacksAndMessages(null);   // added on 2019-05-14
         oppositePlayerNameMap.clear();
         twoPlayerListAdapter.clear();
-        twoPlayerListAdapter.notifyDataSetChanged();
         startClientDiscoveryTimerThread();  // start discovering devices (servers)
+        // showMessage.showMessageInTextView(getString(R.string.discoverPlayerString), MSG_DURATION);
+        showMessage.showMessageInTextView(getString(R.string.discoverPlayerString), DURATION_BT_DISCOVER);
     }
 
     protected void startClientGame() {
@@ -229,12 +186,11 @@ public class JoinGameActivity extends AppCompatActivity {
     }
 
     private void clientLeavingNotification() {
-        Log.d(TAG, "clientLeavingNotification.ioFunctionThreadMap = " + ioFunctionThreadMap);
-        if (clientConnectDevice != null) {
-            for (IoFunctionThread btFunctionThread : ioFunctionThreadMap.values()) {
-                btFunctionThread.write(Constants.TWO_PLAY_CLIENT_EX_CODE, "");
-            }
+        Log.d(TAG, "clientLeavingNotification.selectedIoFuncTh = " + mIoFuncThread);
+        if (mIoFuncThread != null) {
+            mIoFuncThread.write(Constants.TWO_PLAY_CLIENT_EX_CODE, "");
         }
+        mConnectedMacAddress = "";
     }
 
     private void startClientDiscoveryTimerThread() {
@@ -261,14 +217,15 @@ public class JoinGameActivity extends AppCompatActivity {
     }
 
     private void stopClientConnectToThreadAndClearClientDiscoveredMap() {
-        for(ClientConnectToThread connectToThread : discoveredDeviceMap.values()) {
-            stopClientConnectToThread(connectToThread, true);
+        if (mClConnToThread != null) {
+            stopClientConnectToThread(mClConnToThread, true);
         }
-        discoveredDeviceMap.clear(); // clear HashSet because of starting discovering
+        // clear HashSet because of starting discovering
+        discoveredDeviceMap.clear();
     }
 
-    private void stopClientConnectToThread(ClientConnectToThread connectToThread,
-                                           boolean isCloseClientSocket) {
+    protected void stopClientConnectToThread(ClientConnectToThread connectToThread,
+                                             boolean isCloseClientSocket) {
         if (connectToThread != null) {
             if (isCloseClientSocket) {
                 connectToThread.closeClientSocket();
@@ -288,179 +245,121 @@ public class JoinGameActivity extends AppCompatActivity {
     }
 
     private class JoinGameHandler extends Handler {
-
-        private int curIndex = 0;
-        private ArrayList<ClientConnectToThread> threadList = new ArrayList<>();
-
         public JoinGameHandler(Looper looper) {
             super(looper);
         }
-
-        private void connectToNextDiscoveredDevice() {
-            Log.d(TAG, "connectToNextDiscoveredDevice.curIndex = " + curIndex);
-            if (threadList == null || threadList.isEmpty()) return;
-            if (curIndex >= threadList.size()) return;
-            ClientConnectToThread thread = threadList.get(curIndex);
-            if (thread.getState() == Thread.State.NEW) {
-                thread.start();
-            }
-            curIndex++;
-        }
-
         @Override
         public void handleMessage(@NonNull Message msg) {
+            String logStr = "JoinGameHandler";
             // super.handleMessage(msg);
-            Log.d(TAG, "handleMessage.Message = " + msg.what);
+            Log.d(TAG, logStr + ".Message = " + msg.what);
             Bundle data = msg.getData();
             String megString;
-            String deviceName;
-            ClientConnectToThread connectToThread;
-            IoFunctionThread ioFunctionThread;
-            String remoteMacAddress;
+            String deviceName = "";
             ConnectDevice connectDevice;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 connectDevice = data.getParcelable("ConnectDevice", ConnectDevice.class);
             } else {
                 connectDevice = data.getParcelable("ConnectDevice");
             }
+            if (connectDevice != null) {
+                deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
+                Log.d(TAG, logStr + ".deviceName = " + deviceName);
+            }
             switch (msg.what) {
                 case Constants.CL_DISCOVER_TIMER_END:
-                    Log.d(TAG, "handleMessage.CL_DISCOVER_TIMER_END");
-                    megString = discoveryTimeHasReachedString;
+                    megString = logStr + ".CL_DISCOVER_TIMER_END.deviceName = " + deviceName;
                     Log.d(TAG, megString);
-                    if (clientConnectDevice.isDiscovering()) {
-                        clientConnectDevice.cancelDiscovery();
-                    }
-                    showMessage.showMessageInTextView(megString, MSG_DURATION);
-                    // start to connect all the device that were found
-                    /*
-                    for (ClientConnectToThread connectThread : discoveredDeviceMap.values()) {
-                        connectThread.start();
-                    }
-                    */
-                    threadList = new ArrayList<>(discoveredDeviceMap.values());
-                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                        curIndex = 0;
-                        connectToNextDiscoveredDevice();
-                    }, 1000);
+                    isDiscoveryFinished = true;
+                    showMessage.showMessageInTextView(getString(R.string.discoveryTimeHasReachedString),
+                            TEMP_MSG_DURATION);
                     break;
                 case Constants.CL_DISCOVER_TIMER_DISMISSED:
-                    Log.d(TAG, "handleMessage.CL_DISCOVER_TIMER_END");
-                    megString = discoveryWasDismissedString;
+                    megString = logStr + ".CL_DISCOVER_TIMER_DISMISSED.deviceName = " + deviceName;
                     Log.d(TAG, megString);
-                    showMessage.showMessageInTextView(megString, MSG_DURATION);
+                    showMessage.showMessageInTextView(getString(R.string.discoveryWasDismissedString),
+                            TEMP_MSG_DURATION);
+                    isDiscoveryFinished = true;
                     break;
                 case Constants.CL_CONN_TO_TH_NO_CL_SOCKET:
-                    Log.d(TAG, "handleMessage.CL_CONN_TO_TH_NO_CL_SOCKET");
-                    if (connectDevice != null) {
-                        remoteMacAddress = connectDevice.getAddress();
-                        deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
-                        megString = cannotCreateClientSocketString + "(" + deviceName + ")";
-                        Log.d(TAG, megString);
-                        showMessage.showMessageInTextView(megString, MSG_DURATION);
-                        connectToThread = discoveredDeviceMap.get(remoteMacAddress);
-                        stopClientConnectToThread(connectToThread, true);
+                    megString = logStr + ".CL_CONN_TO_TH_NO_CL_SOCKET.deviceName = " + deviceName;
+                    Log.d(TAG, megString);
+                    showMessage.showMessageInTextView(getString(R.string.cannotCreateClientSocketString),
+                            TEMP_MSG_DURATION);
+                    if (mClConnToThread != null) {
+                        stopClientConnectToThread(mClConnToThread, true);
                     }
-                    connectToNextDiscoveredDevice();
+                    mIoFuncThread = null;
+                    mConnectedMacAddress = "";
+                    GHogHunterApp.selectedIoFuncThread = null;
+                    isConnectingFinished = true;
                     break;
                 case Constants.CL_CONN_TO_TH_CONNECTED:
-                    Log.d(TAG, "handleMessage.CL_CONN_TO_TH_CONNECTED");
-                    if (connectDevice != null) {
-                        remoteMacAddress = connectDevice.getAddress();
-                        deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
-                        megString = connectToHostSucceededString + "(" + deviceName + ")";
-                        Log.d(TAG, megString);
-                        // start reading data from the other device and writing data to the other device
-                        connectToThread = discoveredDeviceMap.get(remoteMacAddress);
-                        if (connectToThread != null) {
-                            ioFunctionThread = connectToThread.getIoFunctionThread();
-                            if (ioFunctionThread != null) {
-                                ioFunctionThread.setStartRead(true);    // start reading data
-                            }
-                            if (!ioFunctionThreadMap.containsKey(remoteMacAddress)) {
-                                ioFunctionThreadMap.put(remoteMacAddress, ioFunctionThread);
-                            }
+                    megString = logStr + ".CL_CONN_TO_TH_CONNECTED.deviceName = " + deviceName;
+                    Log.d(TAG, megString);
+                    showMessage.showMessageInTextView(getString(R.string.connectToHostSucceededString),
+                            TEMP_MSG_DURATION);
+                    if (mClConnToThread != null) {
+                        mIoFuncThread = mClConnToThread.getIoFunctionThread();
+                        Log.d(TAG, logStr + "CL_CONN_TO_TH_CONNECTED.mIoFuncThread = " + mIoFuncThread);
+                        if (mIoFuncThread != null) {
+                            mIoFuncThread.setStartRead(true);    // start reading data
+                            mIoFuncThread.write(Constants.OPPOS_PLAYER_NAME_READ, playerName);
                         }
-                        stopClientConnectToThread(connectToThread, false);
+                        stopClientConnectToThread(mClConnToThread, false);
                     }
-                    connectToNextDiscoveredDevice();
+                    isConnectingFinished = true;
                     break;
                 case Constants.OPPOS_PLAYER_NAME_READ:
-                    Log.d(TAG, "handleMessage.OPPOS_PLAYER_NAME_READ");
-                    if (connectDevice != null) {
-                        remoteMacAddress = connectDevice.getAddress();
-                        String oppositeName = data.getString("OppositePlayerName");
-                        megString = oppositeName + " " + hasBeenReadString + ".";
-                        showMessage.showMessageInTextView(megString, MSG_DURATION);
-                        Log.d(TAG, megString);
-                        if (oppositeName != null) {
-                            if (!oppositeName.isEmpty()) {
-                                if (!oppositePlayerNameMap.containsKey(remoteMacAddress)) {
-                                    oppositePlayerNameMap.put(remoteMacAddress, oppositeName);
-                                    ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
-                                    twoPlayerListAdapter.updateData(oppNameList);
-                                }
-                            }
-                        }
-                        ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                        if (ioFunctionThread != null) {
-                            ioFunctionThread.setStartRead(true);    // read next data data
-                        }
+                    megString = logStr + ".OPPOS_PLAYER_NAME_READ.deviceName = " + deviceName;
+                    Log.d(TAG, megString);
+                    showMessage.showMessageInTextView(getString(R.string.hasBeenReadString),
+                            TEMP_MSG_DURATION);
+                    // Re-enable reading so the IoFunctionThread can receive the next signal
+                    // (e.g., TWO_PLAY_HOST_ST_GAME)
+                    if (mIoFuncThread != null) {
+                        mIoFuncThread.setStartRead(true);   // read next data data
                     }
                     break;
                 case Constants.CL_CONN_TO_TH_FAILED_CONNECT:
-                    Log.d(TAG, "handleMessage.CL_CONN_TO_TH_FAILED_CONNECT");
-                    if (connectDevice != null) {
-                        remoteMacAddress = connectDevice.getAddress();
-                        deviceName = ConnectDeviceUtil.getConnectDeviceName(connectDevice);
-                        megString = connectToHostFailedString + "(" + deviceName + ")";
-                        Log.d(TAG, megString);
-                        if (discoveredDeviceMap != null) {
-                            connectToThread = discoveredDeviceMap.get(remoteMacAddress);
-                            stopClientConnectToThread(connectToThread, true);
-                        }
+                    megString = logStr + ".CL_CONN_TO_TH_FAILED_CONNECT.deviceName = " + deviceName;
+                    Log.d(TAG, megString);
+                    showMessage.showMessageInTextView(getString(R.string.connectToHostFailedString),
+                            TEMP_MSG_DURATION);
+                    if (mClConnToThread != null) {
+                        stopClientConnectToThread(mClConnToThread, true);
                     }
-                    connectToNextDiscoveredDevice();
+                    mIoFuncThread = null;
+                    mConnectedMacAddress = "";
+                    GHogHunterApp.selectedIoFuncThread = null;
+                    isConnectingFinished = true;
                     break;
                 case Constants.TWO_PLAY_HOST_EX_CODE:
-                    Log.d(TAG, "handleMessage.TWO_PLAY_HOST_EX_CODE");
-                    if (connectDevice != null) {
-                        remoteMacAddress = connectDevice.getAddress();
-                        showMessage.showMessageInTextView(hostLeftGameString, MSG_DURATION);
-                        ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                        if (ioFunctionThread != null) {
-                            ioFunctionThread.setStartRead(true);    // start reading data
-                        }
-                        // remove the remote connected device from oppositePlayerNameList
-                        oppositePlayerNameMap.remove(remoteMacAddress);
-                        // update list view
-                        ArrayList<String> oppNameList = new ArrayList<>(oppositePlayerNameMap.values());
-                        twoPlayerListAdapter.updateData(oppNameList);
+                    megString = logStr + ".TWO_PLAY_HOST_EX_CODE.deviceName = " + deviceName;
+                    Log.d(TAG, megString);
+                    showMessage.showMessageInTextView(getString(R.string.hostLeftGameString),
+                            TEMP_MSG_DURATION);
+                    if (mClConnToThread != null) {
+                        stopClientConnectToThread(mClConnToThread, true);
                     }
+                    if (mIoFuncThread != null) {
+                        mIoFuncThread.setStartRead(true);    // start reading data
+                    }
+                    // mIoFuncThread = null;
+                    mConnectedMacAddress = "";
+                    GHogHunterApp.selectedIoFuncThread = null;
+                    isConnectingFinished = true;
                     break;
                 case Constants.TWO_PLAY_HOST_ST_GAME:
-                    Log.d(TAG, "handleMessage.TWO_PLAY_HOST_ST_GAME");
-                    if (selectedIoFunctionThread != null) {
-                        GHogHunterApp.selectedIoFuncThread = selectedIoFunctionThread;
-                        for (String remoteMac : ioFunctionThreadMap.keySet()) {
-                            IoFunctionThread ioFuncThread = ioFunctionThreadMap.get(remoteMac);
-                            connectToThread = discoveredDeviceMap.get(remoteMac);
-                            if (ioFuncThread != null) {
-                                if (ioFuncThread != selectedIoFunctionThread) {
-                                    ioFuncThread.write(Constants.TWO_PLAY_CLIENT_EX_CODE, "");
-                                    ConnectDeviceUtil.stopIoFunctionThread(ioFuncThread);
-                                    stopClientConnectToThread(connectToThread, true);
-                                } else {
-                                    stopClientConnectToThread(connectToThread, false);
-                                }
-                            }
-                        }
+                    megString = logStr + ".TWO_PLAY_HOST_ST_GAME.deviceName = " + deviceName;
+                    Log.d(TAG, megString);
+                    showMessage.showMessageInTextView(getString(R.string.hostStartGameString),
+                            TEMP_MSG_DURATION);
+                    if (mClConnToThread != null && mIoFuncThread != null) {
+                        GHogHunterApp.selectedIoFuncThread = mIoFuncThread;
+                        stopClientConnectToThread(mClConnToThread, false);
                         // clear HashMaps
-                        discoveredDeviceMap = null;
-                        ioFunctionThreadMap.clear();
-                        ioFunctionThreadMap = null;
                         oppositePlayerNameMap.clear();
-                        oppositePlayerNameMap = null;
                         // remove all message from joinGameHandler, // added on 2019-05-14
                         joinGameHandler.removeCallbacksAndMessages(null);
                         // start game by different medias
@@ -468,14 +367,12 @@ public class JoinGameActivity extends AppCompatActivity {
                     }
                     break;
                 case Constants.TWO_PLAY_DEF_READ:
-                    Log.d(TAG, "handleMessage.TWO_PLAY_DEF_READ");
+                    megString = logStr + ".TWO_PLAY_DEF_READ.deviceName = " + deviceName;
+                    Log.d(TAG, megString);
+                    showMessage.showMessageInTextView("READ" + deviceName, TEMP_MSG_DURATION);
                     // read the next data
-                    if (connectDevice != null) {
-                        remoteMacAddress = connectDevice.getAddress();
-                        ioFunctionThread = ioFunctionThreadMap.get(remoteMacAddress);
-                        if (ioFunctionThread != null) {
-                            ioFunctionThread.setStartRead(true);    // start reading data
-                        }
+                    if (mClConnToThread != null && mIoFuncThread != null) {
+                        mIoFuncThread.setStartRead(true);    // start reading data
                     }
                     break;
             }

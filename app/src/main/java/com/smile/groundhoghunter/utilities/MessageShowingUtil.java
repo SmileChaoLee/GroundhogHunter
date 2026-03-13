@@ -1,7 +1,6 @@
 package com.smile.groundhoghunter.utilities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
@@ -12,26 +11,19 @@ import java.util.Queue;
 
 public class MessageShowingUtil {
 
-    private final Context mContext;
     private final Activity mActivity;
     private final Handler mHandler;
     private final TextView mTextView;
-    private Queue<Runnable> runnableQueue;
+    private final Queue<Runnable> runnableQueue;
     private final Runnable setTextViewInvisible;
     private boolean isRunnableRunning;
 
     public MessageShowingUtil(final Activity activity, final TextView textView) {
         mActivity = activity;
         mTextView = textView;
-        mContext = mActivity.getApplicationContext();
         mHandler = new Handler(Looper.getMainLooper());
 
-        mActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mTextView.setVisibility(View.INVISIBLE);
-            }
-        });
+        mActivity.runOnUiThread(() -> mTextView.setVisibility(View.INVISIBLE));
 
         runnableQueue = new LinkedList<>();
         isRunnableRunning = false;
@@ -41,6 +33,7 @@ public class MessageShowingUtil {
             public void run() {
                 mHandler.removeCallbacks(this);
                 mTextView.setVisibility(View.INVISIBLE);
+                /*
                 if (!runnableQueue.isEmpty()) {
                     Runnable mRunnable = runnableQueue.poll();
                     mActivity.runOnUiThread(mRunnable);
@@ -48,22 +41,22 @@ public class MessageShowingUtil {
                     // no more runnable object in queue
                     isRunnableRunning = false;
                 }
+                */
             }
         };
 
     }
 
     public void showMessageInTextView(final String message, final int duration) {
-        final Runnable setMessageToTextView = new Runnable() {
-            @Override
-            public void run() {
-                isRunnableRunning = true;
-                mTextView.setText(message);
-                mTextView.setVisibility(View.VISIBLE);
-                mHandler.postDelayed(setTextViewInvisible, duration);
-            }
+        final Runnable setMessageToTextView = () -> {
+            isRunnableRunning = true;
+            mTextView.setText(message);
+            mTextView.setVisibility(View.VISIBLE);
+            mHandler.postDelayed(setTextViewInvisible, duration);
         };
+        mActivity.runOnUiThread(setMessageToTextView);
 
+        /*
         runnableQueue.add(setMessageToTextView);
         if (!isRunnableRunning) {
             isRunnableRunning = true;
@@ -71,5 +64,6 @@ public class MessageShowingUtil {
         } else {
             runnableQueue.add(setMessageToTextView);
         }
+        */
     }
 }

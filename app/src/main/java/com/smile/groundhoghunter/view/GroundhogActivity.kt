@@ -95,7 +95,7 @@ open class GroundhogActivity : AppCompatActivity() {
     @JvmField
     protected var gameView: GameView? = null
     @JvmField
-    protected var selectedIoFuncThread: IoFunctionThread? = null
+    protected var mIoFuncThread: IoFunctionThread? = null
     private lateinit var settingLauncher: ActivityResultLauncher<Intent>
     private lateinit var otherLauncher: ActivityResultLauncher<Intent>
     private lateinit var scoreDB: ScoreSQLite
@@ -119,8 +119,8 @@ open class GroundhogActivity : AppCompatActivity() {
 
         Log.d(TAG, "onCreate.savedInstanceState = $savedInstanceState")
 
-        selectedIoFuncThread = GHogHunterApp.selectedIoFuncThread
-        if (selectedIoFuncThread == null) {
+        mIoFuncThread = GHogHunterApp.selectedIoFuncThread
+        if (mIoFuncThread == null) {
             Log.d(TAG, "selectedIoFunctionThread is null.")
         }
 
@@ -226,13 +226,11 @@ open class GroundhogActivity : AppCompatActivity() {
         ScreenUtil.resizeTextSize(scoreTitleTextView, textFontSize)
         scoreTextView = findViewById(R.id.scoreText)
         ScreenUtil.resizeTextSize(scoreTextView, textFontSize)
-        // scoreTextView.text = "0000"
 
         val hitNumTitleTextView = findViewById<TextView>(R.id.num_hit_Title)
         ScreenUtil.resizeTextSize(hitNumTitleTextView, textFontSize)
         hitNumTextView = findViewById(R.id.num_hit_Text)
         ScreenUtil.resizeTextSize(hitNumTextView, textFontSize)
-        // hitNumTextView.text = "0000"
 
         val gameLinearLayout = findViewById<LinearLayout>(R.id.gameViewAreaLinearLayout)
         val gameFrameLayout = findViewById<FrameLayout>(R.id.gameViewAreaFrameLayout)
@@ -287,7 +285,7 @@ open class GroundhogActivity : AppCompatActivity() {
                         colNum,
                         frameWidth,
                         frameHeight,
-                        selectedIoFuncThread
+                        mIoFuncThread
                     )
                     Log.i(TAG, "gameView created.")
                     gameFrameLayout.addView(gameView)

@@ -47,23 +47,29 @@ public class ConnectDeviceUtil {
 
     public static void stopIoFunctionThread(IoFunctionThread ioFunctionThread) {
         Log.d(TAG, "stopIoFunctionThread");
-        if (ioFunctionThread != null) {
-            synchronized (ioFunctionThread) {
-                ioFunctionThread.setKeepRunning(false);
-                ioFunctionThread.closeIoSocket();
-                ioFunctionThread.setStartRead(true);
-                ioFunctionThread.notify();
-            }
-            boolean retry = true;
-            while (retry) {
-                try {
-                    ioFunctionThread.join();
-                    Log.d(TAG, "stopIoFunctionThread.ioFunctionThread.Join()");
-                    retry = false;
-                    // ioFunctionThread = null;
-                } catch (InterruptedException ex) {
-                    Log.e(TAG, "stopIoFunctionThread.InterruptedException: ", ex);
-                }
+        if (ioFunctionThread == null) return;
+        synchronized (ioFunctionThread.startReadLock) {
+            Log.d(TAG, "stopIoFunctionThread.synchronized(ioFunctionThread.startReadLock");
+            ioFunctionThread.setKeepRunning(false);
+            // ioFunctionThread.closeIoSocket();
+            // internally reentrant, already uses startReadLock
+            ioFunctionThread.setStartRead(true);
+            // No explicit notify() needed — setStartRead() handles it
+            // startReadLock.notify();
+        }
+        Log.d(TAG, "stopIoFunctionThread.closeIoSocket");
+        ioFunctionThread.closeIoSocket();
+
+        boolean retry = true;
+        while (retry) {
+            try {
+                ioFunctionThread.join();
+                Log.d(TAG, "stopIoFunctionThread.ioFunctionThread.Join()");
+                retry = false;
+            } catch (InterruptedException ex) {
+                Log.e(TAG, "stopIoFunctionThread.InterruptedException: ", ex);
+                // Thread.currentThread().interrupt();  // ✅ restore interrupt flag
+                // break;
             }
         }
     }

@@ -27,7 +27,7 @@ public class BtAcceptThread extends ServerAcceptThread {
     private final String mPlayerName;
     private final BluetoothServerSocket mServerSocket;
     private BluetoothSocket mBluetoothSocket;
-    private final HashMap<BtConnectDevice, BtFunctionThread> btFunctionThreadMap;
+    private final HashMap<BtConnectDevice, BtIoFunctionThread> btFunctionThreadMap;
     private int numOfConnections;
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
@@ -56,6 +56,7 @@ public class BtAcceptThread extends ServerAcceptThread {
         Log.d(TAG, "run()");
         Message msg;
         Bundle data;
+        Log.d(TAG, "run().mServerSocket = " + mServerSocket);
         if (mServerSocket == null) {
             // cannot create Server Socket
             msg = mHandler.obtainMessage(Constants.SER_ACCEPT_TH_NO_SER_SOCKET);
@@ -72,7 +73,7 @@ public class BtAcceptThread extends ServerAcceptThread {
                     // A connection was accepted.
                     numOfConnections++;
                     isConnected = true;
-                    BtFunctionThread btFunctionThread = new BtFunctionThread(mHandler, mBluetoothSocket);
+                    BtIoFunctionThread btFunctionThread = new BtIoFunctionThread(mHandler, mBluetoothSocket);
                     btFunctionThread.start();
                     btFunctionThread.write(Constants.OPPOS_PLAYER_NAME_READ, mPlayerName);
                     BtConnectDevice btConnectDevice = new BtConnectDevice(mBluetoothSocket.getRemoteDevice());
@@ -98,11 +99,11 @@ public class BtAcceptThread extends ServerAcceptThread {
     // Closes the connect socket and causes the thread to finish.
     @Override
     public void closeServerSocket() {
-        Log.e(TAG, "closeServerSocket");
+        Log.d(TAG, "closeServerSocket");
         if (mServerSocket != null) {
             try {
+                Log.d(TAG, "closeServerSocket.close()");
                 mServerSocket.close();
-                Log.e(TAG, "closeServerSocket.server socket closed.");
             } catch (Exception ex) {
                 Log.e(TAG, "closeServerSocket.Exception: ", ex);
             }

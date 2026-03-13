@@ -45,7 +45,7 @@
     <string name="exitAppString">Exit Game</string>
 
     <string name="bluetoothString">Bluetooth</string>
-    <string name="wifiString">Local Wi-Fi</string>
+    <string name="wifiString">Wi-Fi Direct</string>
     <string name="internetString">Internet</string>
     <string name="createString">Create</string>
     <string name="joinString">Join</string>
@@ -88,6 +88,7 @@
     <string name="joinBluetoothGameString">Join Bluetooth Game</string>
     <string name="clientLeftGameString">Client left game.</string>
     <string name="hostLeftGameString">Host left game.</string>
+    <string name="hostStartGameString">Host started game.</string>
     <string name="discoveryTimeHasReachedString">Discovery time has reached.</string>
     <string name="discoveryWasDismissedString">Discovery was dismissed.</string>
     <string name="foundDeviceString">Found device</string>
@@ -96,6 +97,8 @@
     <string name="oppositePlayerLeftGameString">Opposite player left game.</string>
     <string name="gameCreatorString">Creator</string>
     <string name="gameJoinerString">Joiner</string>
+    <string name="discoverPlayerString">Finding Players</string>
+    <string name="connectingPlayerString">Connecting Player</string>
 
     <string name="wifiDirectNotEnabledString">Wi-Fi Direct is not enabled.</string>
     <string name="wifiDirectVisibilityActiveString">Wi-Fi Direct peer discovery is active.</string>

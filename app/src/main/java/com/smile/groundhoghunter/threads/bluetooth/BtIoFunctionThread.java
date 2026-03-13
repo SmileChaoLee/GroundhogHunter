@@ -13,13 +13,13 @@ import com.smile.groundhoghunter.models.BtConnectDevice;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class BtFunctionThread extends IoFunctionThread {
-    private final String TAG = "BtFunctionThread";
+public class BtIoFunctionThread extends IoFunctionThread {
+    private final String TAG = "BtIoFunctionThread";
     private final BluetoothSocket mBluetoothSocket;
-    private final IoFunctionThread ioFunctionThread;
 
-    public BtFunctionThread(Handler handler, BluetoothSocket bluetoothSocket) {
+    public BtIoFunctionThread(Handler handler, BluetoothSocket bluetoothSocket) {
         super(handler);
+        Log.d(TAG, "BtIoFunctionThread.Constructor");
         mBluetoothSocket = bluetoothSocket;
         InputStream inpStream = null;
         OutputStream outStream = null;
@@ -27,26 +27,25 @@ public class BtFunctionThread extends IoFunctionThread {
             inpStream = mBluetoothSocket.getInputStream();
             outStream = mBluetoothSocket.getOutputStream();
         } catch (Exception ex) {
-            Log.d(TAG, "Failed to getInputStream().", ex);
-            ex.printStackTrace();
-        }
-        try {
-            outStream = mBluetoothSocket.getOutputStream();
-        } catch (Exception ex) {
-            Log.d(TAG, "Failed to getOutputStream().", ex);
+            Log.e(TAG, "BtIoFunctionThread.Constructor.Exception: ", ex);
         }
         inputStream = inpStream;
         outputStream = outStream;
         keepRunning = true;
-        ioFunctionThread = getThisThread();
-        synchronized (ioFunctionThread) {
+        synchronized (startReadLock) {
             startRead = false;  // default is not reading the input stream
         }
     }
 
     public void run() {
-        if ( (inputStream == null) || (outputStream == null) ) {
+        if ( (inputStream == null)) {
             // finish running
+            Log.d(TAG, "run().inputStream is null.");
+            return;
+        }
+        if (outputStream == null) {
+            // finish running
+            Log.d(TAG, "run().outputStream is null.");
             return;
         }
         Message readMsg;
@@ -54,14 +53,14 @@ public class BtFunctionThread extends IoFunctionThread {
         BtConnectDevice btConnectDevice = new BtConnectDevice(mBluetoothSocket.getRemoteDevice());
         data.putParcelable("ConnectDevice", btConnectDevice);
         while (keepRunning) {
-            synchronized (ioFunctionThread) {
+            synchronized (startReadLock) {
                 // wait until start reading data
                 while (!startRead) {
                     try {
                         Log.d(TAG, "run().Waiting for notification to read data.");
-                        ioFunctionThread.wait();
+                        startReadLock.wait();
                     } catch (InterruptedException ex) {
-                        ex.printStackTrace();
+                        Log.e(TAG, "run().InterruptedException: ", ex);
                     }
                 }
             }
@@ -70,13 +69,15 @@ public class BtFunctionThread extends IoFunctionThread {
                 int byteHead = inputStream.read();
                 int dataLength = inputStream.read();
                 StringBuilder sb = new StringBuilder();
-                int readBuff = -1;
+                int readBuff;
                 int byteRead = 0;
                 while ((byteRead <= dataLength) && ((readBuff = inputStream.read()) != -1) && (readBuff != '\n')) {
                     sb.append((char) readBuff);
                     byteRead++;
                 }
                 mBuffer = sb.toString();
+                Log.d(TAG, "run().byteHead = " + byteHead);
+                Log.d(TAG, "run().mBuffer = " + mBuffer);
                 switch (byteHead) {
                     case Constants.OPPOS_PLAYER_NAME_READ:
                         Log.d(TAG, "run().OPPOS_PLAYER_NAME_READ");
@@ -140,13 +141,12 @@ public class BtFunctionThread extends IoFunctionThread {
                         readMsg = mHandler.obtainMessage(Constants.TWO_PLAY_DEF_READ);
                         break;
                 }
-                synchronized (ioFunctionThread) {
+                synchronized (startReadLock) {
                     startRead = false;
                 }
                 readMsg.setData(data);
+                Log.d(TAG, "run().readMsg.sendToTarget()");
                 readMsg.sendToTarget();
-                Log.d(TAG, "run().byteHead = " + byteHead);
-                Log.d(TAG, "run().mBuffer = " + mBuffer);
             } catch (Exception ex) {
                 Log.d(TAG, "run().Exception.", ex);
                 break;
@@ -162,8 +162,7 @@ public class BtFunctionThread extends IoFunctionThread {
         try {
             mBluetoothSocket.close();
         } catch (Exception ex) {
-            Log.d(TAG, "closeIoSocket.Could not close BluetoothSocket.");
-            ex.printStackTrace();
+            Log.e(TAG, "closeIoSocket.Exception: ", ex);
         }
     }
 }
