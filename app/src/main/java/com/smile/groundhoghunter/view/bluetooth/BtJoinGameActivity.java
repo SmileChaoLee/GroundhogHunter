@@ -119,6 +119,7 @@ public class BtJoinGameActivity extends JoinGameActivity {
         Log.d(TAG, "onItemClick.mClConnToThread = " + mClConnToThread);
         if (mClConnToThread != null) {
             stopClientConnectToThread(mClConnToThread, true);
+            mClConnToThread = null;
         }
         // mIoFuncThread = null;    // might be a bug
 
@@ -222,6 +223,7 @@ public class BtJoinGameActivity extends JoinGameActivity {
                     megString = getString(R.string.scanBluetoothFinishedString);
                     Log.d(TAG, logStr + "." + megString);
                     showMessage.showMessageInTextView(megString, TEMP_MSG_DURATION);
+                    isDiscoveryFinished = true;
                     break;
             }
         }

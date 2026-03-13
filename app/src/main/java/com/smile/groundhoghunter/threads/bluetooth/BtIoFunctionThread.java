@@ -48,10 +48,10 @@ public class BtIoFunctionThread extends IoFunctionThread {
             Log.d(TAG, "run().outputStream is null.");
             return;
         }
+
         Message readMsg;
-        Bundle data = new Bundle();
         BtConnectDevice btConnectDevice = new BtConnectDevice(mBluetoothSocket.getRemoteDevice());
-        data.putParcelable("ConnectDevice", btConnectDevice);
+
         while (keepRunning) {
             synchronized (startReadLock) {
                 // wait until start reading data
@@ -65,6 +65,9 @@ public class BtIoFunctionThread extends IoFunctionThread {
                 }
             }
             try {
+                Bundle data = new Bundle();
+                data.putParcelable("ConnectDevice", btConnectDevice);
+
                 Log.d(TAG, "run().start reading");
                 int byteHead = inputStream.read();
                 int dataLength = inputStream.read();

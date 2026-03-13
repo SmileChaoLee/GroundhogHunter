@@ -89,14 +89,6 @@ abstract public class JoinGameActivity extends AppCompatActivity
                     Log.d(TAG, "clientGameLauncher.resultCode = " + resultCode);
                     Log.d(TAG, "clientGameLauncher.Came back from BtClientGameActivity.");
                     startDiscovery();
-                    /*
-                    discoveredDeviceMap = new HashMap<>();
-                    mIoFuncThread = null;
-                    mConnectedMacAddress = "";
-                    oppositePlayerNameMap = new LinkedHashMap<>();
-                    // update list view
-                    twoPlayerListAdapter.clear();
-                    */
                 });
 
         super.onCreate(savedInstanceState);
@@ -219,6 +211,7 @@ abstract public class JoinGameActivity extends AppCompatActivity
     private void stopClientConnectToThreadAndClearClientDiscoveredMap() {
         if (mClConnToThread != null) {
             stopClientConnectToThread(mClConnToThread, true);
+            mClConnToThread = null;
         }
         // clear HashSet because of starting discovering
         discoveredDeviceMap.clear();
@@ -236,7 +229,6 @@ abstract public class JoinGameActivity extends AppCompatActivity
                     connectToThread.join();
                     Log.d(TAG, "stopClientConnectToThread.connectToThread.Join()");
                     retry = false;
-                    connectToThread = null;
                 } catch (InterruptedException ex) {
                     Log.e(TAG, "stopClientConnectToThread.Exception: ", ex);
                 }
@@ -288,6 +280,7 @@ abstract public class JoinGameActivity extends AppCompatActivity
                             TEMP_MSG_DURATION);
                     if (mClConnToThread != null) {
                         stopClientConnectToThread(mClConnToThread, true);
+                        mClConnToThread = null;
                     }
                     mIoFuncThread = null;
                     mConnectedMacAddress = "";
@@ -307,6 +300,7 @@ abstract public class JoinGameActivity extends AppCompatActivity
                             mIoFuncThread.write(Constants.OPPOS_PLAYER_NAME_READ, playerName);
                         }
                         stopClientConnectToThread(mClConnToThread, false);
+                        mClConnToThread = null;
                     }
                     isConnectingFinished = true;
                     break;
@@ -328,6 +322,7 @@ abstract public class JoinGameActivity extends AppCompatActivity
                             TEMP_MSG_DURATION);
                     if (mClConnToThread != null) {
                         stopClientConnectToThread(mClConnToThread, true);
+                        mClConnToThread = null;
                     }
                     mIoFuncThread = null;
                     mConnectedMacAddress = "";
@@ -341,6 +336,7 @@ abstract public class JoinGameActivity extends AppCompatActivity
                             TEMP_MSG_DURATION);
                     if (mClConnToThread != null) {
                         stopClientConnectToThread(mClConnToThread, true);
+                        mClConnToThread = null;
                     }
                     if (mIoFuncThread != null) {
                         mIoFuncThread.setStartRead(true);    // start reading data
@@ -355,9 +351,8 @@ abstract public class JoinGameActivity extends AppCompatActivity
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView(getString(R.string.hostStartGameString),
                             TEMP_MSG_DURATION);
-                    if (mClConnToThread != null && mIoFuncThread != null) {
+                    if (mIoFuncThread != null) {
                         GHogHunterApp.selectedIoFuncThread = mIoFuncThread;
-                        stopClientConnectToThread(mClConnToThread, false);
                         // clear HashMaps
                         oppositePlayerNameMap.clear();
                         // remove all message from joinGameHandler, // added on 2019-05-14
@@ -371,7 +366,7 @@ abstract public class JoinGameActivity extends AppCompatActivity
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView("READ" + deviceName, TEMP_MSG_DURATION);
                     // read the next data
-                    if (mClConnToThread != null && mIoFuncThread != null) {
+                    if (mIoFuncThread != null) {
                         mIoFuncThread.setStartRead(true);    // start reading data
                     }
                     break;

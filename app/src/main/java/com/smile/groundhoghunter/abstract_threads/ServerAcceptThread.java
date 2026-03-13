@@ -16,6 +16,9 @@ public abstract class ServerAcceptThread extends Thread {
     public void setHandler(Handler mHandler) {
         this.mHandler = mHandler;
     }
+    public void decrementConnections() {
+        // default no-op
+    }
 
     abstract public IoFunctionThread getIoFunctionThread(ConnectDevice mDevice);
     abstract public void closeServerSocket();

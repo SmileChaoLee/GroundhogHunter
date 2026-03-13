@@ -101,15 +101,6 @@ public class CreateGameActivity extends AppCompatActivity
                     Log.d(TAG, "hostGameLauncher.resultCode = " + resultCode);
                     Log.d(TAG, "hostGameLauncher.Came back from BtHostGameActivity.");
                     startDiscoverability();
-                    /*
-                    oppositePlayerName = "";
-                    oppositePlayerNameMap = new LinkedHashMap<>();
-                    mServerAcceptThread = null;
-                    ioFunctionThreadMap = new HashMap<>();
-                    mIoFuncThread = null;
-                    // update list view
-                    twoPlayerListAdapter.clear();
-                    */
                 });
 
         super.onCreate(savedInstanceState);
@@ -244,6 +235,8 @@ public class CreateGameActivity extends AppCompatActivity
         if (oppositePlayerNameMap != null) {
             oppositePlayerNameMap.clear();
         }
+        oppositePlayerName = "";
+        mIoFuncThread = null;
         if (twoPlayerListAdapter != null) {
             twoPlayerListAdapter.clear();
         }
@@ -371,6 +364,9 @@ public class CreateGameActivity extends AppCompatActivity
                                 mIoFuncThread = null;
                             }
                             oppositePlayerNameMap.remove(remoteMacAddress);
+                        }
+                        if (mServerAcceptThread != null) {
+                            mServerAcceptThread.decrementConnections();
                         }
                     }
                     // update list view

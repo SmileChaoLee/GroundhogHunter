@@ -23,7 +23,7 @@ import java.util.UUID;
 public class BtAcceptThread extends ServerAcceptThread {
 
     private static final String TAG = "BtAcceptThread";
-    private static final int MaxConnectedBluetoothDevices = 5;
+    private static final int MAX_CONNECTIONS = 5;
     private final String mPlayerName;
     private final BluetoothServerSocket mServerSocket;
     private BluetoothSocket mBluetoothSocket;
@@ -63,7 +63,7 @@ public class BtAcceptThread extends ServerAcceptThread {
             msg.sendToTarget();
             return;
         }
-        while (keepRunning && (numOfConnections < MaxConnectedBluetoothDevices) ) {
+        while (keepRunning && (numOfConnections < MAX_CONNECTIONS) ) {
             // Keep listening until exception occurs or a socket is returned.
             try {
                 mBluetoothSocket = mServerSocket.accept();
@@ -92,6 +92,7 @@ public class BtAcceptThread extends ServerAcceptThread {
                 // listening is stopped (means BluetoothServerSocket closed or exception occurred)
                 msg = mHandler.obtainMessage(Constants.SER_ACCEPT_TH_STOPPED);
                 msg.sendToTarget();
+                break;
             }
         }
     }
@@ -113,5 +114,13 @@ public class BtAcceptThread extends ServerAcceptThread {
     @Override
     public IoFunctionThread getIoFunctionThread(ConnectDevice btDevice) {
         return btFunctionThreadMap.get(btDevice);
+    }
+
+    @Override
+    public void decrementConnections() {
+        if (numOfConnections > 0) {
+            numOfConnections--;
+            Log.d(TAG, "decrementConnections.numOfConnections = " + numOfConnections);
+        }
     }
 }

@@ -34,9 +34,12 @@ public class BtConnectToThread extends ClientConnectToThread {
         try {
             // mBluetoothSocket = mBluetoothDevice.createRfcommSocketToServiceRecord(appUUID);
             mBluetoothSocket = mBluetoothDevice.createInsecureRfcommSocketToServiceRecord(appUUID);
+            /*
+            // dead code
             if (mBluetoothSocket.isConnected()) {
                 BluetoothUtil.closeBluetoothSocket(mBluetoothSocket);
             }
+            */
         } catch (Exception ex) {
             Log.e(TAG, "BtConnectToThread.Constructor.Exception", ex);
         }
@@ -57,6 +60,9 @@ public class BtConnectToThread extends ClientConnectToThread {
             msg.sendToTarget();
             return;
         }
+        /*
+        // Dead code
+        // will never happen
         String deviceName = BluetoothUtil.getBluetoothDeviceName(mBluetoothDevice);
         if ( (deviceName == null) || (deviceName.isEmpty()) ) {
             msg = mHandler.obtainMessage(Constants.CL_CONN_TO_TH_FAILED_CONNECT);
@@ -64,6 +70,7 @@ public class BtConnectToThread extends ClientConnectToThread {
             msg.sendToTarget();
             return;
         }
+        */
         try {
             // Connect to the remote device through the socket. This call blocks
             // until it succeeds or throws an exception.

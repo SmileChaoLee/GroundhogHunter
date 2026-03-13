@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class BluetoothUtil {
 
     private static final String TAG = "BluetoothUtil";
-    private static final Object lock = new Object();
+    // private static final Object lock = new Object();
 
     @SuppressLint("SupportAnnotationUsage")
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
@@ -83,12 +83,18 @@ public class BluetoothUtil {
             Log.d(TAG, "stopBluetoothFunctionThread.btFunctionThread is null");
             return;
         }
-        synchronized (lock) {
+
+        // ✅ Sync on the correct lock — the one BtIoFunctionThread.run() waits on
+        synchronized (btFunctionThread.startReadLock) {
             btFunctionThread.setKeepRunning(false);
-            btFunctionThread.closeIoSocket();
+            // setStartRead() internally acquires startReadLock (reentrant — safe in Java)
+            // and calls startReadLock.notify() to wake the waiting thread
             btFunctionThread.setStartRead(true);
-            lock.notify();
+            // ✅ Remove: lock.notify() — was notifying the wrong object
         }
+        // ✅ closeIoSocket() is outside the sync block — I/O should not hold the lock
+        btFunctionThread.closeIoSocket();
+
         boolean retry = true;
         while (retry) {
             try {
