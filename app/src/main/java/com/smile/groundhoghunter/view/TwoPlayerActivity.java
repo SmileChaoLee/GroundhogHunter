@@ -92,7 +92,7 @@ public class TwoPlayerActivity extends AppCompatActivity {
             setPlayerName();
         });
         wifiRadioButton = findViewById(R.id.wifiRadioButton);
-        wifiRadioButton.setVisibility(View.VISIBLE);
+        wifiRadioButton.setVisibility(View.GONE);
         ScreenUtil.resizeTextSize(wifiRadioButton, textFontSize);
         wifiRadioButton.setChecked(false);
         wifiRadioButton.setOnClickListener(view -> {
