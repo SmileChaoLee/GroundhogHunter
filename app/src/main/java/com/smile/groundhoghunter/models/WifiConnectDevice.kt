@@ -10,7 +10,10 @@ class WifiConnectDevice(
     val port: Int
 ) : ConnectDevice {
 
-    override fun getName(): String = inetAddress.hostName ?: inetAddress.hostAddress ?: ""
+    // ✅ Use hostAddress (raw IP string e.g. "192.168.49.1") — no network call.
+    //    hostName performs a reverse DNS lookup which throws NetworkOnMainThreadException
+    //    when called from a Handler running on the main thread.
+    override fun getName(): String = inetAddress.hostAddress ?: ""
 
     override fun getAddress(): String = inetAddress.hostAddress ?: ""
 

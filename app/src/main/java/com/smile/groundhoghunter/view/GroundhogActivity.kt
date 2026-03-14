@@ -8,8 +8,6 @@ import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -41,12 +39,10 @@ import com.smile.groundhoghunter.services.GlobalTop10Service
 import com.smile.groundhoghunter.services.LocalTop10Service
 import com.smile.smilelibraries.alertdialogfragment.AlertDialogFragment
 import com.smile.smilelibraries.customized_button.SmileImageButton
-import com.smile.smilelibraries.google_ads_util.AdMobInterstitial
 import com.smile.smilelibraries.models.ExitAppTimer
 import com.smile.smilelibraries.player_record_rest.httpUrl.PlayerRecordRest
 import com.smile.smilelibraries.scoresqlite.ScoreSQLite
 import com.smile.smilelibraries.show_banner_ads.SetBannerAdView
-import com.smile.smilelibraries.show_interstitial_ads.ShowInterstitial
 import com.smile.smilelibraries.utilities.FontAndBitmapUtil
 import com.smile.smilelibraries.utilities.ScreenUtil
 import com.smile.smilelibraries.utilities.SoundPoolUtil
@@ -99,13 +95,14 @@ open class GroundhogActivity : AppCompatActivity() {
     private lateinit var settingLauncher: ActivityResultLauncher<Intent>
     private lateinit var otherLauncher: ActivityResultLauncher<Intent>
     private lateinit var scoreDB: ScoreSQLite
-    private lateinit var interstitialAd: ShowInterstitial
+    // private lateinit var interstitialAd: ShowInterstitial
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate(")
-
         scoreDB = ScoreSQLite(this@GroundhogActivity, Constants.DATABASE_NAME)
 
+        /*
+        // No more interstitial ads
         val adMobInterstitialID = "ca-app-pub-8354869049759576/6595392508"
         val adMobInterstitial = AdMobInterstitial(this@GroundhogActivity, adMobInterstitialID)
         adMobInterstitial.loadAd() // load first ad
@@ -115,7 +112,9 @@ open class GroundhogActivity : AppCompatActivity() {
             adMobInterstitial.loadAd() // load first google ad
         }
         adHandler.postDelayed(adRunnable, 1000)
-        interstitialAd = ShowInterstitial(this@GroundhogActivity, null, adMobInterstitial)
+        interstitialAd = ShowInterstitial(this@GroundhogActivity, null,
+            adMobInterstitial)
+        */
 
         Log.d(TAG, "onCreate.savedInstanceState = $savedInstanceState")
 
@@ -478,7 +477,7 @@ open class GroundhogActivity : AppCompatActivity() {
 
     // private methods
     private fun finishApplication() {
-        Log.d(TAG, "finishApplication");
+        Log.d(TAG, "finishApplication")
         // release resources and threads
         gameView?.apply {
             releaseSynchronizations()
@@ -575,7 +574,7 @@ open class GroundhogActivity : AppCompatActivity() {
                 })
         showInterstitialAdThread.startShowAd(AD_PROVIDER)
         */
-        interstitialAd.ShowAdThread().startShowAd(AD_PROVIDER)
+        // interstitialAd.ShowAdThread().startShowAd(AD_PROVIDER)
         returnToPrevious()
     }
 
@@ -601,7 +600,7 @@ open class GroundhogActivity : AppCompatActivity() {
     }
 
     fun enableAllButtons() {
-        Log.d(TAG, "enableAllButtons");
+        Log.d(TAG, "enableAllButtons")
         startGameButton.isEnabled = true
         pauseGameButton.isEnabled = true
         resumeGameButton.isEnabled = true
@@ -717,7 +716,7 @@ open class GroundhogActivity : AppCompatActivity() {
     }
 
     fun disableAllButtons() {
-        Log.d(TAG, "disableAllButtons");
+        Log.d(TAG, "disableAllButtons")
         startGameButton.isEnabled = false
         pauseGameButton.isEnabled = false
         resumeGameButton.isEnabled = false

@@ -68,10 +68,10 @@ class WifiAcceptThread(handler: Handler, playerName: String) : ServerAcceptThrea
     }
 
     override fun closeServerSocket() {
-        Log.e(TAG, "closeServerSocket")
+        Log.d(TAG, "closeServerSocket")
         try {
             mServerSocket?.close()
-            Log.e(TAG, "closeServerSocket.server socket closed.")
+            Log.d(TAG, "closeServerSocket.server socket closed.")
         } catch (ex: Exception) {
             Log.e(TAG, "closeServerSocket.Exception: ", ex)
         }
@@ -79,5 +79,14 @@ class WifiAcceptThread(handler: Handler, playerName: String) : ServerAcceptThrea
 
     override fun getIoFunctionThread(mDevice: ConnectDevice): IoFunctionThread? {
         return wifiFunctionThreadMap[mDevice]
+    }
+
+    // ✅ Matches BtAcceptThread.decrementConnections() — called by CreateGameActivity when a
+    //    client sends TWO_PLAY_CLIENT_EX_CODE, so the server can accept a new connection slot.
+    override fun decrementConnections() {
+        if (numOfConnections > 0) {
+            numOfConnections--
+            Log.d(TAG, "decrementConnections.numOfConnections = $numOfConnections")
+        }
     }
 }

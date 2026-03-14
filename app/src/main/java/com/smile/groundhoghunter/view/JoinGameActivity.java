@@ -177,6 +177,14 @@ abstract public class JoinGameActivity extends AppCompatActivity
         Log.d(TAG, "startClientGame.do nothing");
     }
 
+    // Called when the host's player name arrives via OPPOS_PLAYER_NAME_READ.
+    // BT subclass: no-op (items are added via ACTION_FOUND BroadcastReceiver).
+    // WiFi subclass: overrides this to add the host to the RecyclerView because
+    //   direct-connect bypasses P2P discovery so PEERS_CHANGED never fires.
+    protected void onOppositePlayerNameRead(String deviceAddress, String playerName) {
+        // default no-op
+    }
+
     private void clientLeavingNotification() {
         Log.d(TAG, "clientLeavingNotification.selectedIoFuncTh = " + mIoFuncThread);
         if (mIoFuncThread != null) {
@@ -309,6 +317,11 @@ abstract public class JoinGameActivity extends AppCompatActivity
                     Log.d(TAG, megString);
                     showMessage.showMessageInTextView(getString(R.string.hasBeenReadString),
                             TEMP_MSG_DURATION);
+                    // Give subclasses a chance to populate the RecyclerView.
+                    // BT adds items via BroadcastReceiver (ACTION_FOUND) so its override is a no-op.
+                    // WiFi with direct-connect never fires PEERS_CHANGED, so it adds the host here.
+                    String oppositeName = data.getString("OppositePlayerName");
+                    onOppositePlayerNameRead(deviceName, oppositeName);
                     // Re-enable reading so the IoFunctionThread can receive the next signal
                     // (e.g., TWO_PLAY_HOST_ST_GAME)
                     if (mIoFuncThread != null) {

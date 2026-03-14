@@ -8,65 +8,86 @@ import com.smile.groundhoghunter.abstract_threads.IoFunctionThread
 import com.smile.groundhoghunter.constants.Constants
 import com.smile.groundhoghunter.models.WifiConnectDevice
 import java.net.Socket
+import java.util.concurrent.Executors
 
 class WifiFunctionThread(handler: Handler, private val mSocket: Socket) : IoFunctionThread(handler) {
-
-    private val ioFunctionThread: IoFunctionThread = thisThread
 
     companion object {
         private const val TAG = "WifiFunctionThread"
     }
 
+    // ✅ Dedicated single-thread executor for all socket writes.
+    //    IoFunctionThread.write() calls outputStream.write() which is a TCP socket
+    //    operation.  Android's BlockGuard throws NetworkOnMainThreadException when
+    //    this is called from the main thread (e.g. from a Handler callback).
+    //    Bluetooth sockets are NOT intercepted by BlockGuard, which is why BT never
+    //    hit this problem.  All WiFi writes must go through this background thread.
+    private val writeExecutor = Executors.newSingleThreadExecutor()
+
     init {
         try {
             inputStream = mSocket.getInputStream()
         } catch (ex: Exception) {
-            Log.d(TAG, "Failed to getInputStream().", ex)
+            Log.e(TAG, "Failed to getInputStream().", ex)
         }
         try {
             outputStream = mSocket.getOutputStream()
         } catch (ex: Exception) {
-            Log.d(TAG, "Failed to getOutputStream().", ex)
+            Log.e(TAG, "Failed to getOutputStream().", ex)
         }
         keepRunning = true
-        synchronized(ioFunctionThread) {
+        // ✅ Use startReadLock (same lock that setStartRead() uses) — matches BtIoFunctionThread
+        synchronized(startReadLock) {
             startRead = false
+        }
+    }
+
+    // Dispatch every write to the background executor instead of the calling thread.
+    override fun write(headByte: Int, data: String) {
+        if (!writeExecutor.isShutdown) {
+            writeExecutor.execute { super.write(headByte, data) }
         }
     }
 
     override fun run() {
         if (inputStream == null || outputStream == null) {
+            Log.d(TAG, "run().inputStream or outputStream is null.")
             return
         }
-        val data = Bundle()
+
         val wifiConnectDevice = WifiConnectDevice(mSocket.inetAddress, mSocket.port)
-        data.putParcelable("ConnectDevice", wifiConnectDevice)
 
         while (keepRunning) {
-            synchronized(ioFunctionThread) {
+            // ✅ Wait on startReadLock — matches the lock used by setStartRead()
+            synchronized(startReadLock) {
                 while (!startRead) {
                     try {
                         Log.d(TAG, "run().Waiting for notification to read data.")
-                        (ioFunctionThread as Object).wait()
+                        (startReadLock as Object).wait()
                     } catch (ex: InterruptedException) {
-                        ex.printStackTrace()
+                        Log.e(TAG, "run().InterruptedException: ", ex)
                     }
                 }
             }
             try {
+                val data = Bundle()
+                data.putParcelable("ConnectDevice", wifiConnectDevice)
+
                 Log.d(TAG, "run().start reading")
-                val byteHead = inputStream.read()
-                val dataLength = inputStream.read()
+                val byteHead = inputStream!!.read()
+                val dataLength = inputStream!!.read()
                 val sb = StringBuilder()
-                var readBuff: Int
                 var byteRead = 0
                 while (byteRead <= dataLength) {
-                    readBuff = inputStream.read()
+                    val readBuff = inputStream!!.read()
                     if (readBuff == -1 || readBuff == '\n'.code) break
                     sb.append(readBuff.toChar())
                     byteRead++
                 }
                 mBuffer = sb.toString()
+                Log.d(TAG, "run().byteHead = $byteHead")
+                Log.d(TAG, "run().mBuffer = $mBuffer")
+
                 val readMsg: Message = when (byteHead) {
                     Constants.OPPOS_PLAYER_NAME_READ -> {
                         Log.d(TAG, "run().OPPOS_PLAYER_NAME_READ")
@@ -130,26 +151,27 @@ class WifiFunctionThread(handler: Handler, private val mSocket: Socket) : IoFunc
                         mHandler.obtainMessage(Constants.TWO_PLAY_DEF_READ)
                     }
                 }
-                synchronized(ioFunctionThread) {
+
+                // ✅ Set startRead = false under the correct lock before dispatching
+                synchronized(startReadLock) {
                     startRead = false
                 }
                 readMsg.data = data
                 readMsg.sendToTarget()
-                Log.d(TAG, "run().byteHead = $byteHead")
-                Log.d(TAG, "run().mBuffer = $mBuffer")
             } catch (ex: Exception) {
-                Log.d(TAG, "run().Exception.", ex)
+                Log.e(TAG, "run().Exception.", ex)
                 break
             }
         }
     }
 
     override fun closeIoSocket() {
+        // Shut down the write executor first so no new writes are queued after close.
+        writeExecutor.shutdownNow()
         try {
             mSocket.close()
         } catch (ex: Exception) {
-            Log.d(TAG, "closeIoSocket.Could not close Socket.")
-            ex.printStackTrace()
+            Log.e(TAG, "closeIoSocket.Exception: ", ex)
         }
     }
 }

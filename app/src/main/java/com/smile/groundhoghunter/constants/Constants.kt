@@ -45,4 +45,11 @@ object Constants {
     const val ADMOB_BANNER_ID = "ca-app-pub-8354869049759576/7169443235"
     @JvmField
     val APP_UUID: UUID = UUID.fromString("b5af9bad-42e0-4d0d-8546-ebeb97e1abfa")
+
+    // WiFi Direct P2P group — must start with "DIRECT-" (≤ 32 chars),
+    // passphrase must be 8–63 ASCII chars.
+    // Both sides share these so the Join side can connect directly without
+    // going through P2P peer discovery (API 29+).
+    const val WIFI_P2P_NETWORK_NAME = "DIRECT-GroundHogHunter"
+    const val WIFI_P2P_PASSPHRASE   = "GroundHog2026"
 }
