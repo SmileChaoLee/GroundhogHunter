@@ -15,7 +15,7 @@ import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
 import com.smile.groundhoghunter.abstract_threads.ServerAcceptThread;
 import com.smile.groundhoghunter.constants.Constants;
 import com.smile.groundhoghunter.interfaces.ConnectDevice;
-import com.smile.groundhoghunter.models.BtConnectDevice;
+import com.smile.groundhoghunter.models.bluetooth.BtConnectDevice;
 
 import java.util.HashMap;
 import java.util.UUID;

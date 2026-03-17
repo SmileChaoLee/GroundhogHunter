@@ -7,7 +7,7 @@ import android.util.Log
 import com.smile.groundhoghunter.abstract_threads.ClientConnectToThread
 import com.smile.groundhoghunter.abstract_threads.IoFunctionThread
 import com.smile.groundhoghunter.constants.Constants
-import com.smile.groundhoghunter.models.WifiConnectDevice
+import com.smile.groundhoghunter.models.wifi.WifiConnectDevice
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -20,7 +20,7 @@ class WifiConnectToThread(
 
     private var mSocket: Socket? = null
     private var wifiFunctionThread: WifiFunctionThread? = null
-    private val wifiConnectDevice = WifiConnectDevice(hostAddress, port)
+    private val wifiConnectDevice = WifiConnectDevice(hostAddress.hostAddress, hostAddress.hostAddress)
 
     companion object {
         private const val TAG = "WifiConnectToThread"

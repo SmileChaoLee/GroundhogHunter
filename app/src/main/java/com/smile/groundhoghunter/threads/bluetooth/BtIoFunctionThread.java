@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
 import com.smile.groundhoghunter.constants.Constants;
-import com.smile.groundhoghunter.models.BtConnectDevice;
+import com.smile.groundhoghunter.models.bluetooth.BtConnectDevice;
 
 import java.io.InputStream;
 import java.io.OutputStream;

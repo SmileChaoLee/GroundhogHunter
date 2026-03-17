@@ -13,8 +13,7 @@ import androidx.annotation.RequiresPermission;
 import com.smile.groundhoghunter.abstract_threads.ClientConnectToThread;
 import com.smile.groundhoghunter.abstract_threads.IoFunctionThread;
 import com.smile.groundhoghunter.constants.Constants;
-import com.smile.groundhoghunter.models.BtConnectDevice;
-import com.smile.groundhoghunter.utilities.BluetoothUtil;
+import com.smile.groundhoghunter.models.bluetooth.BtConnectDevice;
 
 public class BtConnectToThread extends ClientConnectToThread {
 

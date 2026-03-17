@@ -19,7 +19,7 @@ import android.util.Log;
 import com.smile.groundhoghunter.view.JoinGameActivity;
 import com.smile.groundhoghunter.R;
 import com.smile.groundhoghunter.constants.Constants;
-import com.smile.groundhoghunter.models.BtConnectDevice;
+import com.smile.groundhoghunter.models.bluetooth.BtConnectDevice;
 import com.smile.groundhoghunter.threads.bluetooth.BtConnectToThread;
 import com.smile.groundhoghunter.utilities.BluetoothUtil;
 

@@ -73,7 +73,8 @@ public class Groundhog {
                 }
             }
             // calculate the coordinate
-            float diff = (wholeGroundhogArea.bottom - wholeGroundhogArea.top) / halfOfAnimationTimes * numOfAnimationsShown;
+            float diff = (wholeGroundhogArea.bottom - wholeGroundhogArea.top)
+                    / halfOfAnimationTimes * numOfAnimationsShown;
             drawArea = new RectF(wholeGroundhogArea);
             drawArea.top = wholeGroundhogArea.bottom - diff;
             if (numOfAnimationsShown <= 0 ) {

@@ -6,7 +6,7 @@ import android.os.Message
 import android.util.Log
 import com.smile.groundhoghunter.abstract_threads.IoFunctionThread
 import com.smile.groundhoghunter.constants.Constants
-import com.smile.groundhoghunter.models.WifiConnectDevice
+import com.smile.groundhoghunter.models.wifi.WifiConnectDevice
 import java.net.Socket
 import java.util.concurrent.Executors
 
@@ -55,7 +55,7 @@ class WifiFunctionThread(handler: Handler, private val mSocket: Socket) : IoFunc
             return
         }
 
-        val wifiConnectDevice = WifiConnectDevice(mSocket.inetAddress, mSocket.port)
+        val wifiConnectDevice = WifiConnectDevice(mSocket.inetAddress.hostAddress, mSocket.inetAddress.hostAddress)
 
         while (keepRunning) {
             // ✅ Wait on startReadLock — matches the lock used by setStartRead()

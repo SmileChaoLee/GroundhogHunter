@@ -1,4 +1,4 @@
-package com.smile.groundhoghunter.models;
+package com.smile.groundhoghunter.models.bluetooth;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;

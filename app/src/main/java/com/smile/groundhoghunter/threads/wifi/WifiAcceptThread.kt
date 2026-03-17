@@ -8,7 +8,7 @@ import com.smile.groundhoghunter.abstract_threads.IoFunctionThread
 import com.smile.groundhoghunter.abstract_threads.ServerAcceptThread
 import com.smile.groundhoghunter.constants.Constants
 import com.smile.groundhoghunter.interfaces.ConnectDevice
-import com.smile.groundhoghunter.models.WifiConnectDevice
+import com.smile.groundhoghunter.models.wifi.WifiConnectDevice
 import java.net.ServerSocket
 
 class WifiAcceptThread(handler: Handler, playerName: String) : ServerAcceptThread(handler) {
@@ -51,7 +51,7 @@ class WifiAcceptThread(handler: Handler, playerName: String) : ServerAcceptThrea
                 val wifiFunctionThread = WifiFunctionThread(mHandler, socket)
                 wifiFunctionThread.start()
                 wifiFunctionThread.write(Constants.OPPOS_PLAYER_NAME_READ, mPlayerName)
-                val wifiConnectDevice = WifiConnectDevice(socket.inetAddress, socket.port)
+                val wifiConnectDevice = WifiConnectDevice(socket.inetAddress.hostAddress, socket.inetAddress.hostAddress)
                 wifiFunctionThreadMap[wifiConnectDevice] = wifiFunctionThread
                 msg = mHandler.obtainMessage(Constants.SER_ACCEPT_TH_CONNECTED)
                 val bundle = Bundle()
